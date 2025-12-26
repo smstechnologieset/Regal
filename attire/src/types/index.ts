@@ -124,3 +124,72 @@ export interface PaginatedResponse<T> {
   pageSize: number;
   totalPages: number;
 }
+
+// Event Types
+export interface EventPackage {
+  id: string;
+  title: string;
+  description: string;
+  type: EventType;
+  priceStart: number;
+  features: string[];
+  image: string;
+  capacity?: string; // e.g., "50-100 guests"
+  popular?: boolean;
+}
+
+export type EventType = 'wedding' | 'birthday' | 'corporate' | 'graduation' | 'social';
+
+export interface EventRequest {
+  id: string;
+  userId?: string;
+  eventType: EventType | 'custom';
+  budget: number;
+  guestCount: number;
+  date: string;
+  features: string[];
+  name?: string;
+  email?: string;
+  phone?: string;
+  details?: string;
+  status: 'pending' | 'reviewing' | 'proposal_sent' | 'accepted' | 'rejected';
+  createdAt: string;
+}
+
+export type FeatureOption = {
+  id: string;
+  label: string;
+  category: 'venue' | 'catering' | 'decoration' | 'entertainment' | 'other';
+};
+
+// Bridal Types
+export interface BridalGown {
+  id: string;
+  name: string;
+  designer: string;
+  style: string;
+  silhouette: string;
+  priceRent: number;
+  priceBuy: number;
+  sizes: string[];
+  images: string[];
+  description: string;
+  isNew?: boolean;
+}
+
+export interface BridalService {
+  id: string;
+  title: string;
+  description: string;
+  priceStart: number;
+  duration: string; // "2 hours"
+  type: 'makeup' | 'hair' | 'full-styling' | 'fitting';
+  image: string;
+}
+
+export interface AppointmentSlot {
+  id: string;
+  date: string;
+  time: string;
+  available: boolean;
+}

@@ -30,9 +30,9 @@ import { categories } from '@/data/mock/products';
 // Services for main navigation
 const services = [
     { name: 'Attire', href: '/attire', icon: Shirt, description: 'Fashion & Clothing' },
-    { name: 'Events', href: '/events', icon: PartyPopper, description: 'Event Planning', comingSoon: true },
-    { name: 'Bridal', href: '/bridal', icon: HeartIcon, description: 'Bridal Services', comingSoon: true },
-    { name: 'Catering', href: '/catering', icon: UtensilsCrossed, description: 'Catering', comingSoon: true },
+    { name: 'Events', href: '/events', icon: PartyPopper, description: 'Event Planning' },
+    { name: 'Bridal', href: '/bridal', icon: HeartIcon, description: 'Bridal Services' },
+    { name: 'Catering', href: '/catering', icon: UtensilsCrossed, description: 'Catering' },
 ];
 
 export default function Header() {
@@ -180,14 +180,10 @@ export default function Header() {
                                     {services.map((service) => (
                                         <Link
                                             key={service.name}
-                                            href={service.comingSoon ? '#' : service.href}
-                                            className={`px-4 py-2 text-sm font-medium transition-colors ${service.comingSoon
-                                                    ? 'text-slate-400 cursor-not-allowed'
-                                                    : 'text-slate-700 hover:text-rose-600'
-                                                }`}
+                                            href={service.href}
+                                            className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-rose-600 transition-colors"
                                         >
                                             {service.name}
-                                            {service.comingSoon && <span className="ml-1 text-xs">(Soon)</span>}
                                         </Link>
                                     ))}
                                 </>
@@ -311,16 +307,15 @@ export default function Header() {
                                 {services.map((service) => (
                                     <Link
                                         key={service.name}
-                                        href={service.comingSoon ? '#' : service.href}
-                                        onClick={service.comingSoon ? undefined : closeMobileMenu}
-                                        className={`flex items-center gap-3 py-3 ${service.comingSoon ? 'text-slate-400' : 'text-slate-900 hover:text-rose-600'
-                                            }`}
+                                        href={service.href}
+                                        onClick={closeMobileMenu}
+                                        className="flex items-center gap-3 py-3 text-slate-900 hover:text-rose-600"
                                     >
                                         <service.icon size={20} />
                                         <div>
                                             <div className="font-medium">{service.name}</div>
                                             <div className="text-xs text-slate-500">
-                                                {service.comingSoon ? 'Coming Soon' : service.description}
+                                                {service.description}
                                             </div>
                                         </div>
                                     </Link>
