@@ -62,6 +62,7 @@ export default function Footer() {
                                 <input
                                     type="email"
                                     placeholder="Enter your email"
+                                    suppressHydrationWarning
                                     className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-500 transition-colors"
                                 />
                                 <Mail size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -116,8 +117,8 @@ export default function Footer() {
                                     <Link
                                         href={link.comingSoon ? '#' : link.href}
                                         className={`text-sm transition-colors ${link.comingSoon
-                                                ? 'text-slate-500 cursor-not-allowed'
-                                                : 'text-slate-400 hover:text-white'
+                                            ? 'text-slate-500 cursor-not-allowed'
+                                            : 'text-slate-400 hover:text-white'
                                             }`}
                                     >
                                         {link.label}
@@ -185,7 +186,7 @@ export default function Footer() {
             <div className="border-t border-slate-800">
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-400">
-                        <p>© {currentYear} Regal. All rights reserved.</p>
+                        <p suppressHydrationWarning>© {currentYear} Regal. All rights reserved.</p>
                         <div className="flex gap-6">
                             <Link href="/terms" className="hover:text-white">Terms</Link>
                             <Link href="/privacy" className="hover:text-white">Privacy</Link>

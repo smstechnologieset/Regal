@@ -3,21 +3,23 @@
 /**
  * Register Page
  * 
- * UI-only registration page for authentication flow.
- * No actual authentication logic - ready for backend integration.
+ * Registration page for new users.
+ * After signup, users are redirected to login.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useApp } from '@/context/AppContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function RegisterPage() {
     const router = useRouter();
     const { addToast } = useApp();
+    const { signUp, user, isLoading: authLoading } = useAuth();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -34,7 +36,15 @@ export default function RegisterPage() {
         password?: string;
         confirmPassword?: string;
         acceptTerms?: string;
+        general?: string;
     }>({});
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (user && !authLoading) {
+            router.push('/account');
+        }
+    }, [user, authLoading, router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -77,31 +87,50 @@ export default function RegisterPage() {
         }
 
         setIsLoading(true);
+        setErrors({});
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const { error } = await signUp(formData.email, formData.password, formData.name);
 
-        // Show success message (no actual auth)
-        addToast('Account created successfully! (Demo only)', 'success');
+        if (error) {
+            setErrors({ general: error.message });
+            setIsLoading(false);
+            return;
+        }
+
+        addToast('Account created! Please check your email to verify your account.', 'success');
         router.push('/login');
-
         setIsLoading(false);
     };
+
+    // Don't render if already logged in
+    if (user && !authLoading) {
+        return null;
+    }
 
     return (
         <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-slate-50">
             <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <Link href="/" className="inline-block text-3xl font-bold text-slate-900 mb-2">
-                        ATTIRE
+                    <Link href="/" className="inline-block mb-2">
+                        <span className="text-3xl font-bold bg-gradient-to-r from-rose-600 to-purple-600 bg-clip-text text-transparent">
+                            REGAL
+                        </span>
                     </Link>
                     <h1 className="text-2xl font-bold text-slate-900 mb-2">Create Account</h1>
-                    <p className="text-slate-600">Join us and start shopping</p>
+                    <p className="text-slate-600">Join us and start your journey</p>
                 </div>
 
                 {/* Form */}
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+                    {/* General Error */}
+                    {errors.general && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
+                            <AlertCircle size={18} />
+                            {errors.general}
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Name */}
                         <Input

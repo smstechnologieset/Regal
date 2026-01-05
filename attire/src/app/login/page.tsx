@@ -3,21 +3,24 @@
 /**
  * Login Page
  * 
- * UI-only login page for authentication flow.
- * No actual authentication logic - ready for backend integration.
+ * Single login page for both users and admins.
+ * After login, users go to /account, admins see "Access Dashboard" in their profile.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useApp } from '@/context/AppContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { addToast } = useApp();
+    const { signIn, user, isLoading: authLoading } = useAuth();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -26,7 +29,15 @@ export default function LoginPage() {
     });
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+    const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (user && !authLoading) {
+            const redirect = searchParams.get('redirect') || '/account';
+            router.push(redirect);
+        }
+    }, [user, authLoading, router, searchParams]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -57,24 +68,36 @@ export default function LoginPage() {
         }
 
         setIsLoading(true);
+        setErrors({});
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const { error } = await signIn(formData.email, formData.password);
 
-        // Show success message (no actual auth)
-        addToast('Login successful! (Demo only)', 'success');
-        router.push('/');
+        if (error) {
+            setErrors({ general: error.message });
+            setIsLoading(false);
+            return;
+        }
 
+        addToast('Welcome back!', 'success');
+        const redirect = searchParams.get('redirect') || '/account';
+        router.push(redirect);
         setIsLoading(false);
     };
+
+    // Don't render if already logged in
+    if (user && !authLoading) {
+        return null;
+    }
 
     return (
         <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-slate-50">
             <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <Link href="/" className="inline-block text-3xl font-bold text-slate-900 mb-2">
-                        ATTIRE
+                    <Link href="/" className="inline-block mb-2">
+                        <span className="text-3xl font-bold bg-gradient-to-r from-rose-600 to-purple-600 bg-clip-text text-transparent">
+                            REGAL
+                        </span>
                     </Link>
                     <h1 className="text-2xl font-bold text-slate-900 mb-2">Welcome Back</h1>
                     <p className="text-slate-600">Sign in to your account to continue</p>
@@ -82,6 +105,14 @@ export default function LoginPage() {
 
                 {/* Form */}
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+                    {/* General Error */}
+                    {errors.general && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
+                            <AlertCircle size={18} />
+                            {errors.general}
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Email */}
                         <Input
@@ -159,7 +190,7 @@ export default function LoginPage() {
                         </div>
                     </div>
 
-                    {/* Social Login (UI Only) */}
+                    {/* Social Login (UI Only - can be connected later) */}
                     <div className="grid grid-cols-2 gap-3">
                         <button
                             type="button"
