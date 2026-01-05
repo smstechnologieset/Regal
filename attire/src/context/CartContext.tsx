@@ -199,12 +199,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     // Calculate cart total
     const getCartTotal = useCallback(() => {
-        return state.items.reduce((total, item) => total + item.product.price * item.quantity, 0);
+        return state.items.reduce((total: number, item) => total + item.product.price * item.quantity, 0);
     }, [state.items]);
 
     // Get total item count
     const getCartItemCount = useCallback(() => {
-        return state.items.reduce((count, item) => count + item.quantity, 0);
+        return state.items.reduce((count: number, item) => count + item.quantity, 0);
     }, [state.items]);
 
     // Check if item is in cart

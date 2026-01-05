@@ -53,10 +53,18 @@ export default function AdminDashboard() {
         async function fetchStats() {
             const supabase = getSupabaseClient();
 
+            interface Order {
+                id: string;
+                total: number;
+                created_at: string;
+                status: string;
+                service_type: string;
+            }
+
             // Fetch all orders
             const { data: orders } = await supabase
                 .from('orders')
-                .select('*');
+                .select('*') as { data: Order[] | null };
 
             // Fetch users count
             const { count: usersCount } = await supabase
@@ -80,19 +88,19 @@ export default function AdminDashboard() {
                 const now = new Date();
                 const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-                const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+                const totalRevenue = orders.reduce((sum: number, o: Order) => sum + (o.total || 0), 0);
                 const monthlyRevenue = orders
-                    .filter(o => new Date(o.created_at) >= monthStart)
-                    .reduce((sum, o) => sum + (o.total || 0), 0);
-                const activeOrders = orders.filter(o =>
+                    .filter((o: Order) => new Date(o.created_at) >= monthStart)
+                    .reduce((sum: number, o: Order) => sum + (o.total || 0), 0);
+                const activeOrders = orders.filter((o: Order) =>
                     ['pending', 'confirmed', 'in_progress'].includes(o.status)
                 ).length;
 
                 const ordersByService = {
-                    attire: orders.filter(o => o.service_type === 'attire').length,
-                    events: orders.filter(o => o.service_type === 'events').length,
-                    bridal: orders.filter(o => o.service_type === 'bridal').length,
-                    catering: orders.filter(o => o.service_type === 'catering').length,
+                    attire: orders.filter((o: Order) => o.service_type === 'attire').length,
+                    events: orders.filter((o: Order) => o.service_type === 'events').length,
+                    bridal: orders.filter((o: Order) => o.service_type === 'bridal').length,
+                    catering: orders.filter((o: Order) => o.service_type === 'catering').length,
                 };
 
                 setStats({
