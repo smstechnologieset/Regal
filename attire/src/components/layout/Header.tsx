@@ -93,7 +93,7 @@ export default function Header() {
                 {isAttireSection && (
                     <div className="bg-slate-900 text-white text-center py-2 text-sm">
                         <p className="px-4">
-                            🎉 Free shipping on orders over $50 | Use code <span className="font-semibold">SAVE20</span> for 20% off
+                            🎉 Free shipping on orders over $500 | Use code <span className="font-semibold">SAVE20</span> for 20% off
                         </p>
                     </div>
                 )}

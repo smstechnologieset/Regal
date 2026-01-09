@@ -47,11 +47,10 @@ export default function CatalogClient() {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as Category)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                                isActive 
-                                    ? `bg-white ${tab.color} shadow-sm` 
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${isActive
+                                    ? `bg-white ${tab.color} shadow-sm`
                                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
-                            }`}
+                                }`}
                         >
                             <Icon size={18} />
                             {tab.name}
