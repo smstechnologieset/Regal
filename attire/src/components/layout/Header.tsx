@@ -21,12 +21,15 @@ import {
     Shirt,
     PartyPopper,
     Heart as HeartIcon,
-    UtensilsCrossed
+    UtensilsCrossed,
+    LogOut
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useApp } from '@/context/AppContext';
 import { useWishlist } from '@/context/WishlistContext';
-import { categories } from '@/data/mock/products';
+import { useAuth } from '@/context/AuthContext';
+import { getCategories } from '@/lib/api';
+import { Category } from '@/types';
 
 // Services for main navigation
 const services = [
@@ -39,8 +42,10 @@ const services = [
 export default function Header() {
     const router = useRouter();
     const pathname = usePathname();
+    const { user, signOut } = useAuth();
     const { getCartItemCount, toggleCart } = useCart();
     const { searchQuery, setSearchQuery, toggleMobileMenu, isMobileMenuOpen, closeMobileMenu } = useApp();
+    const [categories, setCategories] = useState<Category[]>([]);
 
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [localSearch, setLocalSearch] = useState(searchQuery);
@@ -48,6 +53,18 @@ export default function Header() {
     const [isServicesOpen, setIsServicesOpen] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await getCategories();
+                setCategories(data);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const { itemCount: wishlistCount } = useWishlist();
 
@@ -84,6 +101,12 @@ export default function Header() {
         dropdownTimeoutRef.current = setTimeout(() => {
             setActiveDropdown(null);
         }, 150);
+    };
+
+    const handleSignOut = async () => {
+        await signOut();
+        router.push('/');
+        closeMobileMenu();
     };
 
     return (
@@ -237,13 +260,33 @@ export default function Header() {
                             )}
 
                             {/* User account */}
-                            <Link
-                                href="/login"
-                                className="p-2 text-slate-700 hover:text-slate-900 transition-colors"
-                                aria-label="Account"
-                            >
-                                <User size={22} />
-                            </Link>
+                            {user ? (
+                                <div className="flex items-center gap-1">
+                                    <Link
+                                        href="/account"
+                                        className="p-2 text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-1"
+                                        aria-label="Account"
+                                    >
+                                        <User size={22} />
+                                        <span className="hidden md:inline text-sm font-medium">Account</span>
+                                    </Link>
+                                    <button
+                                        onClick={handleSignOut}
+                                        className="p-2 text-slate-500 hover:text-red-600 transition-colors"
+                                        title="Sign Out"
+                                    >
+                                        <LogOut size={20} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <Link
+                                    href="/login"
+                                    className="p-2 text-slate-700 hover:text-slate-900 transition-colors"
+                                    aria-label="Account"
+                                >
+                                    <User size={22} />
+                                </Link>
+                            )}
 
                             {/* Cart - Always visible */}
                             <button
@@ -362,20 +405,40 @@ export default function Header() {
                         </nav>
 
                         <div className="p-4 border-t border-slate-200">
-                            <Link
-                                href="/login"
-                                onClick={closeMobileMenu}
-                                className="block py-2 text-slate-700 hover:text-slate-900"
-                            >
-                                Sign In
-                            </Link>
-                            <Link
-                                href="/register"
-                                onClick={closeMobileMenu}
-                                className="block py-2 text-slate-700 hover:text-slate-900"
-                            >
-                                Create Account
-                            </Link>
+                            {user ? (
+                                <>
+                                    <Link
+                                        href="/account"
+                                        onClick={closeMobileMenu}
+                                        className="block py-2 text-slate-700 hover:text-slate-900 font-medium"
+                                    >
+                                        My Account
+                                    </Link>
+                                    <button
+                                        onClick={handleSignOut}
+                                        className="block w-full text-left py-2 text-rose-600 hover:text-rose-700 font-medium"
+                                    >
+                                        Sign Out
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link
+                                        href="/login"
+                                        onClick={closeMobileMenu}
+                                        className="block py-2 text-slate-700 hover:text-slate-900"
+                                    >
+                                        Sign In
+                                    </Link>
+                                    <Link
+                                        href="/register"
+                                        onClick={closeMobileMenu}
+                                        className="block py-2 text-slate-700 hover:text-slate-900"
+                                    >
+                                        Create Account
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -5,7 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Check, Calendar, Users, Clock, Mail } from 'lucide-react';
-import { eventPackages } from '@/data/mock/events';
+import { getEventPackageById } from '@/lib/services/events';
+import { EventPackage } from '@/types';
 import Button from '@/components/ui/Button';
 import { formatPrice } from '@/lib/utils';
 
@@ -15,10 +16,32 @@ interface EventDetailPageProps {
 
 export default function EventDetailPage({ params }: EventDetailPageProps) {
     const { id } = use(params);
-    const pkg = eventPackages.find((p) => p.id === id);
+    const [pkg, setPkg] = React.useState<EventPackage | null>(null);
+    const [loading, setLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        async function fetchPackage() {
+            setLoading(true);
+            const data = await getEventPackageById(id);
+            if (!data) {
+                notFound();
+            }
+            setPkg(data);
+            setLoading(false);
+        }
+        fetchPackage();
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600"></div>
+            </div>
+        );
+    }
 
     if (!pkg) {
-        notFound();
+        return null;
     }
 
     return (

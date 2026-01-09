@@ -14,7 +14,7 @@ import { ChevronLeft, Truck, CreditCard, Banknote, Lock } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
-import { submitAttireOrder } from '@/lib/services/attire';
+import { submitOrder } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { formatPrice, isValidEmail, isValidPhone } from '@/lib/utils';
@@ -124,7 +124,7 @@ export default function CheckoutPage() {
 
         try {
             // Submit order to Supabase
-            const result = await submitAttireOrder({
+            const result = await submitOrder({
                 userId: user.id,
                 items: items.map((item) => ({
                     productId: item.product.id,

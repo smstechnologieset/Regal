@@ -2,10 +2,11 @@
  * Catering Service API
  * 
  * Handles all catering-related data fetching and quote submissions.
+ * Uses the standard public Supabase client for client-side and server-side compatibility.
  */
 
 import { getSupabaseClient } from '@/lib/supabase/client';
-import { CateringPackage, MenuItem } from '@/data/mock/catering';
+import { CateringPackage, MenuItem } from '@/types';
 
 /**
  * Fetch all catering packages from the database
@@ -24,14 +25,14 @@ export async function getCateringPackages(): Promise<CateringPackage[]> {
     }
 
     // Transform database format to TypeScript interface format
-    return (data || []).map((pkg: Record<string, unknown>) => ({
-        id: pkg.id,
-        name: pkg.name,
-        description: pkg.description,
-        pricePerGuest: pkg.price_per_guest,
-        minGuests: pkg.min_guests,
-        includes: pkg.includes || [],
-        image: pkg.image,
+    return (data || []).map((pkg: Record<string, any>) => ({
+        id: pkg.id as string,
+        name: pkg.name as string,
+        description: pkg.description as string,
+        pricePerGuest: pkg.price_per_guest as number,
+        minGuests: pkg.min_guests as number,
+        includes: (pkg.includes as string[]) || [],
+        image: pkg.image as string,
     }));
 }
 
@@ -79,14 +80,14 @@ export async function getMenuItems(): Promise<MenuItem[]> {
         return [];
     }
 
-    return (data || []).map((item: Record<string, unknown>) => ({
-        id: item.id,
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        category: item.category,
-        dietary: item.dietary || [],
-        image: item.image,
+    return (data || []).map((item: Record<string, any>) => ({
+        id: item.id as string,
+        name: item.name as string,
+        description: item.description as string,
+        price: item.price as number,
+        category: item.category as 'appetizer' | 'main' | 'dessert' | 'drink' | 'station',
+        dietary: (item.dietary as string[]) || [],
+        image: item.image as string,
     }));
 }
 
@@ -106,14 +107,14 @@ export async function getMenuItemsByCategory(category: string): Promise<MenuItem
         return [];
     }
 
-    return (data || []).map((item: Record<string, unknown>) => ({
-        id: item.id,
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        category: item.category,
-        dietary: item.dietary || [],
-        image: item.image,
+    return (data || []).map((item: Record<string, any>) => ({
+        id: item.id as string,
+        name: item.name as string,
+        description: item.description as string,
+        price: item.price as number,
+        category: item.category as 'appetizer' | 'main' | 'dessert' | 'drink' | 'station',
+        dietary: (item.dietary as string[]) || [],
+        image: item.image as string,
     }));
 }
 

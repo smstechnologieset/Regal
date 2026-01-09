@@ -1,0 +1,55 @@
+/**
+ * Global application constants
+ */
+
+export const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+export const COLORS = [
+    { name: 'Black', hex: '#000000' },
+    { name: 'White', hex: '#FFFFFF' },
+    { name: 'Navy', hex: '#1e3a5f' },
+    { name: 'Gray', hex: '#6B7280' },
+    { name: 'Red', hex: '#DC2626' },
+    { name: 'Pink', hex: '#EC4899' },
+    { name: 'Beige', hex: '#D4B896' },
+    { name: 'Brown', hex: '#78350F' },
+    { name: 'Green', hex: '#059669' },
+    { name: 'Blue', hex: '#2563EB' },
+];
+
+export const EVENT_TYPES = [
+    { value: 'wedding', label: 'Wedding' },
+    { value: 'birthday', label: 'Birthday' },
+    { value: 'corporate', label: 'Corporate Event' },
+    { value: 'graduation', label: 'Graduation' },
+    { value: 'social', label: 'Social Gathering' },
+];
+
+export const COMMON_FEATURES = [
+    { id: 'photo', label: 'Photography', category: 'other' },
+    { id: 'video', label: 'Videography', category: 'other' },
+    { id: 'dj', label: 'DJ / Music', category: 'entertainment' },
+    { id: 'live-band', label: 'Live Band', category: 'entertainment' },
+    { id: 'flowers', label: 'Floral Decoration', category: 'decoration' },
+    { id: 'lighting', label: 'Mood Lighting', category: 'decoration' },
+    { id: 'cake', label: 'Custom Cake', category: 'catering' },
+    { id: 'full-catering', label: 'Full Catering Service', category: 'catering' },
+    { id: 'venue', label: 'Venue Booking', category: 'venue' },
+];
+
+export const CATERING_CATEGORIES = [
+    { value: 'appetizer', label: 'Appetizers' },
+    { value: 'main', label: 'Main Courses' },
+    { value: 'dessert', label: 'Desserts' },
+    { value: 'drink', label: 'Drinks' },
+    { value: 'station', label: 'Live Stations' },
+];
+
+export const BRIDAL_SILHOUETTES = [
+    'Ball Gown',
+    'A-Line',
+    'Mermaid',
+    'Sheath',
+    'Empire',
+    'Mini',
+];

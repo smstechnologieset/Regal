@@ -1,7 +1,8 @@
 /**
  * Bridal Service API
  * 
- * Handles all bridal-related data fetching and appointment bookings.
+ * Handles all bridal-related data fetching and service management.
+ * Uses the standard public Supabase client for client-side and server-side compatibility.
  */
 
 import { getSupabaseClient } from '@/lib/supabase/client';
@@ -15,8 +16,7 @@ export async function getBridalGowns(): Promise<BridalGown[]> {
 
     const { data, error } = await supabase
         .from('bridal_gowns')
-        .select('*')
-        .order('is_new', { ascending: false });
+        .select('*');
 
     if (error) {
         console.error('Error fetching bridal gowns:', error);
@@ -24,51 +24,19 @@ export async function getBridalGowns(): Promise<BridalGown[]> {
     }
 
     // Transform database format to TypeScript interface format
-    return (data || []).map((gown: Record<string, unknown>) => ({
-        id: gown.id,
-        name: gown.name,
-        designer: gown.designer,
-        style: gown.style,
-        silhouette: gown.silhouette,
-        priceRent: gown.price_rent,
-        priceBuy: gown.price_buy,
-        sizes: gown.sizes || [],
-        images: gown.images || [],
-        description: gown.description,
-        isNew: gown.is_new,
+    return (data || []).map((gown: Record<string, any>) => ({
+        id: gown.id as string,
+        name: gown.name as string,
+        designer: gown.designer as string,
+        style: gown.style as string,
+        silhouette: gown.silhouette as string,
+        priceRent: gown.price_rent as number,
+        priceBuy: gown.price_buy as number,
+        sizes: (gown.sizes as string[]) || [],
+        images: (gown.images as string[]) || [],
+        description: gown.description as string,
+        isNew: gown.is_new as boolean,
     }));
-}
-
-/**
- * Fetch a single bridal gown by ID
- */
-export async function getBridalGownById(id: string): Promise<BridalGown | null> {
-    const supabase = getSupabaseClient();
-
-    const { data, error } = await supabase
-        .from('bridal_gowns')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-    if (error || !data) {
-        console.error('Error fetching bridal gown:', error);
-        return null;
-    }
-
-    return {
-        id: data.id,
-        name: data.name,
-        designer: data.designer,
-        style: data.style,
-        silhouette: data.silhouette,
-        priceRent: data.price_rent,
-        priceBuy: data.price_buy,
-        sizes: data.sizes || [],
-        images: data.images || [],
-        description: data.description,
-        isNew: data.is_new,
-    };
 }
 
 /**
@@ -87,50 +55,50 @@ export async function getBridalServices(): Promise<BridalService[]> {
         return [];
     }
 
-    return (data || []).map((service: Record<string, unknown>) => ({
-        id: service.id,
-        title: service.title,
-        description: service.description,
-        priceStart: service.price_start,
-        duration: service.duration,
-        type: service.type,
-        image: service.image,
+    return (data || []).map((service: Record<string, any>) => ({
+        id: service.id as string,
+        title: service.title as string,
+        description: service.description as string,
+        priceStart: service.price_start as number,
+        duration: service.duration as string,
+        type: service.type as 'makeup' | 'hair' | 'full-styling' | 'fitting',
+        image: service.image as string,
     }));
 }
 
 /**
  * Book a bridal appointment (creates order + conversation)
  */
-export async function bookBridalAppointment(appointmentData: {
+export async function bookBridalAppointment(bookingData: {
     userId: string;
     serviceId: string;
-    serviceName: string;
+    serviceTitle: string;
     appointmentDate: string;
     appointmentTime: string;
+    notes: string;
     contactName: string;
     contactEmail: string;
     contactPhone: string;
-    notes: string;
 }): Promise<{ orderId: string; conversationId: string; success: boolean }> {
     const supabase = getSupabaseClient();
 
-    // Create the order
+    // Create the order entry
     const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
-            user_id: appointmentData.userId,
+            user_id: bookingData.userId,
             service_type: 'bridal',
             status: 'pending',
-            total: 0, // Will be updated after consultation
+            total: 0, // Appointments might have fees, but initially 0
             details: {
-                serviceId: appointmentData.serviceId,
-                serviceName: appointmentData.serviceName,
-                appointmentDate: appointmentData.appointmentDate,
-                appointmentTime: appointmentData.appointmentTime,
-                contactName: appointmentData.contactName,
-                contactEmail: appointmentData.contactEmail,
-                contactPhone: appointmentData.contactPhone,
-                notes: appointmentData.notes,
+                serviceId: bookingData.serviceId,
+                serviceTitle: bookingData.serviceTitle,
+                date: bookingData.appointmentDate,
+                time: bookingData.appointmentTime,
+                notes: bookingData.notes,
+                contactName: bookingData.contactName,
+                contactEmail: bookingData.contactEmail,
+                contactPhone: bookingData.contactPhone,
             },
         })
         .select()
@@ -145,10 +113,10 @@ export async function bookBridalAppointment(appointmentData: {
     const { data: conversation, error: convError } = await supabase
         .from('conversations')
         .insert({
-            user_id: appointmentData.userId,
+            user_id: bookingData.userId,
             service_type: 'bridal',
             order_id: order.id,
-            subject: `Bridal Appointment: ${appointmentData.serviceName}`,
+            subject: `Bridal Appointment: ${bookingData.serviceTitle} - ${bookingData.appointmentDate}`,
             status: 'open',
         })
         .select()
@@ -156,27 +124,28 @@ export async function bookBridalAppointment(appointmentData: {
 
     if (convError || !conversation) {
         console.error('Error creating conversation:', convError);
+        // Order was created but conversation failed - still return order
         return { orderId: order.id, conversationId: '', success: true };
     }
 
-    // Send initial message with appointment details
+    // Send initial message with booking details
     const messageContent = `
 **New Bridal Appointment Booking**
 
-💍 **Service:** ${appointmentData.serviceName}
-📅 **Date:** ${new Date(appointmentData.appointmentDate).toLocaleDateString()}
-🕐 **Time:** ${appointmentData.appointmentTime}
+👰 **Service:** ${bookingData.serviceTitle}
+📅 **Date:** ${bookingData.appointmentDate}
+🕒 **Time:** ${bookingData.appointmentTime}
 
-**Special Requests:**
-${appointmentData.notes || 'No special requests.'}
+**Notes:**
+${bookingData.notes || 'No additional notes provided.'}
 
 ---
-*Contact: ${appointmentData.contactName} | ${appointmentData.contactEmail} | ${appointmentData.contactPhone}*
+*Contact: ${bookingData.contactName} | ${bookingData.contactEmail} | ${bookingData.contactPhone}*
     `.trim();
 
     await supabase.from('messages').insert({
         conversation_id: conversation.id,
-        sender_id: appointmentData.userId,
+        sender_id: bookingData.userId,
         content: messageContent,
     });
 

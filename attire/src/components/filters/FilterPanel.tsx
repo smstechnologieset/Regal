@@ -10,7 +10,7 @@
 import React, { useState } from 'react';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
 import { Category, FilterOptions } from '@/types';
-import { SIZES, COLORS } from '@/data/mock/products';
+import { SIZES, COLORS } from '@/lib/constants';
 import { cn, formatPrice } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 

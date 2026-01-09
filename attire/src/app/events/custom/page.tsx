@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { eventTypes, commonFeatures } from '@/data/mock/events';
+import { EVENT_TYPES, COMMON_FEATURES } from '@/lib/constants';
 import { getEventPackages, submitEventRequest } from '@/lib/services/events';
 import { EventPackage } from '@/types';
 import Button from '@/components/ui/Button';
@@ -141,7 +141,7 @@ function CustomEventForm() {
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-slate-700">Event Type</label>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                {eventTypes.map(type => (
+                                {EVENT_TYPES.map(type => (
                                     <button
                                         key={type.value}
                                         type="button"
@@ -214,7 +214,7 @@ function CustomEventForm() {
                         <div className="space-y-4">
                             <label className="block text-sm font-medium text-slate-700">Select Services Needed</label>
                             <div className="grid sm:grid-cols-2 gap-3">
-                                {commonFeatures.map(feature => (
+                                {COMMON_FEATURES.map(feature => (
                                     <label
                                         key={feature.id}
                                         className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${formData.features.includes(feature.label)

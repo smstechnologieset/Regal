@@ -5,7 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, Search } from 'lucide-react';
 import { getCateringPackages, getMenuItems } from '@/lib/services/catering';
-import { CateringPackage, MenuItem } from '@/data/mock/catering';
+import { CateringPackage, MenuItem } from '@/types';
+import { CATERING_CATEGORIES } from '@/lib/constants';
 import Button from '@/components/ui/Button';
 import { formatPrice } from '@/lib/utils';
 
@@ -14,10 +15,12 @@ export default function CateringMenuPage() {
     const [packages, setPackages] = useState<CateringPackage[]>([]);
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [mounted, setMounted] = useState(false);
 
-    const categories = ['all', 'appetizer', 'main', 'dessert', 'station'];
+    const categories = ['all', ...CATERING_CATEGORIES.map(c => c.value)];
 
     useEffect(() => {
+        setMounted(true);
         async function fetchData() {
             setLoading(true);
             const [pkgData, itemData] = await Promise.all([
@@ -34,6 +37,8 @@ export default function CateringMenuPage() {
     const filteredItems = activeCategory === 'all'
         ? menuItems
         : menuItems.filter(item => item.category === activeCategory);
+
+    if (!mounted) return null;
 
     return (
         <div className="min-h-screen bg-slate-50 py-12">
