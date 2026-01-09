@@ -9,7 +9,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
     User,
     Package,
@@ -34,12 +34,36 @@ export default function AccountLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-    const { profile, signOut, isAdmin } = useAuth();
+    const router = useRouter();
+    const { profile, signOut, isAdmin, user, isLoading } = useAuth();
 
     const handleSignOut = async () => {
-        await signOut();
-        window.location.href = '/';
+        try {
+            await signOut();
+            router.push('/');
+        } catch (error) {
+            console.error('Sign out failed:', error);
+            // Force redirect anyway to clear UI
+            window.location.href = '/';
+        }
     };
+
+    // Redirect if not logged in
+    React.useEffect(() => {
+        if (!isLoading && !user) {
+            router.push('/login?redirect=' + encodeURIComponent(pathname));
+        }
+    }, [user, isLoading, router, pathname]);
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-slate-200 border-t-rose-600 rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
+    if (!user) return null;
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -89,8 +113,8 @@ export default function AccountLayout({
                                                 <Link
                                                     href={item.href}
                                                     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                                                            ? 'bg-rose-50 text-rose-700'
-                                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                                        ? 'bg-rose-50 text-rose-700'
+                                                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                                                         }`}
                                                 >
                                                     <item.icon size={20} />
@@ -104,6 +128,7 @@ export default function AccountLayout({
                                 {/* Sign Out */}
                                 <div className="mt-4 pt-4 border-t border-slate-100">
                                     <button
+                                        type="button"
                                         onClick={handleSignOut}
                                         className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
                                     >
