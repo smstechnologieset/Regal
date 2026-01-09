@@ -12,7 +12,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- =====================================================
 -- Extends auth.users with additional profile information
 
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   full_name TEXT,
   phone TEXT,
@@ -37,17 +37,18 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Policies for profiles
-CREATE POLICY "Users can view their own profile"
-  ON public.profiles FOR SELECT
-  USING (auth.uid() = id);
-
-CREATE POLICY "Users can update their own profile"
-  ON public.profiles FOR UPDATE
-  USING (auth.uid() = id);
-
-CREATE POLICY "Admins can view all profiles"
-  ON public.profiles FOR SELECT
-  USING (public.is_admin());
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Users can view their own profile') THEN
+        CREATE POLICY "Users can view their own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Users can update their own profile') THEN
+        CREATE POLICY "Users can update their own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can view all profiles') THEN
+        CREATE POLICY "Admins can view all profiles" ON public.profiles FOR SELECT USING (public.is_admin());
+    END IF;
+END $$;
 
 -- Function to create profile on user signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -64,16 +65,41 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Trigger to auto-create profile
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'on_auth_user_created') THEN
+        CREATE TRIGGER on_auth_user_created
+          AFTER INSERT ON auth.users
+          FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+    END IF;
+END $$;
 
 -- =====================================================
--- CATEGORIES & PRODUCTS (Attire Shop)
+-- CLEANUP BLOCK: Fix wrong ID types if they exist
 -- =====================================================
+DO $$ 
+BEGIN 
+    -- If categories.id is UUID, we need to drop and recreate the service tables
+    -- as we use TEXT (slug-based) IDs for the Regal platform.
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = 'categories' 
+        AND column_name = 'id' 
+        AND data_type = 'uuid'
+    ) THEN
+        DROP TABLE IF EXISTS public.menu_items CASCADE;
+        DROP TABLE IF EXISTS public.catering_packages CASCADE;
+        DROP TABLE IF EXISTS public.bridal_services CASCADE;
+        DROP TABLE IF EXISTS public.bridal_gowns CASCADE;
+        DROP TABLE IF EXISTS public.event_packages CASCADE;
+        DROP TABLE IF EXISTS public.products CASCADE;
+        DROP TABLE IF EXISTS public.categories CASCADE;
+    END IF;
+END $$;
 
 -- Categories table
-CREATE TABLE public.categories (
+CREATE TABLE IF NOT EXISTS public.categories (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   slug TEXT NOT NULL UNIQUE,
@@ -81,12 +107,43 @@ CREATE TABLE public.categories (
   subcategories JSONB DEFAULT '[]'
 );
 
+-- Ensure all required columns exist in categories (in case table was created by an older script)
+DO $$ 
+BEGIN 
+    -- Add slug if missing
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='categories' AND column_name='slug') THEN
+        ALTER TABLE public.categories ADD COLUMN slug TEXT;
+        UPDATE public.categories SET slug = id WHERE slug IS NULL;
+        ALTER TABLE public.categories ALTER COLUMN slug SET NOT NULL;
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'categories_slug_key') THEN
+            ALTER TABLE public.categories ADD CONSTRAINT categories_slug_key UNIQUE (slug);
+        END IF;
+    END IF;
+
+    -- Add image if missing
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='categories' AND column_name='image') THEN
+        ALTER TABLE public.categories ADD COLUMN image TEXT;
+    END IF;
+
+    -- Add subcategories if missing
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='categories' AND column_name='subcategories') THEN
+        ALTER TABLE public.categories ADD COLUMN subcategories JSONB DEFAULT '[]';
+    END IF;
+END $$;
+
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read-only access to categories" ON public.categories FOR SELECT USING (true);
-CREATE POLICY "Admins can manage categories" ON public.categories FOR ALL USING (public.is_admin());
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Allow public read-only access to categories') THEN
+        CREATE POLICY "Allow public read-only access to categories" ON public.categories FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can manage categories') THEN
+        CREATE POLICY "Admins can manage categories" ON public.categories FOR ALL USING (public.is_admin());
+    END IF;
+END $$;
 
 -- Products table
-CREATE TABLE public.products (
+CREATE TABLE IF NOT EXISTS public.products (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT,
@@ -107,15 +164,42 @@ CREATE TABLE public.products (
 );
 
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read-only access to products" ON public.products FOR SELECT USING (true);
-CREATE POLICY "Admins can manage products" ON public.products FOR ALL USING (public.is_admin());
+
+-- Ensure all required columns exist in products
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='description') THEN ALTER TABLE public.products ADD COLUMN description TEXT; END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='original_price') THEN ALTER TABLE public.products ADD COLUMN original_price DECIMAL(10, 2); END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='category') THEN ALTER TABLE public.products ADD COLUMN category TEXT REFERENCES public.categories(id); END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='subcategory') THEN ALTER TABLE public.products ADD COLUMN subcategory TEXT; END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='sizes') THEN ALTER TABLE public.products ADD COLUMN sizes TEXT[] DEFAULT '{}'; END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='colors') THEN ALTER TABLE public.products ADD COLUMN colors JSONB DEFAULT '[]'; END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='images') THEN ALTER TABLE public.products ADD COLUMN images TEXT[] DEFAULT '{}'; END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='badges') THEN ALTER TABLE public.products ADD COLUMN badges TEXT[] DEFAULT '{}'; END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='rating') THEN ALTER TABLE public.products ADD COLUMN rating DECIMAL(2, 1) DEFAULT 0; END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='review_count') THEN ALTER TABLE public.products ADD COLUMN review_count INTEGER DEFAULT 0; END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='popularity') THEN ALTER TABLE public.products ADD COLUMN popularity INTEGER DEFAULT 0; END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='in_stock') THEN ALTER TABLE public.products ADD COLUMN in_stock BOOLEAN DEFAULT TRUE; END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='stock_count') THEN ALTER TABLE public.products ADD COLUMN stock_count INTEGER DEFAULT 0; END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='products' AND column_name='created_at') THEN ALTER TABLE public.products ADD COLUMN created_at TIMESTAMPTZ DEFAULT NOW(); END IF;
+END $$;
+
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Allow public read-only access to products') THEN
+        CREATE POLICY "Allow public read-only access to products" ON public.products FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can manage products') THEN
+        CREATE POLICY "Admins can manage products" ON public.products FOR ALL USING (public.is_admin());
+    END IF;
+END $$;
 
 -- =====================================================
 -- EVENT PLANNING
 -- =====================================================
 
 -- Event packages table
-CREATE TABLE public.event_packages (
+CREATE TABLE IF NOT EXISTS public.event_packages (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
@@ -128,15 +212,22 @@ CREATE TABLE public.event_packages (
 );
 
 ALTER TABLE public.event_packages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read-only access to event_packages" ON public.event_packages FOR SELECT USING (true);
-CREATE POLICY "Admins can manage event_packages" ON public.event_packages FOR ALL USING (public.is_admin());
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Allow public read-only access to event_packages') THEN
+        CREATE POLICY "Allow public read-only access to event_packages" ON public.event_packages FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can manage event_packages') THEN
+        CREATE POLICY "Admins can manage event_packages" ON public.event_packages FOR ALL USING (public.is_admin());
+    END IF;
+END $$;
 
 -- =====================================================
 -- BRIDAL SERVICES
 -- =====================================================
 
 -- Bridal gowns table
-CREATE TABLE public.bridal_gowns (
+CREATE TABLE IF NOT EXISTS public.bridal_gowns (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   designer TEXT,
@@ -151,11 +242,18 @@ CREATE TABLE public.bridal_gowns (
 );
 
 ALTER TABLE public.bridal_gowns ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read-only access to bridal_gowns" ON public.bridal_gowns FOR SELECT USING (true);
-CREATE POLICY "Admins can manage bridal_gowns" ON public.bridal_gowns FOR ALL USING (public.is_admin());
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Allow public read-only access to bridal_gowns') THEN
+        CREATE POLICY "Allow public read-only access to bridal_gowns" ON public.bridal_gowns FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can manage bridal_gowns') THEN
+        CREATE POLICY "Admins can manage bridal_gowns" ON public.bridal_gowns FOR ALL USING (public.is_admin());
+    END IF;
+END $$;
 
 -- Bridal services table
-CREATE TABLE public.bridal_services (
+CREATE TABLE IF NOT EXISTS public.bridal_services (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
@@ -166,15 +264,22 @@ CREATE TABLE public.bridal_services (
 );
 
 ALTER TABLE public.bridal_services ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read-only access to bridal_services" ON public.bridal_services FOR SELECT USING (true);
-CREATE POLICY "Admins can manage bridal_services" ON public.bridal_services FOR ALL USING (public.is_admin());
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Allow public read-only access to bridal_services') THEN
+        CREATE POLICY "Allow public read-only access to bridal_services" ON public.bridal_services FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can manage bridal_services') THEN
+        CREATE POLICY "Admins can manage bridal_services" ON public.bridal_services FOR ALL USING (public.is_admin());
+    END IF;
+END $$;
 
 -- =====================================================
 -- CATERING SERVICES
 -- =====================================================
 
 -- Catering packages table
-CREATE TABLE public.catering_packages (
+CREATE TABLE IF NOT EXISTS public.catering_packages (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT,
@@ -185,11 +290,18 @@ CREATE TABLE public.catering_packages (
 );
 
 ALTER TABLE public.catering_packages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read-only access to catering_packages" ON public.catering_packages FOR SELECT USING (true);
-CREATE POLICY "Admins can manage catering_packages" ON public.catering_packages FOR ALL USING (public.is_admin());
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Allow public read-only access to catering_packages') THEN
+        CREATE POLICY "Allow public read-only access to catering_packages" ON public.catering_packages FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can manage catering_packages') THEN
+        CREATE POLICY "Admins can manage catering_packages" ON public.catering_packages FOR ALL USING (public.is_admin());
+    END IF;
+END $$;
 
 -- Menu items table
-CREATE TABLE public.menu_items (
+CREATE TABLE IF NOT EXISTS public.menu_items (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT,
@@ -200,14 +312,21 @@ CREATE TABLE public.menu_items (
 );
 
 ALTER TABLE public.menu_items ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read-only access to menu_items" ON public.menu_items FOR SELECT USING (true);
-CREATE POLICY "Admins can manage menu_items" ON public.menu_items FOR ALL USING (public.is_admin());
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Allow public read-only access to menu_items') THEN
+        CREATE POLICY "Allow public read-only access to menu_items" ON public.menu_items FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can manage menu_items') THEN
+        CREATE POLICY "Admins can manage menu_items" ON public.menu_items FOR ALL USING (public.is_admin());
+    END IF;
+END $$;
 
 -- =====================================================
 -- ORDERS TABLE
 -- =====================================================
 
-CREATE TABLE public.orders (
+CREATE TABLE IF NOT EXISTS public.orders (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   service_type TEXT NOT NULL CHECK (service_type IN ('attire', 'events', 'bridal', 'catering')),
@@ -223,32 +342,32 @@ CREATE TABLE public.orders (
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
 -- Policies for orders
-CREATE POLICY "Users can view their own orders"
-  ON public.orders FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can create their own orders"
-  ON public.orders FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Admins can view all orders"
-  ON public.orders FOR SELECT
-  USING (public.is_admin());
-
-CREATE POLICY "Admins can update all orders"
-  ON public.orders FOR UPDATE
-  USING (public.is_admin());
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Users can view their own orders') THEN
+        CREATE POLICY "Users can view their own orders" ON public.orders FOR SELECT USING (auth.uid() = user_id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Users can create their own orders') THEN
+        CREATE POLICY "Users can create their own orders" ON public.orders FOR INSERT WITH CHECK (auth.uid() = user_id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can view all orders') THEN
+        CREATE POLICY "Admins can view all orders" ON public.orders FOR SELECT USING (public.is_admin());
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can update all orders') THEN
+        CREATE POLICY "Admins can update all orders" ON public.orders FOR UPDATE USING (public.is_admin());
+    END IF;
+END $$;
 
 -- Index for faster queries
-CREATE INDEX orders_user_id_idx ON public.orders(user_id);
-CREATE INDEX orders_status_idx ON public.orders(status);
-CREATE INDEX orders_service_type_idx ON public.orders(service_type);
+CREATE INDEX IF NOT EXISTS orders_user_id_idx ON public.orders(user_id);
+CREATE INDEX IF NOT EXISTS orders_status_idx ON public.orders(status);
+CREATE INDEX IF NOT EXISTS orders_service_type_idx ON public.orders(service_type);
 
 -- =====================================================
 -- CONVERSATIONS TABLE
 -- =====================================================
 
-CREATE TABLE public.conversations (
+CREATE TABLE IF NOT EXISTS public.conversations (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   admin_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
@@ -264,31 +383,31 @@ CREATE TABLE public.conversations (
 ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
 
 -- Policies for conversations
-CREATE POLICY "Users can view their own conversations"
-  ON public.conversations FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can create their own conversations"
-  ON public.conversations FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Admins can view all conversations"
-  ON public.conversations FOR SELECT
-  USING (public.is_admin());
-
-CREATE POLICY "Admins can update all conversations"
-  ON public.conversations FOR UPDATE
-  USING (public.is_admin());
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Users can view their own conversations') THEN
+        CREATE POLICY "Users can view their own conversations" ON public.conversations FOR SELECT USING (auth.uid() = user_id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Users can create their own conversations') THEN
+        CREATE POLICY "Users can create their own conversations" ON public.conversations FOR INSERT WITH CHECK (auth.uid() = user_id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can view all conversations') THEN
+        CREATE POLICY "Admins can view all conversations" ON public.conversations FOR SELECT USING (public.is_admin());
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can update all conversations') THEN
+        CREATE POLICY "Admins can update all conversations" ON public.conversations FOR UPDATE USING (public.is_admin());
+    END IF;
+END $$;
 
 -- Index for faster queries
-CREATE INDEX conversations_user_id_idx ON public.conversations(user_id);
-CREATE INDEX conversations_status_idx ON public.conversations(status);
+CREATE INDEX IF NOT EXISTS conversations_user_id_idx ON public.conversations(user_id);
+CREATE INDEX IF NOT EXISTS conversations_status_idx ON public.conversations(status);
 
 -- =====================================================
 -- MESSAGES TABLE
 -- =====================================================
 
-CREATE TABLE public.messages (
+CREATE TABLE IF NOT EXISTS public.messages (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   conversation_id UUID REFERENCES public.conversations(id) ON DELETE CASCADE NOT NULL,
   sender_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
@@ -301,40 +420,39 @@ CREATE TABLE public.messages (
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 
 -- Policies for messages
-CREATE POLICY "Users can view messages in their conversations"
-  ON public.messages FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.conversations
-      WHERE id = conversation_id AND user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Users can send messages in their conversations"
-  ON public.messages FOR INSERT
-  WITH CHECK (
-    auth.uid() = sender_id AND
-    EXISTS (
-      SELECT 1 FROM public.conversations
-      WHERE id = conversation_id AND user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Admins can view all messages"
-  ON public.messages FOR SELECT
-  USING (public.is_admin());
-
-CREATE POLICY "Admins can send messages"
-  ON public.messages FOR INSERT
-  WITH CHECK (public.is_admin());
-
-CREATE POLICY "Admins can update messages (mark read)"
-  ON public.messages FOR UPDATE
-  USING (public.is_admin());
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Users can view messages in their conversations') THEN
+        CREATE POLICY "Users can view messages in their conversations" ON public.messages FOR SELECT USING (
+            EXISTS (
+                SELECT 1 FROM public.conversations
+                WHERE id = conversation_id AND user_id = auth.uid()
+            )
+        );
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Users can send messages in their conversations') THEN
+        CREATE POLICY "Users can send messages in their conversations" ON public.messages FOR INSERT WITH CHECK (
+            auth.uid() = sender_id AND
+            EXISTS (
+                SELECT 1 FROM public.conversations
+                WHERE id = conversation_id AND user_id = auth.uid()
+            )
+        );
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can view all messages') THEN
+        CREATE POLICY "Admins can view all messages" ON public.messages FOR SELECT USING (public.is_admin());
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can send messages') THEN
+        CREATE POLICY "Admins can send messages" ON public.messages FOR INSERT WITH CHECK (public.is_admin());
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can update messages (mark read)') THEN
+        CREATE POLICY "Admins can update messages (mark read)" ON public.messages FOR UPDATE USING (public.is_admin());
+    END IF;
+END $$;
 
 -- Index for faster queries
-CREATE INDEX messages_conversation_id_idx ON public.messages(conversation_id);
-CREATE INDEX messages_created_at_idx ON public.messages(created_at);
+CREATE INDEX IF NOT EXISTS messages_conversation_id_idx ON public.messages(conversation_id);
+CREATE INDEX IF NOT EXISTS messages_created_at_idx ON public.messages(created_at);
 
 -- =====================================================
 -- FUNCTIONS & TRIGGERS
@@ -351,9 +469,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE TRIGGER on_new_message
-  AFTER INSERT ON public.messages
-  FOR EACH ROW EXECUTE FUNCTION public.update_conversation_last_message();
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'on_new_message') THEN
+        CREATE TRIGGER on_new_message
+          AFTER INSERT ON public.messages
+          FOR EACH ROW EXECUTE FUNCTION public.update_conversation_last_message();
+    END IF;
+END $$;
 
 -- Update updated_at timestamp
 CREATE OR REPLACE FUNCTION public.update_updated_at()
@@ -364,13 +487,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_profiles_updated_at
-  BEFORE UPDATE ON public.profiles
-  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
-
-CREATE TRIGGER update_orders_updated_at
-  BEFORE UPDATE ON public.orders
-  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_profiles_updated_at') THEN
+        CREATE TRIGGER update_profiles_updated_at
+          BEFORE UPDATE ON public.profiles
+          FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'update_orders_updated_at') THEN
+        CREATE TRIGGER update_orders_updated_at
+          BEFORE UPDATE ON public.orders
+          FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+    END IF;
+END $$;
 
 -- =====================================================
 -- CREATE YOUR FIRST ADMIN USER

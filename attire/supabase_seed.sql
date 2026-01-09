@@ -13,7 +13,8 @@ INSERT INTO public.categories (id, name, slug, image, subcategories) VALUES
 ('men', 'Men', 'men', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop', '[{"id": "men-shirts", "name": "Shirts", "slug": "shirts"}, {"id": "men-tshirts", "name": "T-Shirts", "slug": "tshirts"}, {"id": "men-pants", "name": "Pants", "slug": "pants"}, {"id": "men-suits", "name": "Suits", "slug": "suits"}, {"id": "men-outerwear", "name": "Outerwear", "slug": "outerwear"}]'),
 ('kids', 'Kids', 'kids', 'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=400&h=300&fit=crop', '[{"id": "kids-girls", "name": "Girls", "slug": "girls"}, {"id": "kids-boys", "name": "Boys", "slug": "boys"}, {"id": "kids-baby", "name": "Baby", "slug": "baby"}]'),
 ('accessories', 'Accessories', 'accessories', 'https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=400&h=300&fit=crop', '[{"id": "acc-bags", "name": "Bags", "slug": "bags"}, {"id": "acc-jewelry", "name": "Jewelry", "slug": "jewelry"}, {"id": "acc-watches", "name": "Watches", "slug": "watches"}, {"id": "acc-scarves", "name": "Scarves", "slug": "scarves"}]'),
-('sale', 'Sale', 'sale', 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=300&fit=crop', '[]');
+('sale', 'Sale', 'sale', 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=300&fit=crop', '[]')
+ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
 -- PRODUCTS
@@ -43,7 +44,8 @@ INSERT INTO public.products (id, name, description, price, original_price, categ
 ('prod-022', 'Minimalist Watch', 'Sleek minimalist watch with a leather strap. Japanese quartz movement with water resistance up to 30m. Case diameter: 40mm.', 159.99, NULL, 'accessories', 'watches', ARRAY['One Size'], '[{"name": "Rose Gold", "hex": "#B76E79"}, {"name": "Silver", "hex": "#C0C0C0"}, {"name": "Gold", "hex": "#D4AF37"}]', ARRAY['https://images.unsplash.com/photo-1485968579169-a6d3f4b25f5c?w=400&h=600&fit=crop', 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=600&fit=crop'], ARRAY['bestseller'], 4.6, 234, 88, true, 56, '2024-11-15T10:00:00Z'),
 ('prod-023', 'Satin Slip Dress', 'Elegant satin slip dress with delicate lace trim. Features adjustable spaghetti straps and a cowl neckline. Perfect for evenings out.', 99.99, 139.99, 'women', 'dresses', ARRAY['XS', 'S', 'M', 'L'], '[{"name": "Black", "hex": "#000000"}, {"name": "Red", "hex": "#DC2626"}, {"name": "Green", "hex": "#059669"}]', ARRAY['https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=400&h=600&fit=crop', 'https://images.unsplash.com/photo-1558171813-4c088753af8f?w=400&h=600&fit=crop'], ARRAY['sale'], 4.7, 145, 84, true, 34, '2024-12-10T10:00:00Z'),
 ('prod-024', 'Performance Polo Shirt', 'Moisture-wicking polo shirt designed for active lifestyles. Features UV protection and quick-dry technology. Perfect for golf or casual wear.', 54.99, NULL, 'men', 'shirts', ARRAY['S', 'M', 'L', 'XL', 'XXL'], '[{"name": "White", "hex": "#FFFFFF"}, {"name": "Navy", "hex": "#1e3a5f"}, {"name": "Black", "hex": "#000000"}, {"name": "Green", "hex": "#059669"}]', ARRAY['https://images.unsplash.com/photo-1551232864-3f0890e580d9?w=400&h=600&fit=crop', 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=400&h=600&fit=crop'], ARRAY[]::TEXT[], 4.4, 198, 71, true, 167, '2024-12-01T10:00:00Z'),
-('prod-025', 'Denim Jacket - Out of Stock', 'Classic denim jacket with a modern fit. Features distressed details and brass buttons. A wardrobe essential.', 89.99, NULL, 'women', 'outerwear', ARRAY['XS', 'S', 'M', 'L'], '[{"name": "Blue", "hex": "#2563EB"}]', ARRAY['https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=600&fit=crop', 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=600&fit=crop'], ARRAY[]::TEXT[], 4.8, 423, 96, false, 0, '2024-10-15T10:00:00Z');
+('prod-025', 'Denim Jacket - Out of Stock', 'Classic denim jacket with a modern fit. Features distressed details and brass buttons. A wardrobe essential.', 89.99, NULL, 'women', 'outerwear', ARRAY['XS', 'S', 'M', 'L'], '[{"name": "Blue", "hex": "#2563EB"}]', ARRAY['https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=600&fit=crop', 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=600&fit=crop'], ARRAY[]::TEXT[], 4.8, 423, 96, false, 0, '2024-10-15T10:00:00Z')
+ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
 -- EVENT PACKAGES
@@ -55,7 +57,8 @@ INSERT INTO public.event_packages (id, title, description, type, price_start, fe
 ('birthday-milestone', 'Milestone Celebration', 'Elegant party for 18th, 21st, 50th or any milestone birthday.', 'birthday', 2000, ARRAY['Venue Setup', 'DJ/Music', 'Buffet Catering', 'Photography', 'Custom Cake'], 'https://images.unsplash.com/photo-1533294160622-d5fece760826?w=800&h=600&fit=crop', '50-100 guests', true),
 ('corp-conference', 'Business Conference', 'Professional setup for successful meetings and conferences.', 'corporate', 3000, ARRAY['AV Equipment', 'Seating Arrangement', 'Coffee Breaks & Lunch', 'Stationery'], 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800&h=600&fit=crop', '50-200 attendees', false),
 ('corp-party', 'Company Gala', 'Annual dinner or appreciation party for employees and partners.', 'corporate', 8000, ARRAY['Ballroom Venue', 'Gourmet Dinner', 'Entertainment', 'Awards Ceremony Setup'], 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&h=600&fit=crop', '100+ attendees', false),
-('grad-party', 'Graduation Bash', 'Celebrate your academic achievement in style with family and friends.', 'graduation', 1500, ARRAY['Photo Booth', 'DJ', 'Finger Foods', 'Decorations'], 'https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?w=800&h=600&fit=crop', '50 guests', false);
+('grad-party', 'Graduation Bash', 'Celebrate your academic achievement in style with family and friends.', 'graduation', 1500, ARRAY['Photo Booth', 'DJ', 'Finger Foods', 'Decorations'], 'https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?w=800&h=600&fit=crop', '50 guests', false)
+ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
 -- BRIDAL GOWNS
@@ -64,7 +67,8 @@ INSERT INTO public.bridal_gowns (id, name, designer, style, silhouette, price_re
 ('gown-1', 'Seraphina', 'Elie Saab', 'Romantic', 'A-Line', 1200, 4500, ARRAY['US 4', 'US 6', 'US 8', 'US 10'], ARRAY['https://images.unsplash.com/photo-1594552072238-b8a33785b261?w=800&h=1000&fit=crop'], 'Ethereal A-line gown with floral appliqué and long tulle sleeves.', true),
 ('gown-2', 'Arabella', 'Vera Wang', 'Modern', 'Mermaid', 1500, 6000, ARRAY['US 2', 'US 4', 'US 6'], ARRAY['https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800&h=1000&fit=crop'], 'Sleek mermaid silhouette with dramatic ruffled train.', false),
 ('gown-3', 'Isolde', 'Monique Lhuillier', 'Classic', 'Ballgown', 1800, 7500, ARRAY['US 6', 'US 8', 'US 12'], ARRAY['https://images.unsplash.com/photo-1549416876-b9b9a67484df?w=800&h=1000&fit=crop'], 'Timeless satin ballgown with off-shoulder neckline and crystal embellishments.', false),
-('gown-4', 'Genevieve', 'Oscar de la Renta', 'Boho', 'Sheath', 900, 3200, ARRAY['US 4', 'US 6', 'US 8', 'US 10'], ARRAY['https://images.unsplash.com/photo-1596483550605-d972f113840e?w=800&h=1000&fit=crop'], 'Delicate lace sheath gown with open back and cap sleeves.', false);
+('gown-4', 'Genevieve', 'Oscar de la Renta', 'Boho', 'Sheath', 900, 3200, ARRAY['US 4', 'US 6', 'US 8', 'US 10'], ARRAY['https://images.unsplash.com/photo-1596483550605-d972f113840e?w=800&h=1000&fit=crop'], 'Delicate lace sheath gown with open back and cap sleeves.', false)
+ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
 -- BRIDAL SERVICES
@@ -72,7 +76,8 @@ INSERT INTO public.bridal_gowns (id, name, designer, style, silhouette, price_re
 INSERT INTO public.bridal_services (id, title, description, price_start, duration, type, image) VALUES
 ('makeup-bridal', 'Bridal Makeup', 'HD makeup application, lash application, and touch-up kit.', 250, '2 hours', 'makeup', 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800&h=600&fit=crop'),
 ('hair-bridal', 'Bridal Hair Styling', 'Intricate updo or styling, veil placement, and accessories.', 200, '1.5 hours', 'hair', 'https://images.unsplash.com/photo-1522337360705-8b13d52b03cc?w=800&h=600&fit=crop'),
-('fitting', 'Gown Fitting', 'Personal consultation with our stylist to find your perfect dress.', 50, '1 hour', 'fitting', 'https://images.unsplash.com/photo-1585416294489-4796395c378e?w=800&h=600&fit=crop');
+('fitting', 'Gown Fitting', 'Personal consultation with our stylist to find your perfect dress.', 50, '1 hour', 'fitting', 'https://images.unsplash.com/photo-1585416294489-4796395c378e?w=800&h=600&fit=crop')
+ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
 -- CATERING PACKAGES
@@ -80,7 +85,8 @@ INSERT INTO public.bridal_services (id, title, description, price_start, duratio
 INSERT INTO public.catering_packages (id, name, description, price_per_guest, min_guests, includes, image) VALUES
 ('pkg-buffet-classic', 'Classic Buffet', 'A crowd-pleasing selection of international favorites served buffet style.', 45, 30, ARRAY['2 Appetizers', '3 Main Courses', '2 Sides', 'Dessert Station', 'Soft Drinks'], 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800&h=600&fit=crop'),
 ('pkg-plated-gold', 'Gold Plated Service', 'Elegant 3-course sit-down dinner with table service.', 85, 10, ARRAY['Plated Salad/Soup', 'Choice of Entree', 'Plated Dessert', 'Coffee & Tea Service'], 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&h=600&fit=crop'),
-('pkg-stations-royal', 'Royal Live Stations', 'Interactive cooking stations offering fresh sushi, carving, and pasta.', 110, 50, ARRAY['3 Live Stations', 'Roaming Canapés', 'Dessert Bar', 'Premium Mocktails'], 'https://images.unsplash.com/photo-1547924475-650f0980489c?w=800&h=600&fit=crop');
+('pkg-stations-royal', 'Royal Live Stations', 'Interactive cooking stations offering fresh sushi, carving, and pasta.', 110, 50, ARRAY['3 Live Stations', 'Roaming Canapés', 'Dessert Bar', 'Premium Mocktails'], 'https://images.unsplash.com/photo-1547924475-650f0980489c?w=800&h=600&fit=crop')
+ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
 -- MENU ITEMS
@@ -89,7 +95,8 @@ INSERT INTO public.menu_items (id, name, description, price, category, dietary, 
 ('app-bruschetta', 'Heirloom Tomato Bruschetta', 'Toasted baguette with basil pesto, heirloom tomatoes, and balsamic glaze.', 0, 'appetizer', ARRAY['v', 'vg'], 'https://images.unsplash.com/photo-1572695157363-bc31c5d53163?w=600&fit=crop'),
 ('main-salmon', 'Pan-Seared Salmon', 'Atlantic salmon with lemon butter sauce and asparagus.', 0, 'main', ARRAY['gf', 'df'], 'https://images.unsplash.com/photo-1467003909585-2f8a7270028d?w=600&fit=crop'),
 ('main-steak', 'Filet Mignon', 'Tenderloin steak with rosemary reduction.', 0, 'main', ARRAY['gf'], 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=600&fit=crop'),
-('dessert-tiramisu', 'Classic Tiramisu', 'Espresso-soaked ladyfingers with mascarpone cream.', 0, 'dessert', ARRAY['v'], 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=600&fit=crop');
+('dessert-tiramisu', 'Classic Tiramisu', 'Espresso-soaked ladyfingers with mascarpone cream.', 0, 'dessert', ARRAY['v'], 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=600&fit=crop')
+ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================
 -- SUCCESS MESSAGE

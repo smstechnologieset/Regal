@@ -92,7 +92,8 @@ export async function getProducts(
     const { data, error, count } = await query;
 
     if (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error fetching products:', error.message || error);
+        console.error('Full fetch error object:', error);
         return { data: [], total: 0, page, pageSize, totalPages: 0 };
     }
 
@@ -139,7 +140,8 @@ export async function getCategories(): Promise<Category[]> {
         .select('*');
 
     if (error) {
-        console.error('Error fetching categories:', error);
+        console.error('Error fetching categories:', error.message || error);
+        console.error('Full categories error object:', error);
         return [];
     }
 
@@ -168,7 +170,8 @@ export async function searchProducts(query: string): Promise<Product[]> {
         .limit(20);
 
     if (error) {
-        console.error('Error searching products:', error);
+        console.error('Error searching products:', error.message || error);
+        console.error('Full search error object:', error);
         return [];
     }
 
@@ -195,7 +198,8 @@ export async function getFeaturedProducts(): Promise<{
         .limit(50);
 
     if (error) {
-        console.error('Error fetching featured products:', error);
+        console.error('Error fetching featured products:', error.message || error);
+        console.error('Full featured products error object:', error);
         return { newArrivals: [], bestsellers: [], onSale: [] };
     }
 

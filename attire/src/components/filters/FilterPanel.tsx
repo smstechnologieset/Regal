@@ -9,12 +9,13 @@
 
 import React, { useState } from 'react';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
-import { FilterOptions } from '@/types';
-import { categories, SIZES, COLORS } from '@/data/mock/products';
+import { Category, FilterOptions } from '@/types';
+import { SIZES } from '@/data/mock/products';
 import { cn, formatPrice } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 
 interface FilterPanelProps {
+    categories: Category[];
     filters: FilterOptions;
     onFilterChange: (filters: FilterOptions) => void;
     onClose?: () => void;
@@ -22,6 +23,7 @@ interface FilterPanelProps {
 }
 
 export default function FilterPanel({
+    categories,
     filters,
     onFilterChange,
     onClose,
@@ -30,7 +32,6 @@ export default function FilterPanel({
     const [expandedSections, setExpandedSections] = useState<string[]>([
         'category',
         'size',
-        'color',
         'price',
     ]);
 
@@ -61,16 +62,7 @@ export default function FilterPanel({
         });
     };
 
-    const handleColorToggle = (colorName: string) => {
-        const currentColors = filters.colors || [];
-        const newColors = currentColors.includes(colorName)
-            ? currentColors.filter((c) => c !== colorName)
-            : [...currentColors, colorName];
-        onFilterChange({
-            ...filters,
-            colors: newColors.length > 0 ? newColors : undefined,
-        });
-    };
+
 
     const handlePriceChange = (min: number, max: number) => {
         onFilterChange({
@@ -86,7 +78,6 @@ export default function FilterPanel({
     const hasActiveFilters =
         filters.category ||
         (filters.sizes && filters.sizes.length > 0) ||
-        (filters.colors && filters.colors.length > 0) ||
         filters.priceRange;
 
     return (
@@ -119,7 +110,7 @@ export default function FilterPanel({
                     onToggle={() => toggleSection('category')}
                 >
                     <div className="space-y-2">
-                        {categories.slice(0, 4).map((category) => (
+                        {categories.map((category) => (
                             <label
                                 key={category.id}
                                 className="flex items-center gap-2 cursor-pointer"
@@ -161,31 +152,7 @@ export default function FilterPanel({
                     </div>
                 </FilterSection>
 
-                {/* Color Filter */}
-                <FilterSection
-                    title="Color"
-                    isExpanded={expandedSections.includes('color')}
-                    onToggle={() => toggleSection('color')}
-                >
-                    <div className="flex flex-wrap gap-2">
-                        {COLORS.map((color) => (
-                            <button
-                                key={color.name}
-                                onClick={() => handleColorToggle(color.name)}
-                                className={cn(
-                                    'w-8 h-8 rounded-full border-2 transition-all',
-                                    filters.colors?.includes(color.name)
-                                        ? 'border-slate-900 scale-110'
-                                        : 'border-slate-200 hover:border-slate-400',
-                                    color.hex === '#FFFFFF' && 'border-slate-300'
-                                )}
-                                style={{ backgroundColor: color.hex }}
-                                title={color.name}
-                                aria-label={color.name}
-                            />
-                        ))}
-                    </div>
-                </FilterSection>
+
 
                 {/* Price Filter */}
                 <FilterSection

@@ -10,8 +10,8 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Filter, X, SlidersHorizontal } from 'lucide-react';
-import { Product, FilterOptions, SortOption } from '@/types';
-import { getProducts } from '@/lib/api';
+import { Product, Category, FilterOptions, SortOption } from '@/types';
+import { getProducts, getCategories } from '@/lib/api';
 import ProductCard from '@/components/product/ProductCard';
 import { ProductGridSkeleton } from '@/components/skeletons/ProductCardSkeleton';
 import FilterPanel from '@/components/filters/FilterPanel';
@@ -25,6 +25,7 @@ function ProductsContent() {
     const searchParams = useSearchParams();
 
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [totalProducts, setTotalProducts] = useState(0);
     const [filters, setFilters] = useState<FilterOptions>({});
@@ -34,37 +35,68 @@ function ProductsContent() {
     const { addToCart, toggleCart } = useCart();
     const { addToast, searchQuery } = useApp();
 
-    // Initialize filters from URL params
+    // 1. Fetch categories once on mount
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const result = await getCategories();
+                setCategories(result);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+        fetchCategories();
+    }, []);
+
+    // 2. Sync URL params to local state
     useEffect(() => {
         const category = searchParams.get('category');
         const subcategory = searchParams.get('subcategory');
-        const search = searchParams.get('search');
 
-        const newFilters: FilterOptions = {};
-        if (category) newFilters.category = category;
-        if (subcategory) newFilters.subcategory = subcategory;
-
-        setFilters(newFilters);
+        setFilters(prev => {
+            // Only update if actually different to avoid unnecessary cycles
+            if (prev.category === (category || undefined) &&
+                prev.subcategory === (subcategory || undefined)) {
+                return prev;
+            }
+            return {
+                ...prev,
+                category: category || undefined,
+                subcategory: subcategory || undefined
+            };
+        });
     }, [searchParams]);
 
-    // Fetch products when filters or sort changes
-    const fetchProducts = useCallback(async () => {
-        setLoading(true);
-        try {
-            const result = await getProducts(filters, sortOption, 1, 24);
-            setProducts(result.data);
-            setTotalProducts(result.total);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-            addToast('Failed to load products', 'error');
-        } finally {
-            setLoading(false);
-        }
-    }, [filters, sortOption, addToast]);
-
+    // 3. Fetch products whenever filters or sort changes
     useEffect(() => {
-        fetchProducts();
-    }, [fetchProducts]);
+        let isMounted = true;
+
+        const performFetch = async () => {
+            setLoading(true);
+            try {
+                const result = await getProducts(filters, sortOption, 1, 24);
+                if (isMounted) {
+                    setProducts(result.data);
+                    setTotalProducts(result.total);
+                }
+            } catch (error) {
+                if (isMounted) {
+                    console.error('Error fetching products:', error);
+                    addToast('Failed to load products', 'error');
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        performFetch();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [filters, sortOption, addToast]);
 
     // Filter products by search query (client-side)
     const displayedProducts = searchQuery
@@ -88,7 +120,6 @@ function ProductsContent() {
     const activeFilterCount =
         (filters.category ? 1 : 0) +
         (filters.sizes?.length || 0) +
-        (filters.colors?.length || 0) +
         (filters.priceRange ? 1 : 0);
 
     return (
@@ -113,6 +144,7 @@ function ProductsContent() {
                     <aside className="hidden lg:block w-64 flex-shrink-0">
                         <div className="sticky top-24">
                             <FilterPanel
+                                categories={categories}
                                 filters={filters}
                                 onFilterChange={setFilters}
                             />
@@ -204,6 +236,7 @@ function ProductsContent() {
                     />
                     <div className="absolute top-0 left-0 h-full w-80 max-w-[85vw] bg-white animate-slide-in-left">
                         <FilterPanel
+                            categories={categories}
                             filters={filters}
                             onFilterChange={setFilters}
                             onClose={() => setShowMobileFilters(false)}
