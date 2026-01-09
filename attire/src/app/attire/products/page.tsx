@@ -71,28 +71,6 @@ function ProductsContent() {
         });
     }, [searchParams]);
 
-    // Fetch products and categories
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        try {
-            const [productsResult, categoriesResult] = await Promise.all([
-                getProducts(filters, sortOption, 1, 24),
-                getCategories()
-            ]);
-            setProducts(productsResult.data);
-            setTotalProducts(productsResult.total);
-            setCategories(categoriesResult);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            addToast('Failed to load products', 'error');
-        } finally {
-            setLoading(false);
-        }
-    }, [filters, sortOption, addToast]);
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
     // 3. Fetch products whenever filters or sort changes
     useEffect(() => {
         let isMounted = true;
@@ -145,6 +123,7 @@ function ProductsContent() {
     // Count active filters
     const activeFilterCount =
         (filters.category ? 1 : 0) +
+        (filters.subcategory ? 1 : 0) +
         (filters.sizes?.length || 0) +
         (filters.priceRange ? 1 : 0);
 
@@ -172,7 +151,6 @@ function ProductsContent() {
                             <FilterPanel
                                 categories={categories}
                                 filters={filters}
-                                categories={categories}
                                 onFilterChange={setFilters}
                             />
                         </div>
@@ -271,7 +249,6 @@ function ProductsContent() {
                         <FilterPanel
                             categories={categories}
                             filters={filters}
-                            categories={categories}
                             onFilterChange={setFilters}
                             onClose={() => setShowMobileFilters(false)}
                             isMobile
