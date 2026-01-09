@@ -10,6 +10,7 @@
 import React, { useState } from 'react';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
 import { Category, FilterOptions } from '@/types';
+import { SIZES, COLORS } from '@/data/mock/products';
 import { SIZES } from '@/data/mock/products';
 import { cn, formatPrice } from '@/lib/utils';
 import Button from '@/components/ui/Button';
@@ -17,6 +18,7 @@ import Button from '@/components/ui/Button';
 interface FilterPanelProps {
     categories: Category[];
     filters: FilterOptions;
+    categories: Category[];
     onFilterChange: (filters: FilterOptions) => void;
     onClose?: () => void;
     isMobile?: boolean;
@@ -25,6 +27,7 @@ interface FilterPanelProps {
 export default function FilterPanel({
     categories,
     filters,
+    categories,
     onFilterChange,
     onClose,
     isMobile = false,
@@ -48,6 +51,13 @@ export default function FilterPanel({
             ...filters,
             category: filters.category === categorySlug ? undefined : categorySlug,
             subcategory: undefined,
+        });
+    };
+
+    const handleSubcategoryChange = (subcategorySlug: string) => {
+        onFilterChange({
+            ...filters,
+            subcategory: filters.subcategory === subcategorySlug ? undefined : subcategorySlug,
         });
     };
 
@@ -111,6 +121,48 @@ export default function FilterPanel({
                 >
                     <div className="space-y-2">
                         {categories.map((category) => (
+                            <div key={category.id} className="space-y-1">
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <input
+                                        type="radio"
+                                        name="category"
+                                        checked={filters.category === category.slug}
+                                        onChange={() => handleCategoryChange(category.slug)}
+                                        className="w-4 h-4 text-slate-900 border-slate-300 focus:ring-slate-900"
+                                    />
+                                    <span className={cn(
+                                        "text-sm transition-colors",
+                                        filters.category === category.slug ? "text-slate-900 font-medium" : "text-slate-700 group-hover:text-slate-900"
+                                    )}>
+                                        {category.name}
+                                    </span>
+                                </label>
+                                
+                                {/* Subcategories */}
+                                {filters.category === category.slug && category.subcategories && category.subcategories.length > 0 && (
+                                    <div className="ml-6 space-y-1 pt-1 pb-2 border-l border-slate-100 pl-4">
+                                        {category.subcategories.map((sub) => (
+                                            <label
+                                                key={sub.slug}
+                                                className="flex items-center gap-2 cursor-pointer group/sub"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={filters.subcategory === sub.slug}
+                                                    onChange={() => handleSubcategoryChange(sub.slug)}
+                                                    className="w-3.5 h-3.5 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
+                                                />
+                                                <span className={cn(
+                                                    "text-xs transition-colors",
+                                                    filters.subcategory === sub.slug ? "text-slate-900 font-medium" : "text-slate-500 group-hover/sub:text-slate-700"
+                                                )}>
+                                                    {sub.name}
+                                                </span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                             <label
                                 key={category.id}
                                 className="flex items-center gap-2 cursor-pointer"

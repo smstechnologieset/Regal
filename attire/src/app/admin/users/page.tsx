@@ -4,11 +4,11 @@
  * Admin Users Management Page
  * 
  * Lists all users with filtering and management actions.
+ * Uses secure API endpoints for data fetching and updates.
  */
 
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, MoreVertical, Mail, Shield, User } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { Search, Shield, User } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 interface UserProfile {
@@ -17,27 +17,34 @@ interface UserProfile {
     phone: string | null;
     role: string;
     created_at: string;
-    email?: string;
+    avatar_url?: string | null;
 }
 
 export default function AdminUsersPage() {
     const [users, setUsers] = useState<UserProfile[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [roleFilter, setRoleFilter] = useState('all');
 
     useEffect(() => {
         async function fetchUsers() {
-            const supabase = getSupabaseClient();
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (!error && data) {
-                setUsers(data);
+            try {
+                const response = await fetch('/api/admin/users');
+                
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to fetch users');
+                }
+                
+                const data = await response.json();
+                setUsers(data.users || []);
+            } catch (err) {
+                console.error('Error fetching users:', err);
+                setError(err instanceof Error ? err.message : 'Failed to load users');
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         }
 
         fetchUsers();
@@ -53,17 +60,26 @@ export default function AdminUsersPage() {
 
     const toggleUserRole = async (userId: string, currentRole: string) => {
         const newRole = currentRole === 'admin' ? 'user' : 'admin';
-        const supabase = getSupabaseClient();
 
-        const { error } = await supabase
-            .from('profiles')
-            .update({ role: newRole })
-            .eq('id', userId);
+        try {
+            const response = await fetch('/api/admin/users', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ targetUserId: userId, role: newRole }),
+            });
 
-        if (!error) {
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to update role');
+            }
+
+            // Update local state
             setUsers(users.map(u =>
                 u.id === userId ? { ...u, role: newRole } : u
             ));
+        } catch (err) {
+            console.error('Error updating user role:', err);
+            alert(err instanceof Error ? err.message : 'Failed to update role');
         }
     };
 

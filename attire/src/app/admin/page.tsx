@@ -4,6 +4,7 @@
  * Admin Dashboard Overview
  * 
  * Main admin dashboard with statistics and quick actions.
+ * Uses secure API endpoints for data fetching.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -21,7 +22,6 @@ import {
     Heart,
     UtensilsCrossed
 } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
 
 interface Stats {
     totalRevenue: number;
@@ -37,6 +37,15 @@ interface Stats {
     };
 }
 
+interface RecentOrder {
+    id: string;
+    total: number;
+    status: string;
+    service_type: string;
+    created_at: string;
+    profiles?: { full_name: string | null };
+}
+
 export default function AdminDashboard() {
     const [stats, setStats] = useState<Stats>({
         totalRevenue: 0,
@@ -47,77 +56,37 @@ export default function AdminDashboard() {
         ordersByService: { attire: 0, events: 0, bridal: 0, catering: 0 },
     });
     const [loading, setLoading] = useState(true);
-    const [recentOrders, setRecentOrders] = useState<any[]>([]);
+    const [error, setError] = useState<string | null>(null);
+    const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
 
     useEffect(() => {
         async function fetchStats() {
-            const supabase = getSupabaseClient();
-
-            interface Order {
-                id: string;
-                total: number;
-                created_at: string;
-                status: string;
-                service_type: string;
-            }
-
-            // Fetch all orders
-            const { data: orders } = await supabase
-                .from('orders')
-                .select('*') as { data: Order[] | null };
-
-            // Fetch users count
-            const { count: usersCount } = await supabase
-                .from('profiles')
-                .select('*', { count: 'exact', head: true });
-
-            // Fetch unread messages
-            const { count: unreadCount } = await supabase
-                .from('messages')
-                .select('*', { count: 'exact', head: true })
-                .eq('read', false);
-
-            // Fetch recent orders with user info
-            const { data: recent } = await supabase
-                .from('orders')
-                .select('*, profiles(full_name)')
-                .order('created_at', { ascending: false })
-                .limit(5);
-
-            if (orders) {
-                const now = new Date();
-                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-                const totalRevenue = orders.reduce((sum: number, o: Order) => sum + (o.total || 0), 0);
-                const monthlyRevenue = orders
-                    .filter((o: Order) => new Date(o.created_at) >= monthStart)
-                    .reduce((sum: number, o: Order) => sum + (o.total || 0), 0);
-                const activeOrders = orders.filter((o: Order) =>
-                    ['pending', 'confirmed', 'in_progress'].includes(o.status)
-                ).length;
-
-                const ordersByService = {
-                    attire: orders.filter((o: Order) => o.service_type === 'attire').length,
-                    events: orders.filter((o: Order) => o.service_type === 'events').length,
-                    bridal: orders.filter((o: Order) => o.service_type === 'bridal').length,
-                    catering: orders.filter((o: Order) => o.service_type === 'catering').length,
-                };
-
+            try {
+                const response = await fetch('/api/admin/stats');
+                
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to fetch stats');
+                }
+                
+                const data = await response.json();
+                
                 setStats({
-                    totalRevenue,
-                    monthlyRevenue,
-                    totalUsers: usersCount || 0,
-                    activeOrders,
-                    unreadMessages: unreadCount || 0,
-                    ordersByService,
+                    totalRevenue: data.totalRevenue,
+                    monthlyRevenue: data.monthlyRevenue,
+                    totalUsers: data.totalUsers,
+                    activeOrders: data.activeOrders,
+                    unreadMessages: data.unreadMessages,
+                    ordersByService: data.ordersByService,
                 });
+                
+                setRecentOrders(data.recentOrders || []);
+            } catch (err) {
+                console.error('Error fetching admin stats:', err);
+                setError(err instanceof Error ? err.message : 'Failed to load dashboard');
+            } finally {
+                setLoading(false);
             }
-
-            if (recent) {
-                setRecentOrders(recent);
-            }
-
-            setLoading(false);
         }
 
         fetchStats();

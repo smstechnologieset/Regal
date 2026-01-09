@@ -53,6 +53,10 @@ function ProductsContent() {
         const category = searchParams.get('category');
         const subcategory = searchParams.get('subcategory');
 
+        const newFilters: FilterOptions = {};
+        if (category) newFilters.category = category;
+        if (subcategory) newFilters.subcategory = subcategory;
+
         setFilters(prev => {
             // Only update if actually different to avoid unnecessary cycles
             if (prev.category === (category || undefined) &&
@@ -67,6 +71,28 @@ function ProductsContent() {
         });
     }, [searchParams]);
 
+    // Fetch products and categories
+    const fetchData = useCallback(async () => {
+        setLoading(true);
+        try {
+            const [productsResult, categoriesResult] = await Promise.all([
+                getProducts(filters, sortOption, 1, 24),
+                getCategories()
+            ]);
+            setProducts(productsResult.data);
+            setTotalProducts(productsResult.total);
+            setCategories(categoriesResult);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            addToast('Failed to load products', 'error');
+        } finally {
+            setLoading(false);
+        }
+    }, [filters, sortOption, addToast]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
     // 3. Fetch products whenever filters or sort changes
     useEffect(() => {
         let isMounted = true;
@@ -146,6 +172,7 @@ function ProductsContent() {
                             <FilterPanel
                                 categories={categories}
                                 filters={filters}
+                                categories={categories}
                                 onFilterChange={setFilters}
                             />
                         </div>
@@ -174,7 +201,13 @@ function ProductsContent() {
                                 {filters.category && (
                                     <FilterTag
                                         label={filters.category}
-                                        onRemove={() => setFilters({ ...filters, category: undefined })}
+                                        onRemove={() => setFilters({ ...filters, category: undefined, subcategory: undefined })}
+                                    />
+                                )}
+                                {filters.subcategory && (
+                                    <FilterTag
+                                        label={filters.subcategory}
+                                        onRemove={() => setFilters({ ...filters, subcategory: undefined })}
                                     />
                                 )}
                                 {filters.sizes?.map((size) => (
@@ -238,6 +271,7 @@ function ProductsContent() {
                         <FilterPanel
                             categories={categories}
                             filters={filters}
+                            categories={categories}
                             onFilterChange={setFilters}
                             onClose={() => setShowMobileFilters(false)}
                             isMobile

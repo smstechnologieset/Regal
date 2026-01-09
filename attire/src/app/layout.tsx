@@ -11,6 +11,7 @@ import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { SocketProvider } from "@/context/SocketContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -45,6 +46,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans min-h-screen flex flex-col`}>
         <AuthProvider>
+          <SocketProvider>
+            <AppProvider>
           <AppProvider>
             <WishlistProvider>
               <CartProvider>
@@ -54,6 +57,8 @@ export default function RootLayout({
                 <CartDrawer />
                 <ToastContainer />
               </CartProvider>
+            </AppProvider>
+          </SocketProvider>
             </WishlistProvider>
           </AppProvider>
         </AuthProvider>
