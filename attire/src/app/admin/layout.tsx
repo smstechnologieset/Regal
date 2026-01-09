@@ -7,7 +7,7 @@
  * Only accessible to users with admin role.
  */
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -47,36 +47,26 @@ const navItems = [
     { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
-export default function AdminLayout({
-    children,
+function AdminSidebar({
+    sidebarOpen,
+    setSidebarOpen,
+    pathname,
+    profile,
+    handleSignOut
 }: {
-    children: React.ReactNode;
+    sidebarOpen: boolean;
+    setSidebarOpen: (open: boolean) => void;
+    pathname: string;
+    profile: any;
+    handleSignOut: () => void;
 }) {
-    const pathname = usePathname();
-    const router = useRouter();
     const searchParams = useSearchParams();
-    const { profile, signOut } = useAuth();
-    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [ordersExpanded, setOrdersExpanded] = useState(pathname.includes('/admin/orders'));
-
-    const handleSignOut = async () => {
-        await signOut();
-        router.push('/');
-    };
 
     const currentPath = pathname + (searchParams.toString() ? '?' + searchParams.toString() : '');
 
     return (
-        <div className="min-h-screen bg-slate-100">
-            {/* Mobile Header */}
-            <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-slate-900 text-white flex items-center justify-between px-4 z-50">
-                <button onClick={() => setSidebarOpen(true)} className="p-2">
-                    <Menu size={24} />
-                </button>
-                <span className="font-bold text-lg">Admin Dashboard</span>
-                <div className="w-10"></div>
-            </header>
-
+        <>
             {/* Sidebar Overlay */}
             {sidebarOpen && (
                 <div
@@ -190,6 +180,51 @@ export default function AdminLayout({
                     </button>
                 </div>
             </aside>
+        </>
+    );
+}
+
+function SidebarFallback() {
+    return (
+        <aside className="fixed top-0 left-0 h-full w-72 bg-slate-900 z-50 animate-pulse" />
+    );
+}
+
+export default function AdminLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    const pathname = usePathname();
+    const router = useRouter();
+    const { profile, signOut } = useAuth();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    const handleSignOut = async () => {
+        await signOut();
+        router.push('/');
+    };
+
+    return (
+        <div className="min-h-screen bg-slate-100">
+            {/* Mobile Header */}
+            <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-slate-900 text-white flex items-center justify-between px-4 z-50">
+                <button onClick={() => setSidebarOpen(true)} className="p-2">
+                    <Menu size={24} />
+                </button>
+                <span className="font-bold text-lg">Admin Dashboard</span>
+                <div className="w-10"></div>
+            </header>
+
+            <Suspense fallback={<SidebarFallback />}>
+                <AdminSidebar
+                    sidebarOpen={sidebarOpen}
+                    setSidebarOpen={setSidebarOpen}
+                    pathname={pathname}
+                    profile={profile}
+                    handleSignOut={handleSignOut}
+                />
+            </Suspense>
 
             {/* Main Content */}
             <main className="lg:ml-72 pt-16 lg:pt-0 min-h-screen">

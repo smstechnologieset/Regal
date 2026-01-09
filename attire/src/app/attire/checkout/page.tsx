@@ -13,7 +13,8 @@ import Image from 'next/image';
 import { ChevronLeft, Truck, CreditCard, Banknote, Lock } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useApp } from '@/context/AppContext';
-import { submitOrder } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
+import { submitAttireOrder } from '@/lib/services/attire';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { formatPrice, isValidEmail, isValidPhone } from '@/lib/utils';
@@ -35,6 +36,7 @@ export default function CheckoutPage() {
     const router = useRouter();
     const { items, getCartTotal, clearCart } = useCart();
     const { addToast } = useApp();
+    const { user } = useAuth();
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod');
@@ -112,24 +114,39 @@ export default function CheckoutPage() {
             return;
         }
 
+        if (!user) {
+            addToast('Please log in to place an order', 'error');
+            router.push('/login?redirect=/attire/checkout');
+            return;
+        }
+
         setIsSubmitting(true);
 
         try {
-            // Submit order to mock API
-            const result = await submitOrder({
+            // Submit order to Supabase
+            const result = await submitAttireOrder({
+                userId: user.id,
                 items: items.map((item) => ({
                     productId: item.product.id,
+                    productName: item.product.name,
                     quantity: item.quantity,
                     size: item.selectedSize,
                     color: item.selectedColor.name,
+                    price: item.product.price,
                 })),
                 shippingAddress: formData,
+                subtotal,
+                shipping,
+                total,
             });
 
             if (result.success) {
                 // Clear cart and redirect to confirmation
                 clearCart();
+                addToast('Order placed successfully!', 'success');
                 router.push(`/attire/order-confirmation?orderId=${result.orderId}`);
+            } else {
+                addToast('Failed to place order. Please try again.', 'error');
             }
         } catch (error) {
             console.error('Order submission failed:', error);

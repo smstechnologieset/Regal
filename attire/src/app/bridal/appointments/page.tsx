@@ -1,15 +1,22 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Calendar, CheckCircle, Clock } from 'lucide-react';
-import { bridalServices } from '@/data/mock/bridal';
+import { getBridalServices, bookBridalAppointment } from '@/lib/services/bridal';
+import { BridalService } from '@/types';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useApp } from '@/context/AppContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function BridalAppointmentPage() {
     const { addToast } = useApp();
+    const { user } = useAuth();
+    const router = useRouter();
+
+    const [services, setServices] = useState<BridalService[]>([]);
     const [selectedService, setSelectedService] = useState('');
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
@@ -21,19 +28,63 @@ export default function BridalAppointmentPage() {
     });
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [loadingServices, setLoadingServices] = useState(true);
+
+    // Fetch services from database
+    useEffect(() => {
+        async function fetchServices() {
+            const data = await getBridalServices();
+            setServices(data);
+            setLoadingServices(false);
+        }
+        fetchServices();
+    }, []);
 
     // Mock time slots
     const timeSlots = ['10:00 AM', '11:00 AM', '01:00 PM', '02:00 PM', '04:00 PM'];
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!user) {
+            addToast('Please log in to book an appointment', 'error');
+            router.push('/login?redirect=/bridal/appointments');
+            return;
+        }
+
+        const service = services.find(s => s.id === selectedService);
+        if (!service) {
+            addToast('Please select a service', 'error');
+            return;
+        }
+
         setLoading(true);
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setLoading(false);
-        setSuccess(true);
-        addToast('Appointment booked successfully!', 'success');
+        try {
+            const result = await bookBridalAppointment({
+                userId: user.id,
+                serviceId: selectedService,
+                serviceName: service.title,
+                appointmentDate: date,
+                appointmentTime: time,
+                contactName: formData.name,
+                contactEmail: formData.email,
+                contactPhone: formData.phone,
+                notes: formData.notes,
+            });
+
+            if (result.success) {
+                setSuccess(true);
+                addToast('Appointment booked successfully!', 'success');
+            } else {
+                addToast('Failed to book appointment. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Booking failed:', error);
+            addToast('Failed to book appointment. Please try again.', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (success) {
@@ -97,12 +148,14 @@ export default function BridalAppointmentPage() {
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-3">Select Service</label>
                                     <div className="grid gap-3">
-                                        {bridalServices.map(service => (
+                                        {loadingServices ? (
+                                            <div className="text-center py-4 text-slate-500">Loading services...</div>
+                                        ) : services.map((service: BridalService) => (
                                             <label
                                                 key={service.id}
                                                 className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${selectedService === service.id
-                                                        ? 'border-rose-600 bg-rose-50'
-                                                        : 'border-slate-200 hover:border-slate-300'
+                                                    ? 'border-rose-600 bg-rose-50'
+                                                    : 'border-slate-200 hover:border-slate-300'
                                                     }`}
                                             >
                                                 <input

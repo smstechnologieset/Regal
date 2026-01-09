@@ -1,19 +1,24 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle, Utensils } from 'lucide-react';
-import { cateringPackages } from '@/data/mock/catering';
+import { getCateringPackages, submitCateringQuote } from '@/lib/services/catering';
+import { CateringPackage } from '@/data/mock/catering';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useApp } from '@/context/AppContext';
+import { useAuth } from '@/context/AuthContext';
 
 function CateringQuoteForm() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const { addToast } = useApp();
+    const { user } = useAuth();
 
     const preselectedPkgId = searchParams.get('package');
+    const [packages, setPackages] = useState<CateringPackage[]>([]);
     const [selectedPkg, setSelectedPkg] = useState(preselectedPkgId || '');
     const [guests, setGuests] = useState('');
     const [date, setDate] = useState('');
@@ -28,15 +33,56 @@ function CateringQuoteForm() {
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [loadingPackages, setLoadingPackages] = useState(true);
+
+    // Fetch packages from database
+    useEffect(() => {
+        async function fetchPackages() {
+            const data = await getCateringPackages();
+            setPackages(data);
+            setLoadingPackages(false);
+        }
+        fetchPackages();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!user) {
+            addToast('Please log in to request a quote', 'error');
+            router.push('/login?redirect=/catering/quote');
+            return;
+        }
+
         setLoading(true);
-        // Simulate API
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setLoading(false);
-        setSuccess(true);
-        addToast('Quote request sent!', 'success');
+
+        try {
+            const selectedPackage = packages.find(p => p.id === selectedPkg);
+            const result = await submitCateringQuote({
+                userId: user.id,
+                packageId: selectedPkg || undefined,
+                packageName: selectedPackage?.name,
+                guestCount: parseInt(guests) || 0,
+                eventDate: date,
+                venue: formData.venue,
+                dietaryRequirements: formData.dietary,
+                notes: formData.notes,
+                contactName: formData.name,
+                contactEmail: formData.email,
+            });
+
+            if (result.success) {
+                setSuccess(true);
+                addToast('Quote request sent!', 'success');
+            } else {
+                addToast('Failed to submit quote request. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Quote submission failed:', error);
+            addToast('Failed to submit quote request. Please try again.', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (success) {
@@ -92,9 +138,10 @@ function CateringQuoteForm() {
                                 value={selectedPkg}
                                 onChange={(e) => setSelectedPkg(e.target.value)}
                                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                                disabled={loadingPackages}
                             >
                                 <option value="">Custom / No Package</option>
-                                {cateringPackages.map(pkg => (
+                                {packages.map((pkg: CateringPackage) => (
                                     <option key={pkg.id} value={pkg.id}>{pkg.name} (${pkg.pricePerGuest}/guest)</option>
                                 ))}
                             </select>

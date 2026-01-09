@@ -1,19 +1,33 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Sparkles, Calendar, PenTool, ArrowRight } from 'lucide-react';
-import { eventPackages, eventTypes } from '@/data/mock/events';
+import { eventTypes } from '@/data/mock/events';
+import { getEventPackages } from '@/lib/services/events';
+import { EventPackage } from '@/types';
 import EventPackageCard from '@/components/events/EventPackageCard';
 import Button from '@/components/ui/Button';
 
 export default function EventsPage() {
     const [selectedType, setSelectedType] = useState<string>('all');
+    const [packages, setPackages] = useState<EventPackage[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchPackages() {
+            setLoading(true);
+            const data = await getEventPackages();
+            setPackages(data);
+            setLoading(false);
+        }
+        fetchPackages();
+    }, []);
 
     const filteredPackages = selectedType === 'all'
-        ? eventPackages
-        : eventPackages.filter(pkg => pkg.type === selectedType);
+        ? packages
+        : packages.filter(pkg => pkg.type === selectedType);
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -85,16 +99,24 @@ export default function EventsPage() {
             {/* Packages Grid */}
             <section className="py-16 md:py-24">
                 <div className="container mx-auto px-4">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredPackages.map((pkg) => (
-                            <EventPackageCard key={pkg.id} eventPackage={pkg} />
-                        ))}
-                    </div>
-
-                    {filteredPackages.length === 0 && (
-                        <div className="text-center py-20">
-                            <p className="text-slate-500 text-lg">No event packages found for this category.</p>
+                    {loading ? (
+                        <div className="flex flex-center justify-center py-20">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600"></div>
                         </div>
+                    ) : (
+                        <>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {filteredPackages.map((pkg) => (
+                                    <EventPackageCard key={pkg.id} eventPackage={pkg} />
+                                ))}
+                            </div>
+
+                            {filteredPackages.length === 0 && (
+                                <div className="text-center py-20">
+                                    <p className="text-slate-500 text-lg">No event packages found for this category.</p>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </section>
@@ -122,3 +144,4 @@ export default function EventsPage() {
         </div>
     );
 }
+

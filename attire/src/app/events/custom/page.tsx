@@ -1,35 +1,62 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Upload } from 'lucide-react';
-import { eventTypes, commonFeatures, eventPackages } from '@/data/mock/events';
+import { ArrowLeft } from 'lucide-react';
+import { eventTypes, commonFeatures } from '@/data/mock/events';
+import { getEventPackages, submitEventRequest } from '@/lib/services/events';
+import { EventPackage } from '@/types';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useApp } from '@/context/AppContext';
+import { useAuth } from '@/context/AuthContext';
 
 function CustomEventForm() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { addToast } = useApp();
+    const { user } = useAuth();
 
     const packageId = searchParams.get('package');
-    const selectedPackage = packageId ? eventPackages.find(p => p.id === packageId) : null;
+    const [packages, setPackages] = useState<EventPackage[]>([]);
+    const [selectedPackage, setSelectedPackage] = useState<EventPackage | null>(null);
 
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        eventType: selectedPackage ? selectedPackage.type : '',
-        guestCount: selectedPackage && selectedPackage.capacity ? parseInt(selectedPackage.capacity.match(/\d+/)?.[0] || '50') : '',
-        budget: selectedPackage ? selectedPackage.priceStart : '',
+        eventType: '',
+        guestCount: '' as string | number,
+        budget: '' as string | number,
         date: '',
         description: '',
-        features: selectedPackage ? [...selectedPackage.features] : [] as string[],
+        features: [] as string[],
         name: '',
         email: '',
         phone: '',
     });
+
+    // Fetch packages and set selected if packageId exists
+    useEffect(() => {
+        async function fetchPackages() {
+            const data = await getEventPackages();
+            setPackages(data);
+            if (packageId) {
+                const pkg = data.find(p => p.id === packageId);
+                if (pkg) {
+                    setSelectedPackage(pkg);
+                    setFormData(prev => ({
+                        ...prev,
+                        eventType: pkg.type,
+                        guestCount: pkg.capacity ? parseInt(pkg.capacity.match(/\d+/)?.[0] || '50') : '',
+                        budget: pkg.priceStart,
+                        features: [...pkg.features],
+                    }));
+                }
+            }
+        }
+        fetchPackages();
+    }, [packageId]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -52,14 +79,41 @@ function CustomEventForm() {
             return;
         }
 
-        setLoading(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setLoading(false);
+        if (!user) {
+            addToast('Please log in to submit a request', 'error');
+            router.push('/login?redirect=/events/custom');
+            return;
+        }
 
-        // Show success and redirect
-        addToast('Request submitted successfully!', 'success');
-        router.push('/events/requests/REQ-12345');
+        setLoading(true);
+
+        try {
+            const result = await submitEventRequest({
+                userId: user.id,
+                packageId: selectedPackage?.id,
+                eventType: formData.eventType,
+                guestCount: Number(formData.guestCount) || 0,
+                budget: Number(formData.budget) || 0,
+                date: formData.date,
+                features: formData.features,
+                description: formData.description,
+                contactName: formData.name,
+                contactEmail: formData.email,
+                contactPhone: formData.phone,
+            });
+
+            if (result.success) {
+                addToast('Request submitted successfully!', 'success');
+                router.push(`/dashboard/orders`);
+            } else {
+                addToast('Failed to submit request. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Event request failed:', error);
+            addToast('Failed to submit request. Please try again.', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
