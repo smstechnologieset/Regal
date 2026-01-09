@@ -48,19 +48,17 @@ export default function RootLayout({
         <AuthProvider>
           <SocketProvider>
             <AppProvider>
-          <AppProvider>
-            <WishlistProvider>
-              <CartProvider>
-                <Header />
-                <main className="flex-1">{children}</main>
-                <Footer />
-                <CartDrawer />
-                <ToastContainer />
-              </CartProvider>
+              <WishlistProvider>
+                <CartProvider>
+                  <Header />
+                  <main className="flex-1">{children}</main>
+                  <Footer />
+                  <CartDrawer />
+                  <ToastContainer />
+                </CartProvider>
+              </WishlistProvider>
             </AppProvider>
           </SocketProvider>
-            </WishlistProvider>
-          </AppProvider>
         </AuthProvider>
       </body>
     </html>

@@ -11,14 +11,12 @@ import React, { useState } from 'react';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
 import { Category, FilterOptions } from '@/types';
 import { SIZES, COLORS } from '@/data/mock/products';
-import { SIZES } from '@/data/mock/products';
 import { cn, formatPrice } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 
 interface FilterPanelProps {
     categories: Category[];
     filters: FilterOptions;
-    categories: Category[];
     onFilterChange: (filters: FilterOptions) => void;
     onClose?: () => void;
     isMobile?: boolean;
@@ -27,7 +25,6 @@ interface FilterPanelProps {
 export default function FilterPanel({
     categories,
     filters,
-    categories,
     onFilterChange,
     onClose,
     isMobile = false,
@@ -163,19 +160,6 @@ export default function FilterPanel({
                                     </div>
                                 )}
                             </div>
-                            <label
-                                key={category.id}
-                                className="flex items-center gap-2 cursor-pointer"
-                            >
-                                <input
-                                    type="radio"
-                                    name="category"
-                                    checked={filters.category === category.slug}
-                                    onChange={() => handleCategoryChange(category.slug)}
-                                    className="w-4 h-4 text-slate-900 border-slate-300 focus:ring-slate-900"
-                                />
-                                <span className="text-sm text-slate-700">{category.name}</span>
-                            </label>
                         ))}
                     </div>
                 </FilterSection>
