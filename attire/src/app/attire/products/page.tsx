@@ -10,8 +10,8 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Filter, X, SlidersHorizontal } from 'lucide-react';
-import { Product, FilterOptions, SortOption } from '@/types';
-import { getProducts } from '@/lib/api';
+import { Product, Category, FilterOptions, SortOption } from '@/types';
+import { getProducts, getCategories } from '@/lib/api';
 import ProductCard from '@/components/product/ProductCard';
 import { ProductGridSkeleton } from '@/components/skeletons/ProductCardSkeleton';
 import FilterPanel from '@/components/filters/FilterPanel';
@@ -25,6 +25,7 @@ function ProductsContent() {
     const searchParams = useSearchParams();
 
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [totalProducts, setTotalProducts] = useState(0);
     const [filters, setFilters] = useState<FilterOptions>({});
@@ -38,7 +39,6 @@ function ProductsContent() {
     useEffect(() => {
         const category = searchParams.get('category');
         const subcategory = searchParams.get('subcategory');
-        const search = searchParams.get('search');
 
         const newFilters: FilterOptions = {};
         if (category) newFilters.category = category;
@@ -47,15 +47,19 @@ function ProductsContent() {
         setFilters(newFilters);
     }, [searchParams]);
 
-    // Fetch products when filters or sort changes
-    const fetchProducts = useCallback(async () => {
+    // Fetch products and categories
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const result = await getProducts(filters, sortOption, 1, 24);
-            setProducts(result.data);
-            setTotalProducts(result.total);
+            const [productsResult, categoriesResult] = await Promise.all([
+                getProducts(filters, sortOption, 1, 24),
+                getCategories()
+            ]);
+            setProducts(productsResult.data);
+            setTotalProducts(productsResult.total);
+            setCategories(categoriesResult);
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error('Error fetching data:', error);
             addToast('Failed to load products', 'error');
         } finally {
             setLoading(false);
@@ -63,8 +67,8 @@ function ProductsContent() {
     }, [filters, sortOption, addToast]);
 
     useEffect(() => {
-        fetchProducts();
-    }, [fetchProducts]);
+        fetchData();
+    }, [fetchData]);
 
     // Filter products by search query (client-side)
     const displayedProducts = searchQuery
@@ -114,6 +118,7 @@ function ProductsContent() {
                         <div className="sticky top-24">
                             <FilterPanel
                                 filters={filters}
+                                categories={categories}
                                 onFilterChange={setFilters}
                             />
                         </div>
@@ -142,7 +147,13 @@ function ProductsContent() {
                                 {filters.category && (
                                     <FilterTag
                                         label={filters.category}
-                                        onRemove={() => setFilters({ ...filters, category: undefined })}
+                                        onRemove={() => setFilters({ ...filters, category: undefined, subcategory: undefined })}
+                                    />
+                                )}
+                                {filters.subcategory && (
+                                    <FilterTag
+                                        label={filters.subcategory}
+                                        onRemove={() => setFilters({ ...filters, subcategory: undefined })}
                                     />
                                 )}
                                 {filters.sizes?.map((size) => (
@@ -205,6 +216,7 @@ function ProductsContent() {
                     <div className="absolute top-0 left-0 h-full w-80 max-w-[85vw] bg-white animate-slide-in-left">
                         <FilterPanel
                             filters={filters}
+                            categories={categories}
                             onFilterChange={setFilters}
                             onClose={() => setShowMobileFilters(false)}
                             isMobile

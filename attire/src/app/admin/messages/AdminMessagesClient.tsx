@@ -4,12 +4,12 @@
  * Admin Messages Client Component
  * 
  * Lists all customer conversations for admin to manage.
+ * Uses secure API endpoints for data fetching.
  */
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { MessageSquare, ChevronRight, Search, Clock, User } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
 
 interface Conversation {
     id: string;
@@ -25,25 +25,35 @@ interface Conversation {
 export default function AdminMessagesClient() {
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
 
     useEffect(() => {
         async function fetchConversations() {
-            const supabase = getSupabaseClient();
-            const { data, error } = await supabase
-                .from('conversations')
-                .select('*, profiles(full_name)')
-                .order('last_message_at', { ascending: false });
-
-            if (!error && data) {
-                setConversations(data);
+            try {
+                const params = new URLSearchParams();
+                if (statusFilter !== 'all') params.set('status', statusFilter);
+                
+                const response = await fetch(`/api/admin/conversations?${params.toString()}`);
+                
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to fetch conversations');
+                }
+                
+                const data = await response.json();
+                setConversations(data.conversations || []);
+            } catch (err) {
+                console.error('Error fetching conversations:', err);
+                setError(err instanceof Error ? err.message : 'Failed to load conversations');
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         }
 
         fetchConversations();
-    }, []);
+    }, [statusFilter]);
 
     const filteredConversations = conversations.filter(conv => {
         const matchesSearch = !search ||

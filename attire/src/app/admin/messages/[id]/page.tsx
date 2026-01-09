@@ -4,13 +4,13 @@
  * Admin Message Detail Page
  * 
  * Shows conversation with customer for admin to respond.
+ * Uses secure API endpoints for data fetching and updates.
  */
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Loader2, User, Package, XCircle, CheckCircle } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
 import ChatWindow from '@/components/chat/ChatWindow';
 import Button from '@/components/ui/Button';
 
@@ -30,22 +30,28 @@ export default function AdminMessagePage() {
     const conversationId = params.id as string;
     const [conversation, setConversation] = useState<Conversation | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchConversation() {
             if (!conversationId) return;
 
-            const supabase = getSupabaseClient();
-            const { data, error } = await supabase
-                .from('conversations')
-                .select('*, profiles(full_name)')
-                .eq('id', conversationId)
-                .single();
-
-            if (!error && data) {
-                setConversation(data);
+            try {
+                const response = await fetch(`/api/admin/conversations/${conversationId}`);
+                
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to fetch conversation');
+                }
+                
+                const data = await response.json();
+                setConversation(data.conversation);
+            } catch (err) {
+                console.error('Error fetching conversation:', err);
+                setError(err instanceof Error ? err.message : 'Conversation not found');
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         }
 
         fetchConversation();
@@ -55,15 +61,23 @@ export default function AdminMessagePage() {
         if (!conversation) return;
 
         const newStatus = conversation.status === 'open' ? 'closed' : 'open';
-        const supabase = getSupabaseClient();
 
-        const { error } = await supabase
-            .from('conversations')
-            .update({ status: newStatus })
-            .eq('id', conversationId);
+        try {
+            const response = await fetch('/api/admin/conversations', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ conversationId, status: newStatus }),
+            });
 
-        if (!error) {
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to update status');
+            }
+
             setConversation({ ...conversation, status: newStatus });
+        } catch (err) {
+            console.error('Error updating conversation status:', err);
+            alert(err instanceof Error ? err.message : 'Failed to update status');
         }
     };
 

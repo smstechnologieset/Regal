@@ -4,20 +4,26 @@
  * Chat Window Component
  * 
  * Reusable real-time chat interface for both user and admin views.
- * Uses Supabase Realtime for message sync.
+ * Uses Socket.io via SocketContext for real-time messaging, typing indicators, and read receipts.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { getSupabaseClient } from '@/lib/supabase/client';
+import { useSocket } from '@/context/SocketContext';
 
 interface Message {
     id: string;
+    conversation_id: string;
     sender_id: string;
     content: string;
-    created_at: string;
     read: boolean;
+    created_at: string;
+}
+
+interface TypingUser {
+    userId: string;
+    userName: string;
 }
 
 interface ChatWindowProps {
@@ -26,100 +32,117 @@ interface ChatWindowProps {
 }
 
 export default function ChatWindow({ conversationId, isAdmin = false }: ChatWindowProps) {
-    const { user, profile } = useAuth();
+    const { user } = useAuth();
+    const { 
+        joinConversation, 
+        leaveConversation, 
+        sendMessage, 
+        startTyping, 
+        stopTyping, 
+        markAsRead, 
+        onNewMessage,
+        onTypingUpdate,
+        onMessagesRead,
+        isConnected
+    } = useSocket();
+
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
-    const [sending, setSending] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const supabase = getSupabaseClient();
 
     // Scroll to bottom
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    // Fetch messages
+    // Initial fetch of messages via API
     useEffect(() => {
         async function fetchMessages() {
-            const { data, error } = await supabase
-                .from('messages')
-                .select('*')
-                .eq('conversation_id', conversationId)
-                .order('created_at', { ascending: true });
-
-            if (!error && data) {
-                setMessages(data);
+            try {
+                const endpoint = isAdmin 
+                    ? `/api/admin/conversations/${conversationId}` 
+                    : `/api/conversations/${conversationId}`; // Need to ensure user-side API exists too
+                
+                const response = await fetch(endpoint);
+                if (response.ok) {
+                    const data = await response.json();
+                    setMessages(data.messages || []);
+                }
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         }
 
         fetchMessages();
-    }, [conversationId, supabase]);
+    }, [conversationId, isAdmin]);
 
-    // Subscribe to real-time updates
+    // Socket listeners setup
     useEffect(() => {
-        const channel = supabase
-            .channel(`messages:${conversationId}`)
-            .on(
-                'postgres_changes',
-                {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'messages',
-                    filter: `conversation_id=eq.${conversationId}`,
-                },
-                (payload: any) => {
-                    setMessages((prev) => [...prev, payload.new as Message]);
-                }
-            )
-            .subscribe();
+        if (!isConnected) return;
+
+        joinConversation(conversationId);
+
+        const removeNewMessage = onNewMessage((msg) => {
+            if (msg.conversation_id === conversationId) {
+                setMessages((prev) => [...prev, msg]);
+            }
+        });
+
+        const removeTypingUpdate = onTypingUpdate((data) => {
+            if (data.conversationId === conversationId) {
+                setTypingUsers(data.users);
+            }
+        });
+
+        const removeMessagesRead = onMessagesRead((data) => {
+            if (data.conversationId === conversationId) {
+                setMessages((prev) => prev.map(m => ({ ...m, read: true })));
+            }
+        });
 
         return () => {
-            supabase.removeChannel(channel);
+            leaveConversation(conversationId);
+            removeNewMessage();
+            removeTypingUpdate();
+            removeMessagesRead();
         };
-    }, [conversationId, supabase]);
+    }, [conversationId, isConnected, joinConversation, leaveConversation, onNewMessage, onTypingUpdate, onMessagesRead]);
 
     // Scroll on new messages
     useEffect(() => {
         scrollToBottom();
-    }, [messages]);
+    }, [messages, typingUsers]);
 
-    // Mark messages as read
+    // Mark messages as read when window is open and new messages arrive
     useEffect(() => {
-        if (isAdmin && messages.length > 0) {
-            const unreadIds = messages
-                .filter(m => !m.read && m.sender_id !== user?.id)
-                .map(m => m.id);
-
-            if (unreadIds.length > 0) {
-                supabase
-                    .from('messages')
-                    .update({ read: true })
-                    .in('id', unreadIds)
-                    .then();
+        if (messages.length > 0) {
+            const hasUnread = messages.some(m => !m.read && m.sender_id !== user?.id);
+            if (hasUnread) {
+                markAsRead(conversationId);
             }
         }
-    }, [messages, isAdmin, user, supabase]);
+    }, [messages, conversationId, user?.id, markAsRead]);
 
-    const handleSend = async (e: React.FormEvent) => {
+    const handleSend = (e: React.FormEvent) => {
         e.preventDefault();
         if (!newMessage.trim() || !user) return;
 
-        setSending(true);
+        sendMessage(conversationId, newMessage.trim());
+        setNewMessage('');
+        stopTyping(conversationId);
+    };
 
-        const { error } = await supabase.from('messages').insert({
-            conversation_id: conversationId,
-            sender_id: user.id,
-            content: newMessage.trim(),
-            read: false,
-        });
-
-        if (!error) {
-            setNewMessage('');
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNewMessage(e.target.value);
+        if (e.target.value.trim()) {
+            startTyping(conversationId);
+        } else {
+            stopTyping(conversationId);
         }
-
-        setSending(false);
     };
 
     const formatTime = (date: string) => {
@@ -145,9 +168,16 @@ export default function ChatWindow({ conversationId, isAdmin = false }: ChatWind
     });
 
     return (
-        <div className="flex flex-col h-[500px] bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+        <div className="flex flex-col h-[600px] bg-slate-50 rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            {/* Connection Status */}
+            {!isConnected && (
+                <div className="bg-amber-50 text-amber-700 text-xs py-1 px-4 text-center border-b border-amber-100 italic">
+                    Connecting to real-time service...
+                </div>
+            )}
+
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
                 {loading ? (
                     <div className="flex items-center justify-center h-full">
                         <Loader2 className="animate-spin text-slate-400" size={24} />
@@ -159,12 +189,12 @@ export default function ChatWindow({ conversationId, isAdmin = false }: ChatWind
                 ) : (
                     Object.entries(groupedMessages).map(([date, msgs]) => (
                         <div key={date}>
-                            <div className="text-center mb-4">
-                                <span className="px-3 py-1 bg-white text-xs text-slate-500 rounded-full border border-slate-200">
+                            <div className="text-center mb-6">
+                                <span className="px-3 py-1 bg-white text-xs text-slate-500 rounded-full border border-slate-100 shadow-sm">
                                     {date}
                                 </span>
                             </div>
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 {msgs.map((msg) => {
                                     const isOwn = msg.sender_id === user?.id;
                                     return (
@@ -172,19 +202,25 @@ export default function ChatWindow({ conversationId, isAdmin = false }: ChatWind
                                             key={msg.id}
                                             className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
                                         >
-                                            <div
-                                                className={`max-w-[75%] px-4 py-2 rounded-2xl ${isOwn
-                                                    ? 'bg-rose-600 text-white rounded-br-sm'
-                                                    : 'bg-white text-slate-900 border border-slate-200 rounded-bl-sm'
-                                                    }`}
-                                            >
-                                                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                                                <p
-                                                    className={`text-xs mt-1 ${isOwn ? 'text-rose-200' : 'text-slate-400'
+                                            <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} max-w-[80%]`}>
+                                                <div
+                                                    className={`px-4 py-2.5 rounded-2xl shadow-sm ${isOwn
+                                                        ? 'bg-rose-600 text-white rounded-br-none'
+                                                        : 'bg-white text-slate-900 border border-slate-100 rounded-bl-none'
                                                         }`}
                                                 >
-                                                    {formatTime(msg.created_at)}
-                                                </p>
+                                                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                                                </div>
+                                                <div className="flex items-center gap-1.5 mt-1 px-1">
+                                                    <p className="text-[10px] text-slate-400 font-medium">
+                                                        {formatTime(msg.created_at)}
+                                                    </p>
+                                                    {isOwn && (
+                                                        <span className={`text-[10px] font-bold ${msg.read ? 'text-blue-500' : 'text-slate-300'}`}>
+                                                            {msg.read ? 'Read' : 'Sent'}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     );
@@ -192,6 +228,24 @@ export default function ChatWindow({ conversationId, isAdmin = false }: ChatWind
                             </div>
                         </div>
                     ))
+                )}
+
+                {/* Typing Indicator */}
+                {typingUsers.length > 0 && (
+                    <div className="flex justify-start">
+                        <div className="bg-slate-200/50 px-3 py-1.5 rounded-full flex items-center gap-2">
+                             <div className="flex gap-1">
+                                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></span>
+                             </div>
+                             <span className="text-[10px] text-slate-500 font-medium">
+                                {typingUsers.length === 1 
+                                    ? `${typingUsers[0].userName} is typing...` 
+                                    : 'Several people are typing...'}
+                             </span>
+                        </div>
+                    </div>
                 )}
                 <div ref={messagesEndRef} />
             </div>
@@ -202,21 +256,17 @@ export default function ChatWindow({ conversationId, isAdmin = false }: ChatWind
                     <input
                         type="text"
                         value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
+                        onChange={handleInputChange}
                         placeholder="Type your message..."
-                        className="flex-1 px-4 py-2 border border-slate-200 rounded-full focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
-                        disabled={sending}
+                        className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full focus:ring-2 focus:ring-rose-500 focus:bg-white focus:border-transparent outline-none transition-all text-sm"
+                        autoComplete="off"
                     />
                     <button
                         type="submit"
-                        disabled={sending || !newMessage.trim()}
-                        className="w-10 h-10 bg-rose-600 text-white rounded-full flex items-center justify-center hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        disabled={!newMessage.trim()}
+                        className="w-10 h-10 bg-rose-600 text-white rounded-full flex items-center justify-center hover:bg-rose-700 disabled:opacity-40 disabled:scale-95 disabled:cursor-not-allowed transition-all shadow-sm"
                     >
-                        {sending ? (
-                            <Loader2 className="animate-spin" size={18} />
-                        ) : (
-                            <Send size={18} />
-                        )}
+                        <Send size={18} />
                     </button>
                 </div>
             </form>

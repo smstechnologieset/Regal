@@ -4,13 +4,13 @@
  * Admin Orders Management - Client Component
  * 
  * Lists all orders with filtering by service and status.
+ * Uses secure API endpoints for data fetching.
  */
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Search, ChevronRight, Package, ShoppingBag, Calendar, Heart, UtensilsCrossed } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase/client';
 
 interface Order {
     id: string;
@@ -26,26 +26,37 @@ export default function AdminOrdersClient() {
     const searchParams = useSearchParams();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [serviceFilter, setServiceFilter] = useState(searchParams.get('service') || 'all');
     const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
 
     useEffect(() => {
         async function fetchOrders() {
-            const supabase = getSupabaseClient();
-            const { data, error } = await supabase
-                .from('orders')
-                .select('*, profiles(full_name)')
-                .order('created_at', { ascending: false });
-
-            if (!error && data) {
-                setOrders(data);
+            try {
+                const params = new URLSearchParams();
+                if (serviceFilter !== 'all') params.set('service', serviceFilter);
+                if (statusFilter !== 'all') params.set('status', statusFilter);
+                
+                const response = await fetch(`/api/admin/orders?${params.toString()}`);
+                
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to fetch orders');
+                }
+                
+                const data = await response.json();
+                setOrders(data.orders || []);
+            } catch (err) {
+                console.error('Error fetching orders:', err);
+                setError(err instanceof Error ? err.message : 'Failed to load orders');
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         }
 
         fetchOrders();
-    }, []);
+    }, [serviceFilter, statusFilter]);
 
     const filteredOrders = orders.filter(order => {
         const matchesSearch = !search ||
