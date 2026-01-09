@@ -193,3 +193,24 @@ export interface AppointmentSlot {
   time: string;
   available: boolean;
 }
+
+// Catering Types
+export interface MenuItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: 'appetizer' | 'main' | 'dessert' | 'drink' | 'station';
+  dietary?: string[];
+  image: string;
+}
+
+export interface CateringPackage {
+  id: string;
+  name: string;
+  description: string;
+  pricePerGuest: number;
+  minGuests: number;
+  includes: string[];
+  image: string;
+}

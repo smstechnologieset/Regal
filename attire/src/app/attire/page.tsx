@@ -14,9 +14,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Truck, RefreshCw, Shield, Clock } from 'lucide-react';
-import { Product } from '@/types';
-import { getFeaturedProducts } from '@/lib/api';
-import { categories } from '@/data/mock/products';
+import { Product, Category } from '@/types';
+import { getFeaturedProducts, getCategories } from '@/lib/api';
 import ProductCard from '@/components/product/ProductCard';
 import { ProductGridSkeleton } from '@/components/skeletons/ProductCardSkeleton';
 import Button from '@/components/ui/Button';
@@ -55,26 +54,33 @@ export default function AttireHomePage() {
     bestsellers: Product[];
     onSale: Product[];
   } | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const { addToCart, toggleCart } = useCart();
   const { addToast } = useApp();
 
-  // Fetch featured products
+  // Fetch featured products and categories
   useEffect(() => {
-    const fetchProducts = async () => {
+    setMounted(true);
+    const fetchData = async () => {
       try {
-        const data = await getFeaturedProducts();
-        setFeaturedProducts(data);
+        const [productsData, categoriesData] = await Promise.all([
+          getFeaturedProducts(),
+          getCategories()
+        ]);
+        setFeaturedProducts(productsData);
+        setCategories(categoriesData);
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
+    fetchData();
   }, []);
 
   // Auto-rotate hero slides
@@ -95,6 +101,8 @@ export default function AttireHomePage() {
       toggleCart();
     }
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen">

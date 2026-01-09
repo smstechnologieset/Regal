@@ -2,6 +2,7 @@
  * Events Service API
  * 
  * Handles all event-related data fetching and order submissions.
+ * Uses the standard public Supabase client for client-side and server-side compatibility.
  */
 
 import { getSupabaseClient } from '@/lib/supabase/client';
@@ -24,16 +25,16 @@ export async function getEventPackages(): Promise<EventPackage[]> {
     }
 
     // Transform database format to TypeScript interface format
-    return (data || []).map((pkg: Record<string, unknown>) => ({
-        id: pkg.id,
-        title: pkg.title,
-        description: pkg.description,
-        type: pkg.type,
-        priceStart: pkg.price_start,
-        features: pkg.features || [],
-        image: pkg.image,
-        capacity: pkg.capacity,
-        popular: pkg.popular,
+    return (data || []).map((pkg: Record<string, any>) => ({
+        id: pkg.id as string,
+        title: pkg.title as string,
+        description: pkg.description as string,
+        type: pkg.type as 'wedding' | 'birthday' | 'corporate' | 'graduation' | 'social',
+        priceStart: pkg.price_start as number,
+        features: (pkg.features as string[]) || [],
+        image: pkg.image as string,
+        capacity: pkg.capacity as string,
+        popular: pkg.popular as boolean,
     }));
 }
 
@@ -54,16 +55,16 @@ export async function getEventPackagesByType(type: string): Promise<EventPackage
         return [];
     }
 
-    return (data || []).map((pkg: Record<string, unknown>) => ({
-        id: pkg.id,
-        title: pkg.title,
-        description: pkg.description,
-        type: pkg.type,
-        priceStart: pkg.price_start,
-        features: pkg.features || [],
-        image: pkg.image,
-        capacity: pkg.capacity,
-        popular: pkg.popular,
+    return (data || []).map((pkg: Record<string, any>) => ({
+        id: pkg.id as string,
+        title: pkg.title as string,
+        description: pkg.description as string,
+        type: pkg.type as 'wedding' | 'birthday' | 'corporate' | 'graduation' | 'social',
+        priceStart: pkg.price_start as number,
+        features: (pkg.features as string[]) || [],
+        image: pkg.image as string,
+        capacity: pkg.capacity as string,
+        popular: pkg.popular as boolean,
     }));
 }
 

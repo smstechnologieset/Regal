@@ -64,7 +64,7 @@ export default function BridalAppointmentPage() {
             const result = await bookBridalAppointment({
                 userId: user.id,
                 serviceId: selectedService,
-                serviceName: service.title,
+                serviceTitle: service.title,
                 appointmentDate: date,
                 appointmentTime: time,
                 contactName: formData.name,

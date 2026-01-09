@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Sparkles, Calendar, PenTool, ArrowRight } from 'lucide-react';
-import { eventTypes } from '@/data/mock/events';
+import { EVENT_TYPES } from '@/lib/constants';
 import { getEventPackages } from '@/lib/services/events';
 import { EventPackage } from '@/types';
 import EventPackageCard from '@/components/events/EventPackageCard';
@@ -14,8 +14,10 @@ export default function EventsPage() {
     const [selectedType, setSelectedType] = useState<string>('all');
     const [packages, setPackages] = useState<EventPackage[]>([]);
     const [loading, setLoading] = useState(true);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         async function fetchPackages() {
             setLoading(true);
             const data = await getEventPackages();
@@ -28,6 +30,8 @@ export default function EventsPage() {
     const filteredPackages = selectedType === 'all'
         ? packages
         : packages.filter(pkg => pkg.type === selectedType);
+
+    if (!mounted) return null;
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -80,7 +84,7 @@ export default function EventsPage() {
                         >
                             All Events
                         </button>
-                        {eventTypes.map((type) => (
+                        {EVENT_TYPES.map((type) => (
                             <button
                                 key={type.value}
                                 onClick={() => setSelectedType(type.value)}

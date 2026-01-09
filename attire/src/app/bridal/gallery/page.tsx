@@ -9,6 +9,7 @@ import { BridalGown } from '@/types';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { formatPrice } from '@/lib/utils';
+import { BRIDAL_SILHOUETTES } from '@/lib/constants';
 
 export default function BridalGalleryPage() {
     const [filter, setFilter] = useState('all');
@@ -27,9 +28,9 @@ export default function BridalGalleryPage() {
 
     const filteredGowns = filter === 'all'
         ? gowns
-        : gowns.filter(gown => gown.silhouette.toLowerCase() === filter);
+        : gowns.filter(gown => gown.silhouette.toLowerCase() === filter.toLowerCase());
 
-    const silhouettes = ['all', ...Array.from(new Set(gowns.map(g => g.silhouette.toLowerCase())))];
+    const silhouettes = ['all', ...BRIDAL_SILHOUETTES];
 
     return (
         <div className="min-h-screen bg-slate-50 py-12">

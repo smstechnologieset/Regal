@@ -37,8 +37,11 @@ export default function AccountLayout({
     const router = useRouter();
     const { profile, signOut, isAdmin, user, isLoading } = useAuth();
 
+    const [isLoggingOut, setIsLoggingOut] = React.useState(false);
+
     const handleSignOut = async () => {
         try {
+            setIsLoggingOut(true);
             await signOut();
             router.push('/');
         } catch (error) {
@@ -50,10 +53,10 @@ export default function AccountLayout({
 
     // Redirect if not logged in
     React.useEffect(() => {
-        if (!isLoading && !user) {
+        if (!isLoading && !user && !isLoggingOut) {
             router.push('/login?redirect=' + encodeURIComponent(pathname));
         }
-    }, [user, isLoading, router, pathname]);
+    }, [user, isLoading, router, pathname, isLoggingOut]);
 
     if (isLoading) {
         return (

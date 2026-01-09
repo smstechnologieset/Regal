@@ -35,13 +35,6 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 /**
- * Search products by query
- */
-export async function searchProducts(query: string): Promise<Product[]> {
-    return attireService.searchProducts(query);
-}
-
-/**
  * Get featured products for homepage
  */
 export async function getFeaturedProducts(): Promise<{
@@ -64,12 +57,6 @@ export async function getRelatedProducts(productId: string, limit: number = 4): 
  * Routes to attire service
  */
 export async function submitOrder(orderData: any): Promise<{ orderId: string; success: boolean }> {
-    // Note: The UI might need small adjustments to pass the right data structure
-    // but the service handles the Supabase interaction.
-    const result = await attireService.submitAttireOrder(orderData);
-    return {
-        orderId: result.orderId,
-        success: result.success
-    };
+    return attireService.createOrder(orderData);
 }
 

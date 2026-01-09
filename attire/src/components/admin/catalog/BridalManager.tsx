@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, X, Heart, Loader2, Sparkles, Scissors, Upload } from 'lucide-react';
 import ImageUpload from './ImageUpload';
+import { BRIDAL_SILHOUETTES } from '@/lib/constants';
 
 interface Gown {
     id: string;
@@ -297,7 +298,16 @@ export default function BridalManager() {
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Silhouette</label>
-                                        <input type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={gownForm.silhouette} onChange={e => setGownForm({...gownForm, silhouette: e.target.value})} />
+                                        <select 
+                                            className="w-full px-4 py-2 border border-slate-200 rounded-lg" 
+                                            value={gownForm.silhouette} 
+                                            onChange={e => setGownForm({...gownForm, silhouette: e.target.value})}
+                                        >
+                                            <option value="">Select Silhouette</option>
+                                            {BRIDAL_SILHOUETTES.map(s => (
+                                                <option key={s} value={s}>{s}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Rent Price ($)</label>

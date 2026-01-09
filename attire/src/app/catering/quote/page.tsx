@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle, Utensils } from 'lucide-react';
 import { getCateringPackages, submitCateringQuote } from '@/lib/services/catering';
-import { CateringPackage } from '@/data/mock/catering';
+import { CateringPackage } from '@/types';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { useApp } from '@/context/AppContext';
