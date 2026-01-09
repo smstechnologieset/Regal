@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useApp } from '@/context/AppContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { categories } from '@/data/mock/products';
 
 // Services for main navigation
@@ -47,6 +48,8 @@ export default function Header() {
     const [isServicesOpen, setIsServicesOpen] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const { itemCount: wishlistCount } = useWishlist();
 
     const cartCount = getCartItemCount();
 
@@ -220,10 +223,15 @@ export default function Header() {
                                     {/* Wishlist */}
                                     <Link
                                         href="/attire/wishlist"
-                                        className="hidden sm:flex p-2 text-slate-700 hover:text-slate-900 transition-colors"
+                                        className="relative p-2 text-slate-700 hover:text-slate-900 transition-colors"
                                         aria-label="Wishlist"
                                     >
                                         <Heart size={22} />
+                                        {wishlistCount > 0 && (
+                                            <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-600 text-white text-[10px] font-medium rounded-full flex items-center justify-center">
+                                                {wishlistCount}
+                                            </span>
+                                        )}
                                     </Link>
                                 </>
                             )}

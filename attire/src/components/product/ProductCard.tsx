@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { Heart, ShoppingBag, Star } from 'lucide-react';
 import { Product } from '@/types';
 import Badge from '@/components/ui/Badge';
+import { useWishlist } from '@/context/WishlistContext';
 import { formatPrice, calculateDiscount, cn } from '@/lib/utils';
 
 interface ProductCardProps {
@@ -23,7 +24,9 @@ interface ProductCardProps {
 export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
     const [isHovered, setIsHovered] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
-    const [isWishlisted, setIsWishlisted] = useState(false);
+    const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+
+    const isWishlisted = isInWishlist(product.id);
 
     const discount = product.originalPrice
         ? calculateDiscount(product.originalPrice, product.price)
@@ -32,7 +35,11 @@ export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
     const handleWishlist = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        setIsWishlisted(!isWishlisted);
+        if (isWishlisted) {
+            removeFromWishlist(product.id);
+        } else {
+            addToWishlist(product);
+        }
     };
 
     const handleQuickAdd = (e: React.MouseEvent) => {

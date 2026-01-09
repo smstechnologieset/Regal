@@ -163,10 +163,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Sign out
     const signOut = async () => {
-        await supabase.auth.signOut();
-        setUser(null);
-        setProfile(null);
-        setSession(null);
+        try {
+            await supabase.auth.signOut();
+        } catch (error) {
+            console.error('Supabase signOut error:', error);
+        } finally {
+            // Always clear local state to prevent UI persistence
+            setUser(null);
+            setProfile(null);
+            setSession(null);
+        }
     };
 
     // Update profile
