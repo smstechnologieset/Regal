@@ -22,6 +22,7 @@ import {
     Heart,
     UtensilsCrossed
 } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
 
 interface Stats {
     totalRevenue: number;
@@ -47,6 +48,7 @@ interface RecentOrder {
 }
 
 export default function AdminDashboard() {
+    const { showApiError } = useApp();
     const [stats, setStats] = useState<Stats>({
         totalRevenue: 0,
         monthlyRevenue: 0,
@@ -56,7 +58,6 @@ export default function AdminDashboard() {
         ordersByService: { attire: 0, events: 0, bridal: 0, catering: 0 },
     });
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
 
     useEffect(() => {
@@ -64,10 +65,7 @@ export default function AdminDashboard() {
             try {
                 const response = await fetch('/api/admin/stats');
                 
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.error || 'Failed to fetch stats');
-                }
+                if (!response.ok) throw response;
                 
                 const data = await response.json();
                 
@@ -83,7 +81,7 @@ export default function AdminDashboard() {
                 setRecentOrders(data.recentOrders || []);
             } catch (err) {
                 console.error('Error fetching admin stats:', err);
-                setError(err instanceof Error ? err.message : 'Failed to load dashboard');
+                showApiError(err, 'Failed to load dashboard');
             } finally {
                 setLoading(false);
             }

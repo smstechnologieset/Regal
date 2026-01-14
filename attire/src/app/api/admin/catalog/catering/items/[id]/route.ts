@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 /**
  * Admin Catering Catalog API (Single Menu Item)
  * 
@@ -29,11 +31,16 @@ export async function PATCH(
             .select()
             .single();
 
-        if (dbError) throw dbError;
+        if (dbError) {
+            if (dbError.code === '23505') {
+                return NextResponse.json({ error: 'Slug already exists on another item' }, { status: 400 });
+            }
+            throw dbError;
+        }
         return NextResponse.json({ item: data });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error updating menu item:', error);
-        return NextResponse.json({ error: 'Failed to update item' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to update item' }, { status: 500 });
     }
 }
 
@@ -56,8 +63,8 @@ export async function DELETE(
 
         if (dbError) throw dbError;
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error deleting menu item:', error);
-        return NextResponse.json({ error: 'Failed to delete item' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to delete item' }, { status: 500 });
     }
 }

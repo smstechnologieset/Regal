@@ -20,7 +20,7 @@ function LoginContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { addToast } = useApp();
-    const { signIn, user, isLoading: authLoading } = useAuth();
+    const { signIn, user, isAdmin, isLoading: authLoading } = useAuth();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -34,10 +34,20 @@ function LoginContent() {
     // Redirect if already logged in
     useEffect(() => {
         if (user && !authLoading) {
-            const redirect = searchParams.get('redirect') || '/account';
-            router.push(redirect);
+            const redirectParams = searchParams.get('redirect');
+            if (redirectParams) {
+                router.push(redirectParams);
+                return;
+            }
+
+            // Default redirection based on role
+            if (isAdmin) {
+                router.push('/admin');
+            } else {
+                router.push('/account');
+            }
         }
-    }, [user, authLoading, router, searchParams]);
+    }, [user, authLoading, isAdmin, router, searchParams]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -79,8 +89,8 @@ function LoginContent() {
         }
 
         addToast('Welcome back!', 'success');
-        const redirect = searchParams.get('redirect') || '/account';
-        router.push(redirect);
+        
+        // Redirection is handled by the useEffect once state updates
         setIsLoading(false);
     };
 

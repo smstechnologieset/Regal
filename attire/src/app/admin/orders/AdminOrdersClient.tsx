@@ -11,6 +11,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Search, ChevronRight, Package, ShoppingBag, Calendar, Heart, UtensilsCrossed } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
 
 interface Order {
     id: string;
@@ -23,10 +24,10 @@ interface Order {
 }
 
 export default function AdminOrdersClient() {
+    const { showApiError } = useApp();
     const searchParams = useSearchParams();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [serviceFilter, setServiceFilter] = useState(searchParams.get('service') || 'all');
     const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
@@ -40,16 +41,13 @@ export default function AdminOrdersClient() {
                 
                 const response = await fetch(`/api/admin/orders?${params.toString()}`);
                 
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.error || 'Failed to fetch orders');
-                }
+                if (!response.ok) throw response;
                 
                 const data = await response.json();
                 setOrders(data.orders || []);
             } catch (err) {
                 console.error('Error fetching orders:', err);
-                setError(err instanceof Error ? err.message : 'Failed to load orders');
+                showApiError(err, 'Failed to load orders');
             } finally {
                 setLoading(false);
             }

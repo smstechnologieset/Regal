@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 /**
  * Admin Attire Catalog API (Products)
  * 

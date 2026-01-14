@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, X, Utensils, Loader2, Info, Upload } from 'lucide-react';
 import ImageUpload from './ImageUpload';
+import { useApp } from '@/context/AppContext';
 
 interface CateringPackage {
     id: string;
@@ -25,12 +26,13 @@ interface MenuItem {
 }
 
 export default function CateringManager() {
+    const { addToast, showApiError } = useApp();
     const [activeTab, setActiveTab] = useState<'packages' | 'items'>('packages');
     const [packages, setPackages] = useState<CateringPackage[]>([]);
     const [items, setItems] = useState<MenuItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<any | null>(null);
+    const [editingItem, setEditingItem] = useState<CateringPackage | MenuItem | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [dietaryInput, setDietaryInput] = useState('');
     const [inclusionsInput, setInclusionsInput] = useState('');
@@ -59,24 +61,27 @@ export default function CateringManager() {
             const res = await fetch(url);
             const data = await res.json();
             if (activeTab === 'packages') setPackages(data.packages || []);
+            if (activeTab === 'packages') setPackages(data.packages || []);
             else setItems(data.items || []);
         } catch (error) {
             console.error('Error fetching catering data:', error);
+            showApiError(error, 'Failed to fetch catering data');
         } finally {
             setLoading(false);
         }
     }
-    const handleOpenModal = (item?: any) => {
+    const handleOpenModal = (item?: CateringPackage | MenuItem) => {
         if (activeTab === 'packages') {
+            const pkg = item as CateringPackage;
             if (item) {
-                setEditingItem(item);
+                setEditingItem(pkg);
                 setPackageForm({
-                    name: item.name,
-                    description: item.description || '',
-                    price_per_guest: item.price_per_guest?.toString() || '',
-                    min_guests: item.min_guests?.toString() || '',
-                    includes: item.includes || [],
-                    image: item.image || ''
+                    name: pkg.name,
+                    description: pkg.description || '',
+                    price_per_guest: pkg.price_per_guest?.toString() || '',
+                    min_guests: pkg.min_guests?.toString() || '',
+                    includes: pkg.includes || [],
+                    image: pkg.image || ''
                 });
             } else {
                 setEditingItem(null);
@@ -87,15 +92,16 @@ export default function CateringManager() {
             }
             setInclusionsInput('');
         } else {
+            const menuItem = item as MenuItem;
             if (item) {
-                setEditingItem(item);
+                setEditingItem(menuItem);
                 setItemForm({
-                    name: item.name,
-                    category: item.category || 'appetizer',
-                    price: item.price?.toString() || '',
-                    description: item.description || '',
-                    dietary: item.dietary || [],
-                    image: item.image || ''
+                    name: menuItem.name,
+                    category: menuItem.category || 'appetizer',
+                    price: menuItem.price?.toString() || '',
+                    description: menuItem.description || '',
+                    dietary: menuItem.dietary || [],
+                    image: menuItem.image || ''
                 });
             } else {
                 setEditingItem(null);
@@ -129,12 +135,13 @@ export default function CateringManager() {
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to save');
+            if (!response.ok) throw response;
             setIsModalOpen(false);
             fetchData();
+            addToast(`${activeTab === 'packages' ? 'Package' : 'Item'} saved successfully`, 'success');
         } catch (error) {
             console.error('Error saving catering item:', error);
-            alert('Error saving');
+            showApiError(error, 'Failed to save');
         } finally {
             setSubmitting(false);
         }
@@ -201,10 +208,12 @@ export default function CateringManager() {
         try {
             const baseUrl = activeTab === 'packages' ? '/api/admin/catalog/catering/packages' : '/api/admin/catalog/catering/items';
             const response = await fetch(`${baseUrl}/${id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Failed to delete');
+            if (!response.ok) throw response;
+            addToast('Deleted successfully', 'success');
             fetchData();
         } catch (error) {
             console.error('Error deleting:', error);
+            showApiError(error, 'Failed to delete');
         }
     };
 

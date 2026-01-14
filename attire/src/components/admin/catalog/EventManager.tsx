@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, X, Calendar, Loader2, Users, Upload } from 'lucide-react';
 import ImageUpload from './ImageUpload';
+import { useApp } from '@/context/AppContext';
 
 interface EventPackage {
     id: string;
@@ -17,6 +18,7 @@ interface EventPackage {
 }
 
 export default function EventManager() {
+    const { addToast, showApiError } = useApp();
     const [packages, setPackages] = useState<EventPackage[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,6 +51,7 @@ export default function EventManager() {
             setPackages(data.packages || []);
         } catch (error) {
             console.error('Error fetching events:', error);
+            showApiError(error, 'Failed to fetch event data');
         } finally {
             setLoading(false);
         }
@@ -103,12 +106,13 @@ export default function EventManager() {
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to save');
+            if (!response.ok) throw response;
             setIsModalOpen(false);
             fetchData();
+            addToast('Package saved successfully', 'success');
         } catch (error) {
             console.error('Error saving event:', error);
-            alert('Error saving event');
+            showApiError(error, 'Failed to save package');
         } finally {
             setSubmitting(false);
         }
@@ -147,10 +151,12 @@ export default function EventManager() {
             const response = await fetch(`/api/admin/catalog/events/${id}`, {
                 method: 'DELETE'
             });
-            if (!response.ok) throw new Error('Failed to delete');
+            if (!response.ok) throw response;
+            addToast('Package deleted successfully', 'success');
             fetchData();
         } catch (error) {
             console.error('Error deleting:', error);
+            showApiError(error, 'Failed to delete package');
         }
     };
 

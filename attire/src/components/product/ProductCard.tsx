@@ -62,6 +62,7 @@ export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
                         src={isHovered && product.images[1] ? product.images[1] : product.images[0]}
                         alt={product.name}
                         fill
+                        unoptimized
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                         className={cn(
                             'object-cover transition-all duration-500',
@@ -77,7 +78,7 @@ export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
                     )}
 
                     {/* Out of stock overlay */}
-                    {!product.inStock && (
+                    {(!product.inStock || (product.stockCount ?? 0) <= 0) && (
                         <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
                             <Badge type="outOfStock" size="md" />
                         </div>
@@ -118,7 +119,7 @@ export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
                     </button>
 
                     {/* Quick add button */}
-                    {product.inStock && onQuickAdd && (
+                    {product.inStock && (product.stockCount ?? 0) > 0 && onQuickAdd && (
                         <button
                             onClick={handleQuickAdd}
                             className="absolute bottom-2 left-2 right-2 py-2.5 bg-slate-900 text-white text-sm font-medium rounded-lg opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2"

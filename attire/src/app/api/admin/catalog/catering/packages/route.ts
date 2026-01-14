@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 /**
  * Admin Catering Catalog API (Packages)
  * 
@@ -23,9 +25,9 @@ export async function GET(request: NextRequest) {
 
         if (dbError) throw dbError;
         return NextResponse.json({ packages: data || [] });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching catering packages:', error);
-        return NextResponse.json({ error: 'Failed to fetch packages' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to fetch packages' }, { status: 500 });
     }
 }
 
@@ -44,10 +46,15 @@ export async function POST(request: NextRequest) {
             .select()
             .single();
 
-        if (dbError) throw dbError;
+        if (dbError) {
+            if (dbError.code === '23505') {
+                return NextResponse.json({ error: 'Package ID already exists' }, { status: 400 });
+            }
+            throw dbError;
+        }
         return NextResponse.json({ package: data });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error creating catering package:', error);
-        return NextResponse.json({ error: 'Failed to create package' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to create package' }, { status: 500 });
     }
 }

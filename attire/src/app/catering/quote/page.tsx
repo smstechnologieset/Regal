@@ -93,7 +93,7 @@ function CateringQuoteForm() {
                 </div>
                 <h2 className="text-3xl font-bold text-slate-900 mb-2 font-serif">Request Received</h2>
                 <p className="text-slate-600 mb-8">
-                    We've received your catering inquiry. Our culinary team will review your requirements and send a customized proposal to your email within 24 hours.
+                    We&apos;ve received your catering inquiry. Our culinary team will review your requirements and send a customized proposal to your email within 24 hours.
                 </p>
                 <div className="flex gap-4 justify-center">
                     <Link href="/catering">
@@ -235,7 +235,7 @@ export default function CateringQuotePage() {
                         Back to Catering
                     </Link>
                     <h1 className="text-3xl md:text-4xl font-bold text-slate-900 font-serif mb-2">Request a Quote</h1>
-                    <p className="text-slate-600">Tell us about your event, and we'll craft the perfect menu.</p>
+                    <p className="text-slate-600">Tell us about your event, and we&apos;ll craft the perfect menu.</p>
                 </div>
 
                 <Suspense fallback={<div className="text-center py-12">Loading form...</div>}>

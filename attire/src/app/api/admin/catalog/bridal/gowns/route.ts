@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 /**
  * Admin Bridal Catalog API (Gowns)
  * 
@@ -23,9 +25,9 @@ export async function GET(request: NextRequest) {
 
         if (dbError) throw dbError;
         return NextResponse.json({ gowns: data || [] });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching bridal gowns:', error);
-        return NextResponse.json({ error: 'Failed to fetch gowns' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to fetch gowns' }, { status: 500 });
     }
 }
 
@@ -44,10 +46,15 @@ export async function POST(request: NextRequest) {
             .select()
             .single();
 
-        if (dbError) throw dbError;
+        if (dbError) {
+            if (dbError.code === '23505') {
+                return NextResponse.json({ error: 'Gown ID already exists' }, { status: 400 });
+            }
+            throw dbError;
+        }
         return NextResponse.json({ gown: data });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error creating bridal gown:', error);
-        return NextResponse.json({ error: 'Failed to create gown' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to create gown' }, { status: 500 });
     }
 }

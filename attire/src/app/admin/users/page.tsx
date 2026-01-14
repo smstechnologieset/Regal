@@ -10,6 +10,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Shield, User } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { useApp } from '@/context/AppContext';
 
 interface UserProfile {
     id: string;
@@ -21,9 +22,9 @@ interface UserProfile {
 }
 
 export default function AdminUsersPage() {
+    const { addToast, showApiError } = useApp();
     const [users, setUsers] = useState<UserProfile[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [roleFilter, setRoleFilter] = useState('all');
 
@@ -32,16 +33,13 @@ export default function AdminUsersPage() {
             try {
                 const response = await fetch('/api/admin/users');
                 
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.error || 'Failed to fetch users');
-                }
+                if (!response.ok) throw response;
                 
                 const data = await response.json();
                 setUsers(data.users || []);
             } catch (err) {
                 console.error('Error fetching users:', err);
-                setError(err instanceof Error ? err.message : 'Failed to load users');
+                showApiError(err, 'Failed to load users');
             } finally {
                 setLoading(false);
             }
@@ -68,18 +66,16 @@ export default function AdminUsersPage() {
                 body: JSON.stringify({ targetUserId: userId, role: newRole }),
             });
 
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.error || 'Failed to update role');
-            }
+            if (!response.ok) throw response;
 
             // Update local state
             setUsers(users.map(u =>
                 u.id === userId ? { ...u, role: newRole } : u
             ));
+            addToast('User role updated successfully', 'success');
         } catch (err) {
             console.error('Error updating user role:', err);
-            alert(err instanceof Error ? err.message : 'Failed to update role');
+            showApiError(err, 'Failed to update role');
         }
     };
 

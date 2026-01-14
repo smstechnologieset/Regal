@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 /**
  * Admin Bridal Catalog API (Single Service)
  * 
@@ -29,11 +31,16 @@ export async function PATCH(
             .select()
             .single();
 
-        if (dbError) throw dbError;
+        if (dbError) {
+            if (dbError.code === '23505') {
+                return NextResponse.json({ error: 'Service ID already exists' }, { status: 400 });
+            }
+            throw dbError;
+        }
         return NextResponse.json({ service: data });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error updating bridal service:', error);
-        return NextResponse.json({ error: 'Failed to update service' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to update service' }, { status: 500 });
     }
 }
 
@@ -56,8 +63,8 @@ export async function DELETE(
 
         if (dbError) throw dbError;
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error deleting bridal service:', error);
-        return NextResponse.json({ error: 'Failed to delete service' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to delete service' }, { status: 500 });
     }
 }

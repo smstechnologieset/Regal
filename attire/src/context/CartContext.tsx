@@ -10,9 +10,10 @@
  * const { cart, addToCart, removeFromCart, updateQuantity, clearCart } = useCart();
  */
 
-import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
 import { CartItem, Product, ProductColor } from '@/types';
 import { storage } from '@/lib/utils';
+import { useAuth } from './AuthContext';
 
 // Cart state interface
 interface CartState {
@@ -126,25 +127,77 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 // Create context
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// Storage key
-const CART_STORAGE_KEY = 'attire-cart';
+const GUEST_CART_KEY = 'attire-cart-guest';
+const USER_CART_PREFIX = 'attire-cart-';
+
+function getStorageKey(userId?: string) {
+    return userId ? `${USER_CART_PREFIX}${userId}` : GUEST_CART_KEY;
+}
 
 // Provider component
 export function CartProvider({ children }: { children: React.ReactNode }) {
     const [state, dispatch] = useReducer(cartReducer, initialState);
+    const { user } = useAuth();
+    const isFirstLoad = useRef(true);
+    const prevUserId = useRef<string | null | undefined>(undefined);
 
-    // Load cart from localStorage on mount
+    // Initial load and merging logic
     useEffect(() => {
-        const savedCart = storage.get<CartItem[]>(CART_STORAGE_KEY, []);
-        dispatch({ type: 'SET_CART', payload: savedCart });
-    }, []);
+        // Skip if it is not the first load OR if user state hasn't settled
+        const currentKey = getStorageKey(user?.id);
+        const savedCart = storage.get<CartItem[]>(currentKey, []);
 
-    // Save cart to localStorage when items change
+        if (isFirstLoad.current) {
+            dispatch({ type: 'SET_CART', payload: savedCart });
+            isFirstLoad.current = false;
+            prevUserId.current = user?.id;
+            return;
+        }
+
+        // Handle Login (Guest -> User)
+        if (user?.id && !prevUserId.current) {
+            console.log('CartContext: User logged in, merging guest cart...');
+            const guestCart = storage.get<CartItem[]>(GUEST_CART_KEY, []);
+            const userCart = storage.get<CartItem[]>(getStorageKey(user.id), []);
+
+            // Merging logic: user items + guest items (avoiding duplicates)
+            const mergedItems = [...userCart];
+            guestCart.forEach(guestItem => {
+                const existingIndex = mergedItems.findIndex(
+                    uItem =>
+                        uItem.product.id === guestItem.product.id &&
+                        uItem.selectedSize === guestItem.selectedSize &&
+                        uItem.selectedColor.name === guestItem.selectedColor.name
+                );
+
+                if (existingIndex >= 0) {
+                    mergedItems[existingIndex].quantity += guestItem.quantity;
+                } else {
+                    mergedItems.push(guestItem);
+                }
+            });
+
+            dispatch({ type: 'SET_CART', payload: mergedItems });
+            // Clear guest cart after merging
+            storage.remove(GUEST_CART_KEY);
+        }
+        // Handle Logout (User -> Guest)
+        else if (!user?.id && prevUserId.current) {
+            console.log('CartContext: User logged out, reverting to guest cart...');
+            const guestCart = storage.get<CartItem[]>(GUEST_CART_KEY, []);
+            dispatch({ type: 'SET_CART', payload: guestCart });
+        }
+
+        prevUserId.current = user?.id;
+    }, [user?.id]);
+
+    // Save cart to specific storage when items change
     useEffect(() => {
         if (!state.isLoading) {
-            storage.set(CART_STORAGE_KEY, state.items);
+            const currentKey = getStorageKey(user?.id);
+            storage.set(currentKey, state.items);
         }
-    }, [state.items, state.isLoading]);
+    }, [state.items, state.isLoading, user?.id]);
 
     // Add item to cart
     const addToCart = useCallback(

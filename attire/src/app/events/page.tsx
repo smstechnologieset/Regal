@@ -17,9 +17,9 @@ export default function EventsPage() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
         async function fetchPackages() {
-            setLoading(true);
             const data = await getEventPackages();
             setPackages(data);
             setLoading(false);
@@ -41,6 +41,7 @@ export default function EventsPage() {
                     src="https://images.unsplash.com/photo-1519225468359-e9ffa5f7406b?w=1920&h=1080&fit=crop"
                     alt="Event Planning"
                     fill
+                    unoptimized
                     className="object-cover"
                 />
                 <div className="absolute inset-0 bg-slate-900/60" />

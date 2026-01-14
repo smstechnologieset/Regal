@@ -16,19 +16,22 @@ import { useApp } from '@/context/AppContext';
 import ProductCard from '@/components/product/ProductCard';
 import Button from '@/components/ui/Button';
 import { formatPrice } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { Product } from '@/types';
 
 export default function WishlistPage() {
     const { items, removeFromWishlist, clearWishlist, itemCount, isLoading } = useWishlist();
     const { addToCart, toggleCart } = useCart();
     const { addToast } = useApp();
+    const router = useRouter();
 
-    const handleAddToCart = (product: any) => {
+    const handleAddToCart = (product: Product) => {
         if (product.sizes && product.sizes.length > 0) {
             addToCart(product, product.sizes[0], product.colors[0], 1);
             addToast(`${product.name} added to cart!`, 'success');
             toggleCart();
         } else {
-            window.location.href = `/attire/products/${product.id}`;
+            router.push(`/attire/products/${product.id}`);
         }
     };
 

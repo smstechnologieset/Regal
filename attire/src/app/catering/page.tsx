@@ -15,6 +15,7 @@ export default function CateringPage() {
                     src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop"
                     alt="Gourmet Catering"
                     fill
+                    unoptimized
                     className="object-cover"
                     priority
                 />
@@ -84,13 +85,14 @@ export default function CateringPage() {
                                 src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&fit=crop"
                                 alt="Fine Dining"
                                 fill
+                                unoptimized
                                 className="object-cover"
                             />
                         </div>
                         <div className="w-full md:w-1/2 p-8 md:py-12 md:pr-12 text-white">
                             <h2 className="text-3xl font-bold mb-4 font-serif">Curated for You</h2>
                             <p className="text-slate-300 mb-8">
-                                Whether it's an intimate dinner or a grand gala, we have packages to suit every occasion.
+                                Whether it&apos;s an intimate dinner or a grand gala, we have packages to suit every occasion.
                             </p>
                             <Link href="/catering/quote">
                                 <Button className="bg-amber-600 hover:bg-amber-700 text-white w-full md:w-auto">

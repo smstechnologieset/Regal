@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, X, Image as ImageIcon, Loader2, Upload } from 'lucide-react';
 import ImageUpload from './ImageUpload';
+import { useApp } from '@/context/AppContext';
+import { cn } from '@/lib/utils';
 
 interface Product {
     id: string;
@@ -11,8 +13,11 @@ interface Product {
     price: number;
     category: string | null;
     sizes: string[];
-    colors: any[];
+    colors: { name: string; hex: string }[];
     images: string[];
+    badges: string[];
+    original_price: number | null;
+    stock_count: number;
     in_stock: boolean;
     subcategory: string | null;
     categories?: { name: string };
@@ -31,6 +36,7 @@ interface Category {
 }
 
 export default function AttireManager() {
+    const { addToast, showApiError } = useApp();
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
@@ -39,6 +45,9 @@ export default function AttireManager() {
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
     const [subcategoryFilter, setSubcategoryFilter] = useState('');
+    const [stockFilter, setStockFilter] = useState<'all' | 'in_stock' | 'out_of_stock' | 'low_stock'>('all');
+    const [saleFilter, setSaleFilter] = useState<'all' | 'on_sale' | 'regular'>('all');
+    const [highlightFilter, setHighlightFilter] = useState<'all' | 'new' | 'bestseller'>('all');
     const [submitting, setSubmitting] = useState(false);
 
     // Form state
@@ -49,12 +58,18 @@ export default function AttireManager() {
         category: '',
         subcategory: '',
         sizes: [] as string[],
+        colors: [] as { name: string; hex: string }[],
         in_stock: true,
-        images: [] as string[]
+        images: [] as string[],
+        original_price: '',
+        badges: [] as string[],
+        stock_count: '0'
     });
 
     // Local input states for comma-separated fields
     const [sizeInput, setSizeInput] = useState('');
+    const [colorName, setColorName] = useState('');
+    const [colorHex, setColorHex] = useState('#000000');
 
     useEffect(() => {
         fetchData();
@@ -76,6 +91,7 @@ export default function AttireManager() {
             setCategories(cData.categories || []);
         } catch (error) {
             console.error('Error fetching attire data:', error);
+            showApiError(error, 'Failed to fetch catalog data');
         } finally {
             setLoading(false);
         }
@@ -92,12 +108,15 @@ export default function AttireManager() {
                 category: product.category || '',
                 subcategory: product.subcategory || '',
                 sizes: initialSizes,
+                colors: product.colors || [],
                 in_stock: product.in_stock,
-                images: product.images || []
+                images: product.images || [],
+                original_price: product.original_price?.toString() || '',
+                badges: product.badges || [],
+                stock_count: product.stock_count?.toString() || '0'
             });
             setSizeInput(initialSizes.join(', '));
         } else {
-            setEditingProduct(null);
             setFormData({
                 name: '',
                 description: '',
@@ -105,8 +124,12 @@ export default function AttireManager() {
                 category: categories[0]?.id || '',
                 subcategory: '',
                 sizes: [],
+                colors: [],
                 in_stock: true,
-                images: []
+                images: [],
+                original_price: '',
+                badges: [],
+                stock_count: '0'
             });
             setSizeInput('');
         }
@@ -115,6 +138,22 @@ export default function AttireManager() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Stock consistency validation
+        const stockCount = parseInt(formData.stock_count) || 0;
+        if (stockCount > 0 && !formData.in_stock) {
+            addToast('Products with stock count > 0 must be marked as "In Stock"', 'error');
+            return;
+        }
+
+        // Price consistency validation
+        const price = parseFloat(formData.price) || 0;
+        const originalPrice = formData.original_price ? parseFloat(formData.original_price) : null;
+        if (originalPrice !== null && originalPrice <= price) {
+            addToast('Original Price must be greater than current Price to create a Sale', 'error');
+            return;
+        }
+
         setSubmitting(true);
         try {
             const url = editingProduct 
@@ -127,17 +166,19 @@ export default function AttireManager() {
                 body: JSON.stringify({
                     ...formData,
                     price: parseFloat(formData.price),
+                    original_price: formData.original_price ? parseFloat(formData.original_price) : null,
+                    stock_count: parseInt(formData.stock_count) || 0,
                     id: editingProduct ? undefined : formData.name.toLowerCase().replace(/\s+/g, '-')
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to save product');
+            if (!response.ok) throw response;
             
             setIsModalOpen(false);
             fetchData();
         } catch (error) {
             console.error('Error saving product:', error);
-            alert('Error saving product');
+            showApiError(error, 'Failed to save product');
         } finally {
             setSubmitting(false);
         }
@@ -149,10 +190,12 @@ export default function AttireManager() {
             const response = await fetch(`/api/admin/catalog/attire/products/${id}`, {
                 method: 'DELETE'
             });
-            if (!response.ok) throw new Error('Failed to delete');
+            if (!response.ok) throw response;
+            addToast('Product deleted successfully', 'success');
             fetchData();
         } catch (error) {
             console.error('Error deleting:', error);
+            showApiError(error, 'Failed to delete product');
         }
     };
 
@@ -161,7 +204,22 @@ export default function AttireManager() {
                             product.description?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategory = !categoryFilter || product.category === categoryFilter;
         const matchesSubcategory = !subcategoryFilter || product.subcategory === subcategoryFilter;
-        return matchesSearch && matchesCategory && matchesSubcategory;
+        
+        const isOnSale = (product.original_price ?? 0) > product.price;
+        const matchesSale = saleFilter === 'all' || 
+                           (saleFilter === 'on_sale' && isOnSale) || 
+                           (saleFilter === 'regular' && !isOnSale);
+                           
+        const matchesStock = stockFilter === 'all' ||
+                            (stockFilter === 'in_stock' && product.in_stock && product.stock_count > 0) ||
+                            (stockFilter === 'out_of_stock' && (!product.in_stock || product.stock_count <= 0)) ||
+                            (stockFilter === 'low_stock' && product.in_stock && product.stock_count > 0 && product.stock_count <= 10);
+                            
+        const matchesHighlight = highlightFilter === 'all' ||
+                                (highlightFilter === 'new' && (product.badges || []).includes('new')) ||
+                                (highlightFilter === 'bestseller' && (product.badges || []).includes('bestseller'));
+                                
+        return matchesSearch && matchesCategory && matchesSubcategory && matchesSale && matchesStock && matchesHighlight;
     });
 
     const activeCategory = categories.find(c => c.id === formData.category);
@@ -180,9 +238,9 @@ export default function AttireManager() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="flex items-center gap-2 w-full md:w-auto">
+                <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
                     <select
-                        className="px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 text-sm"
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 text-xs font-medium"
                         value={categoryFilter}
                         onChange={(e) => {
                             setCategoryFilter(e.target.value);
@@ -194,27 +252,77 @@ export default function AttireManager() {
                             <option key={c.id} value={c.id}>{c.name}</option>
                         ))}
                     </select>
-                    {categoryFilter && categories.find(c => c.id === categoryFilter)?.subcategories?.length ? (
-                        <select
-                            className="px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 text-sm"
-                            value={subcategoryFilter}
-                            onChange={(e) => setSubcategoryFilter(e.target.value)}
-                        >
-                            <option value="">All Subcategories</option>
-                            {categories.find(c => c.id === categoryFilter)?.subcategories?.map((s: any) => (
-                                <option key={s.slug} value={s.slug}>{s.name}</option>
-                            ))}
-                        </select>
-                    ) : null}
+
+                    <select
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 text-xs font-medium"
+                        value={stockFilter}
+                        onChange={(e) => setStockFilter(e.target.value as any)}
+                    >
+                        <option value="all">Stock: All</option>
+                        <option value="in_stock">In Stock</option>
+                        <option value="low_stock">Low Stock (≤10)</option>
+                        <option value="out_of_stock">Out of Stock</option>
+                    </select>
+
+                    <select
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 text-xs font-medium"
+                        value={saleFilter}
+                        onChange={(e) => setSaleFilter(e.target.value as any)}
+                    >
+                        <option value="all">Sale: All</option>
+                        <option value="on_sale">On Sale</option>
+                        <option value="regular">Regular Price</option>
+                    </select>
+
+                    <select
+                        className="px-3 py-1.5 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 text-xs font-medium"
+                        value={highlightFilter}
+                        onChange={(e) => setHighlightFilter(e.target.value as any)}
+                    >
+                        <option value="all">Badge: All</option>
+                        <option value="new">New Arrivals</option>
+                        <option value="bestseller">Best Sellers</option>
+                    </select>
+
                     <button
                         onClick={() => handleOpenModal()}
-                        className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors whitespace-nowrap"
+                        className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors whitespace-nowrap text-sm"
                     >
                         <Plus size={18} />
                         Add Product
                     </button>
                 </div>
             </div>
+
+            {(stockFilter !== 'all' || saleFilter !== 'all' || highlightFilter !== 'all' || categoryFilter !== '') && (
+                <div className="flex items-center gap-2 flex-wrap pb-2">
+                    <span className="text-xs text-slate-400">Active Admin Filters:</span>
+                    {categoryFilter && (
+                        <FilterBadge label={`Category: ${categories.find(c => c.id === categoryFilter)?.name}`} onClear={() => setCategoryFilter('')} />
+                    )}
+                    {stockFilter !== 'all' && (
+                        <FilterBadge label={`Stock: ${stockFilter.replace('_', ' ')}`} onClear={() => setStockFilter('all')} />
+                    )}
+                    {saleFilter !== 'all' && (
+                        <FilterBadge label={`Sale: ${saleFilter === 'on_sale' ? 'Yes' : 'No'}`} onClear={() => setSaleFilter('all')} />
+                    )}
+                    {highlightFilter !== 'all' && (
+                        <FilterBadge label={`Badge: ${highlightFilter}`} onClear={() => setHighlightFilter('all')} />
+                    )}
+                    <button 
+                        onClick={() => {
+                            setCategoryFilter('');
+                            setStockFilter('all');
+                            setSaleFilter('all');
+                            setHighlightFilter('all');
+                            setSearchTerm('');
+                        }}
+                        className="text-xs text-rose-600 hover:text-rose-700 font-medium"
+                    >
+                        Reset All
+                    </button>
+                </div>
+            )}
 
             {loading ? (
                 <div className="flex justify-center py-20">
@@ -232,7 +340,7 @@ export default function AttireManager() {
                                         <ImageIcon size={40} />
                                     </div>
                                 )}
-                                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                                     <button onClick={() => handleOpenModal(product)} className="p-2 bg-white rounded-lg shadow-sm text-slate-600 hover:text-rose-600">
                                         <Edit2 size={16} />
                                     </button>
@@ -240,8 +348,19 @@ export default function AttireManager() {
                                         <Trash2 size={16} />
                                     </button>
                                 </div>
+                                <div className="absolute top-2 left-2 flex flex-col gap-1">
+                                    {product.badges?.includes('new') && (
+                                        <span className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">NEW</span>
+                                    )}
+                                    {product.badges?.includes('bestseller') && (
+                                        <span className="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">BEST SELLER</span>
+                                    )}
+                                    {product.original_price && product.original_price > product.price && (
+                                        <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">SALE</span>
+                                    )}
+                                </div>
                                 {!product.in_stock && (
-                                    <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+                                    <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10 pointer-events-none">
                                         <span className="bg-slate-900 text-white text-xs font-bold px-3 py-1 rounded-full px-2">OUT OF STOCK</span>
                                     </div>
                                 )}
@@ -249,13 +368,30 @@ export default function AttireManager() {
                             <div className="p-4">
                                 <div className="flex justify-between items-start mb-1">
                                     <h3 className="font-semibold text-slate-900 truncate flex-1">{product.name}</h3>
-                                    <span className="font-bold text-rose-600">${product.price}</span>
+                                    <div className="flex flex-col items-end">
+                                        <span className="font-bold text-rose-600">${product.price}</span>
+                                        {product.original_price && (
+                                            <span className="text-[10px] text-slate-400 line-through">${product.original_price}</span>
+                                        )}
+                                    </div>
                                 </div>
-                                <p className="text-xs text-slate-500 mb-2 truncate capitalize">{product.categories?.name || 'General'}</p>
-                                <div className="flex flex-wrap gap-1">
-                                    {product.sizes?.map(size => (
-                                        <span key={size} className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">{size}</span>
-                                    ))}
+                                <p className="text-xs text-slate-500 mb-2 truncate capitalize">
+                                    {(categories.find(c => c.id === product.category)?.name) || 'General'}
+                                </p>
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex flex-wrap gap-1">
+                                        {product.sizes?.map(size => (
+                                            <span key={size} className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">{size}</span>
+                                        ))}
+                                    </div>
+                                    <span className={cn(
+                                        "text-[10px] font-medium px-2 py-0.5 rounded",
+                                        product.stock_count > 10 ? "bg-slate-100 text-slate-600" :
+                                        product.stock_count > 0 ? "bg-amber-100 text-amber-600" :
+                                        "bg-red-100 text-red-600"
+                                    )}>
+                                        Stock: {product.stock_count}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -294,6 +430,35 @@ export default function AttireManager() {
                                         className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
                                         value={formData.price}
                                         onChange={(e) => setFormData({...formData, price: e.target.value})}
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium text-slate-700">Original Price ($) <span className="text-[10px] text-slate-400 ml-1">(Optional - for Sale)</span></label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+                                        value={formData.original_price}
+                                        onChange={(e) => setFormData({...formData, original_price: e.target.value})}
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium text-slate-700">Stock Count</label>
+                                    <input
+                                        required
+                                        type="number"
+                                        className="w-full px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+                                        value={formData.stock_count}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const count = parseInt(val) || 0;
+                                            setFormData({
+                                                ...formData, 
+                                                stock_count: val,
+                                                // Auto-check in_stock if count becomes > 0
+                                                in_stock: count > 0 ? true : formData.in_stock
+                                            });
+                                        }}
                                     />
                                 </div>
                                 <div className="space-y-1">
@@ -380,15 +545,112 @@ export default function AttireManager() {
                                     </div>
                                     <p className="text-[10px] text-slate-400">First image will be used as the thumbnail. Max 6 images.</p>
                                 </div>
+
+                                {/* Color Management */}
+                                <div className="col-span-2 space-y-3">
+                                    <label className="text-sm font-medium text-slate-700">Available Colors</label>
+                                    <div className="flex flex-wrap gap-2 mb-3">
+                                        {formData.colors.map((color, idx) => (
+                                            <div 
+                                                key={idx} 
+                                                className="flex items-center gap-2 bg-slate-50 border border-slate-200 pl-1 pr-2 py-1 rounded-full group"
+                                            >
+                                                <div 
+                                                    className="w-5 h-5 rounded-full border border-black/10" 
+                                                    style={{ backgroundColor: color.hex }} 
+                                                />
+                                                <span className="text-xs font-medium text-slate-700">{color.name}</span>
+                                                <button 
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newColors = [...formData.colors];
+                                                        newColors.splice(idx, 1);
+                                                        setFormData({ ...formData, colors: newColors });
+                                                    }}
+                                                    className="p-0.5 text-slate-400 hover:text-red-500 rounded-full hover:bg-red-50 transition-colors"
+                                                >
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <div className="flex-1 space-y-1">
+                                            <input 
+                                                type="text" 
+                                                placeholder="Color Name (e.g. Midnight Blue)"
+                                                className="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500"
+                                                value={colorName}
+                                                onChange={(e) => setColorName(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <input 
+                                                type="color" 
+                                                className="w-10 h-8 p-0 border border-slate-200 rounded outline-none cursor-pointer"
+                                                value={colorHex}
+                                                onChange={(e) => setColorHex(e.target.value)}
+                                            />
+                                        </div>
+                                        <button 
+                                            type="button"
+                                            onClick={() => {
+                                                if (!colorName.trim()) return;
+                                                setFormData({
+                                                    ...formData,
+                                                    colors: [...formData.colors, { name: colorName.trim(), hex: colorHex }]
+                                                });
+                                                setColorName('');
+                                            }}
+                                            className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
+                                        >
+                                            Add
+                                        </button>
+                                    </div>
+                                    <p className="text-[10px] text-slate-400">Add colors one by one with their name and pick a hex value.</p>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    id="in_stock"
-                                    checked={formData.in_stock}
-                                    onChange={(e) => setFormData({...formData, in_stock: e.target.checked})}
-                                />
-                                <label htmlFor="in_stock" className="text-sm text-slate-700">Currently in stock</label>
+                            <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="in_stock"
+                                        className="rounded border-slate-300 text-rose-600 focus:ring-rose-500"
+                                        checked={formData.in_stock}
+                                        onChange={(e) => setFormData({...formData, in_stock: e.target.checked})}
+                                    />
+                                    <label htmlFor="in_stock" className="text-sm text-slate-700">In Stock</label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="is_new"
+                                        className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked={formData.badges.includes('new')}
+                                        onChange={(e) => {
+                                            const newBadges = e.target.checked 
+                                                ? [...formData.badges, 'new']
+                                                : formData.badges.filter(b => b !== 'new');
+                                            setFormData({...formData, badges: newBadges});
+                                        }}
+                                    />
+                                    <label htmlFor="is_new" className="text-sm text-emerald-700 font-medium">New Arrival</label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="is_best_seller"
+                                        className="rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+                                        checked={formData.badges.includes('bestseller')}
+                                        onChange={(e) => {
+                                            const newBadges = e.target.checked 
+                                                ? [...formData.badges, 'bestseller']
+                                                : formData.badges.filter(b => b !== 'bestseller');
+                                            setFormData({...formData, badges: newBadges});
+                                        }}
+                                    />
+                                    <label htmlFor="is_best_seller" className="text-sm text-amber-700 font-medium">Best Seller</label>
+                                </div>
                             </div>
                             <div className="pt-4 flex gap-3">
                                 <button
@@ -412,5 +674,16 @@ export default function AttireManager() {
                 </div>
             )}
         </div>
+    );
+}
+
+function FilterBadge({ label, onClear }: { label: string; onClear: () => void }) {
+    return (
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-medium rounded-full">
+            {label}
+            <button onClick={onClear} className="hover:text-rose-600 transition-colors">
+                <X size={10} />
+            </button>
+        </span>
     );
 }

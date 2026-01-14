@@ -15,48 +15,49 @@ export async function getProducts(
     filters?: FilterOptions,
     sort?: SortOption,
     page: number = 1,
-    pageSize: number = 12
+    pageSize: number = 12,
+    signal?: AbortSignal
 ): Promise<PaginatedResponse<Product>> {
-    return attireService.getProducts(filters, sort, page, pageSize);
+    return attireService.getProducts(filters, sort, page, pageSize, signal);
 }
 
 /**
  * Fetch a single product by ID
  */
-export async function getProductById(id: string): Promise<Product | null> {
-    return attireService.getProductById(id);
+export async function getProductById(id: string, signal?: AbortSignal): Promise<Product | null> {
+    return attireService.getProductById(id, signal);
 }
 
 /**
  * Fetch all categories
  */
-export async function getCategories(): Promise<Category[]> {
-    return attireService.getCategories();
+export async function getCategories(signal?: AbortSignal): Promise<Category[]> {
+    return attireService.getCategories(signal);
 }
 
 /**
  * Get featured products for homepage
  */
-export async function getFeaturedProducts(): Promise<{
+export async function getFeaturedProducts(signal?: AbortSignal): Promise<{
     newArrivals: Product[];
     bestsellers: Product[];
     onSale: Product[];
 }> {
-    return attireService.getFeaturedProducts();
+    return attireService.getFeaturedProducts(signal);
 }
 
 /**
  * Get related products (same category, excluding current product)
  */
-export async function getRelatedProducts(productId: string, limit: number = 4): Promise<Product[]> {
-    return attireService.getRelatedProducts(productId, limit);
+export async function getRelatedProducts(productId: string, limit: number = 4, signal?: AbortSignal): Promise<Product[]> {
+    return attireService.getRelatedProducts(productId, limit, signal);
 }
 
 /**
  * Submit an attire order
  * Routes to attire service
  */
-export async function submitOrder(orderData: any): Promise<{ orderId: string; success: boolean }> {
+export async function submitOrder(orderData: Record<string, unknown>): Promise<{ orderId: string; conversationId: string; success: boolean }> {
     return attireService.createOrder(orderData);
 }
 

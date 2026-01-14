@@ -52,6 +52,7 @@ export default function EventDetailPage({ params }: EventDetailPageProps) {
                     src={pkg.image}
                     alt={pkg.title}
                     fill
+                    unoptimized
                     className="object-cover"
                     priority
                 />
@@ -121,6 +122,7 @@ export default function EventDetailPage({ params }: EventDetailPageProps) {
                                                 }?w=400&h=400&fit=crop`}
                                             alt="Gallery"
                                             fill
+                                            unoptimized
                                             className="object-cover hover:scale-110 transition-transform duration-500"
                                         />
                                     </div>

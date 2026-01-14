@@ -169,6 +169,7 @@ export default function RegalLandingPage() {
                                         src={service.image}
                                         alt={service.name}
                                         fill
+                                        unoptimized
                                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
 
@@ -244,6 +245,7 @@ export default function RegalLandingPage() {
                                     src="https://images.unsplash.com/photo-1529543544277-750e1a223f71?w=800&h=800&fit=crop"
                                     alt="Regal Team"
                                     fill
+                                    unoptimized
                                     className="object-cover"
                                 />
                             </div>

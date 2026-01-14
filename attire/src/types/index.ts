@@ -73,6 +73,8 @@ export interface FilterOptions {
     max: number;
   };
   inStock?: boolean;
+  onSale?: boolean;
+  badges?: ProductBadge[];
 }
 
 export type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'popularity';

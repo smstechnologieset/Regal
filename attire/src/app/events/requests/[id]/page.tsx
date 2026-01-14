@@ -16,17 +16,7 @@ export default function EventRequestPage({ params }: RequestPageProps) {
     const { id } = use(params);
 
     // Mock request data
-    const request = {
-        id,
-        type: 'Wedding',
-        status: 'reviewing',
-        date: '2025-06-15',
-        guests: 150,
-        budget: 15000,
-        title: 'Fairytale Garden Wedding',
-        description: 'We want a romantic garden wedding with floral arches, live string quartet, and a gourmet plated dinner. Color palette: Sage green and blush pink.',
-        createdAt: new Date().toISOString(),
-    };
+    const request = React.useMemo(() => getMockRequest(id), [id]);
 
     return (
         <div className="min-h-screen bg-slate-50 py-8">
@@ -47,12 +37,6 @@ export default function EventRequestPage({ params }: RequestPageProps) {
                             </h1>
                             <p className="text-slate-500 mt-1">Request ID: {request.id}</p>
                         </div>
-                        {request.status === 'proposal_sent' && (
-                            <div className="flex gap-3">
-                                <Button variant="outline">Decline Proposal</Button>
-                                <Button>Accept Proposal</Button>
-                            </div>
-                        )}
                     </div>
                 </div>
 
@@ -134,7 +118,7 @@ export default function EventRequestPage({ params }: RequestPageProps) {
                                     id: '1',
                                     sender: 'admin',
                                     text: `Hello! I'm Sarah, your dedicated event planner at Regal. I've received your request for a ${request.type} event and am currently reviewing the details. I'll have a preliminary proposal ready for you shortly!`,
-                                    timestamp: new Date(Date.now() - 3600000)
+                                    timestamp: new Date('2025-01-14T09:30:00Z')
                                 }
                             ]}
                         />
@@ -143,4 +127,19 @@ export default function EventRequestPage({ params }: RequestPageProps) {
             </div>
         </div>
     );
+}
+
+// Mock request data creator to avoid impure render
+function getMockRequest(id: string) {
+    return {
+        id,
+        type: 'Wedding',
+        status: 'reviewing',
+        date: '2025-06-15',
+        guests: 150,
+        budget: 15000,
+        title: 'Fairytale Garden Wedding',
+        description: 'We want a romantic garden wedding with floral arches, live string quartet, and a gourmet plated dinner. Color palette: Sage green and blush pink.',
+        createdAt: new Date('2025-01-01').toISOString(),
+    };
 }

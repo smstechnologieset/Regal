@@ -49,38 +49,51 @@ const features = [
 ];
 
 export default function AttireHomePage() {
+  const { categories, categoriesLoading, addToast } = useApp();
   const [featuredProducts, setFeaturedProducts] = useState<{
     newArrivals: Product[];
     bestsellers: Product[];
     onSale: Product[];
   } | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const { addToCart, toggleCart } = useCart();
-  const { addToast } = useApp();
 
   // Fetch featured products and categories
   useEffect(() => {
+    const controller = new AbortController();
+    console.log('AttireHomePage: Mount Effect Triggered');
     setMounted(true);
+    
     const fetchData = async () => {
+      console.log('AttireHomePage: Starting fetchData...');
       try {
-        const [productsData, categoriesData] = await Promise.all([
-          getFeaturedProducts(),
-          getCategories()
-        ]);
-        setFeaturedProducts(productsData);
-        setCategories(categoriesData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
+        const productsData = await getFeaturedProducts(controller.signal);
+        
+        if (!controller.signal.aborted) {
+          console.log('AttireHomePage: fetchData Success', !!productsData);
+          setFeaturedProducts(productsData);
+          setLoading(false);
+          console.log('AttireHomePage: fetchData Complete (loading state set to false)');
+        }
+      } catch (error: any) {
+        if (error.name === 'AbortError') {
+          console.log('AttireHomePage: fetchData aborted');
+          return;
+        }
+        console.error('AttireHomePage: fetchData Error:', error);
         setLoading(false);
       }
     };
 
     fetchData();
+
+    return () => {
+      console.log('AttireHomePage: Unmounting (aborting fetch)...');
+      controller.abort();
+    };
   }, []);
 
   // Auto-rotate hero slides
@@ -118,6 +131,7 @@ export default function AttireHomePage() {
               src={slide.image}
               alt={slide.title}
               fill
+              unoptimized
               priority={index === 0}
               className="object-cover"
             />
@@ -185,27 +199,34 @@ export default function AttireHomePage() {
             Shop by Category
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {categories.slice(0, 4).map((category) => (
-              <Link
-                key={category.id}
-                href={`/attire/products?category=${category.slug}`}
-                className="group relative aspect-[4/5] rounded-xl overflow-hidden"
-              >
-                <Image
-                  src={category.image || ''}
-                  alt={category.name}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-xl font-bold text-white mb-1">{category.name}</h3>
-                  <span className="text-sm text-white/80 flex items-center gap-1 group-hover:gap-2 transition-all">
-                    Shop Now <ArrowRight size={14} />
-                  </span>
-                </div>
-              </Link>
-            ))}
+            {categoriesLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="aspect-[4/5] rounded-xl bg-slate-100 animate-pulse" />
+              ))
+            ) : (
+              categories.slice(0, 4).map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/attire/products?category=${category.slug}`}
+                  className="group relative aspect-[4/5] rounded-xl overflow-hidden"
+                >
+                  <Image
+                    src={category.image || ''}
+                    alt={category.name}
+                    fill
+                    unoptimized
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h3 className="text-xl font-bold text-white mb-1">{category.name}</h3>
+                    <span className="text-sm text-white/80 flex items-center gap-1 group-hover:gap-2 transition-all">
+                      Shop Now <ArrowRight size={14} />
+                    </span>
+                  </div>
+                </Link>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -249,6 +270,7 @@ export default function AttireHomePage() {
               src="https://images.unsplash.com/photo-1607082350899-7e105aa886ae?w=1920&h=600&fit=crop"
               alt="Sale Banner"
               fill
+              unoptimized
               className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-rose-600/90 to-rose-600/50" />

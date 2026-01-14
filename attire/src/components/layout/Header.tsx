@@ -44,8 +44,7 @@ export default function Header() {
     const pathname = usePathname();
     const { user, signOut } = useAuth();
     const { getCartItemCount, toggleCart } = useCart();
-    const { searchQuery, setSearchQuery, toggleMobileMenu, isMobileMenuOpen, closeMobileMenu } = useApp();
-    const [categories, setCategories] = useState<Category[]>([]);
+    const { searchQuery, setSearchQuery, toggleMobileMenu, isMobileMenuOpen, closeMobileMenu, categories } = useApp();
 
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [localSearch, setLocalSearch] = useState(searchQuery);
@@ -54,17 +53,7 @@ export default function Header() {
     const searchInputRef = useRef<HTMLInputElement>(null);
     const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const data = await getCategories();
-                setCategories(data);
-            } catch (error) {
-                console.error('Error fetching categories:', error);
-            }
-        };
-        fetchCategories();
-    }, []);
+    // Categories are now managed globally in AppContext
 
     const { itemCount: wishlistCount } = useWishlist();
 
@@ -73,7 +62,7 @@ export default function Header() {
     // Check if we're in the Attire section
     const isAttireSection = pathname.startsWith('/attire');
     const isMainPage = pathname === '/';
-
+    const isAdminPage = pathname.startsWith('/admin');
     // Handle search submission
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -105,9 +94,13 @@ export default function Header() {
 
     const handleSignOut = async () => {
         await signOut();
-        router.push('/');
+        // Use window.location.href for a full refresh to ensure all cookies and state are cleared
+        window.location.href = '/';
         closeMobileMenu();
     };
+
+    // Don't show the main header on admin pages - move after all hooks to comply with React rules
+    if (isAdminPage) return null;
 
     return (
         <>

@@ -20,9 +20,9 @@ export default function CateringMenuPage() {
     const categories = ['all', ...CATERING_CATEGORIES.map(c => c.value)];
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
         async function fetchData() {
-            setLoading(true);
             const [pkgData, itemData] = await Promise.all([
                 getCateringPackages(),
                 getMenuItems()
@@ -73,6 +73,7 @@ export default function CateringMenuPage() {
                                                 src={pkg.image}
                                                 alt={pkg.name}
                                                 fill
+                                                unoptimized
                                                 className="object-cover"
                                             />
                                             <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold text-slate-900 shadow-sm">
@@ -134,6 +135,7 @@ export default function CateringMenuPage() {
                                                 src={item.image}
                                                 alt={item.name}
                                                 fill
+                                                unoptimized
                                                 className="object-cover group-hover:scale-105 transition-transform duration-500"
                                             />
                                         </div>

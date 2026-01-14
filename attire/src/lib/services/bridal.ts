@@ -24,7 +24,7 @@ export async function getBridalGowns(): Promise<BridalGown[]> {
     }
 
     // Transform database format to TypeScript interface format
-    return (data || []).map((gown: Record<string, any>) => ({
+    return (data || []).map((gown: Record<string, unknown>) => ({
         id: gown.id as string,
         name: gown.name as string,
         designer: gown.designer as string,
@@ -55,7 +55,7 @@ export async function getBridalServices(): Promise<BridalService[]> {
         return [];
     }
 
-    return (data || []).map((service: Record<string, any>) => ({
+    return (data || []).map((service: Record<string, unknown>) => ({
         id: service.id as string,
         title: service.title as string,
         description: service.description as string,

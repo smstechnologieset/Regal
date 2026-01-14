@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 /**
  * Admin Single Order API
  * 

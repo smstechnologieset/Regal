@@ -9,7 +9,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Loader2, Package, User, Calendar, DollarSign, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Loader2, Package, User, Calendar, DollarSign, MessageSquare, ShoppingBag, Truck } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import { useApp } from '@/context/AppContext';
 import Button from '@/components/ui/Button';
@@ -20,7 +20,8 @@ interface Order {
     service_type: string;
     status: string;
     total: number;
-    details: Record<string, unknown>;
+    details: any;
+    shipping_address?: any;
     notes: string | null;
     created_at: string;
     updated_at: string;
@@ -39,23 +40,35 @@ export default function AdminOrderDetailPage() {
 
     useEffect(() => {
         async function fetchOrder() {
-            if (!orderId) return;
-
-            const supabase = getSupabaseClient();
-            const { data, error } = await supabase
-                .from('orders')
-                .select('*, profiles(full_name, phone)')
-                .eq('id', orderId)
-                .single();
-
-            if (!error && data) {
-                setOrder(data);
+            if (!orderId) {
+                setLoading(false);
+                return;
             }
-            setLoading(false);
+
+            try {
+                const supabase = getSupabaseClient();
+                const { data, error } = await supabase
+                    .from('orders')
+                    .select('*, profiles(full_name, phone)')
+                    .eq('id', orderId)
+                    .single();
+
+                if (error) {
+                    console.error('Error fetching order:', error);
+                    addToast(`Failed to load order: ${error.message}`, 'error');
+                } else if (data) {
+                    setOrder(data);
+                }
+            } catch (err: any) {
+                console.error('Unexpected error in fetchOrder:', err);
+                addToast('An unexpected error occurred while loading the order', 'error');
+            } finally {
+                setLoading(false);
+            }
         }
 
         fetchOrder();
-    }, [orderId]);
+    }, [orderId, addToast]);
 
     const updateStatus = async (newStatus: string) => {
         if (!order) return;
@@ -175,6 +188,72 @@ export default function AdminOrderDetailPage() {
                         </div>
                     </div>
 
+                    {/* Order Items */}
+                    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                        <h2 className="font-semibold text-slate-900 mb-6 flex items-center gap-2">
+                            <ShoppingBag size={20} />
+                            Order Items
+                        </h2>
+                        <div className="space-y-4">
+                            {Array.isArray(order.details) ? (
+                                order.details.map((item: any, idx: number) => (
+                                    <div key={idx} className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-16 bg-slate-100 rounded overflow-hidden flex-shrink-0">
+                                                {/* Image would go here if available */}
+                                                <div className="w-full h-full flex items-center justify-center text-slate-400">
+                                                    <ShoppingBag size={20} />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-slate-900">{item.productName || 'Unknown Product'}</p>
+                                                <p className="text-sm text-slate-500">
+                                                    {item.size && <span>Size: {item.size}</span>}
+                                                    {item.color && <span className="ml-3">Color: {item.color}</span>}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-medium text-slate-900">${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
+                                            <p className="text-sm text-slate-500">{item.quantity || 1} x ${item.price?.toFixed(2) || '0.00'}</p>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-slate-500 text-sm">No items found in this order.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Shipping Address */}
+                    {order.shipping_address && (
+                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                            <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                                <Truck size={20} />
+                                Shipping Address
+                            </h2>
+                            <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p className="text-slate-500">Recipient</p>
+                                    <p className="font-medium text-slate-900">{order.shipping_address.fullName}</p>
+                                </div>
+                                <div>
+                                    <p className="text-slate-500">Contact</p>
+                                    <p className="font-medium text-slate-900">{order.shipping_address.phone}</p>
+                                    <p className="text-slate-500">{order.shipping_address.email}</p>
+                                </div>
+                                <div className="sm:col-span-2">
+                                    <p className="text-slate-500">Address</p>
+                                    <p className="font-medium text-slate-900">
+                                        {order.shipping_address.address}<br />
+                                        {order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.zipCode}<br />
+                                        {order.shipping_address.country}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Status Update */}
                     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
                         <h2 className="font-semibold text-slate-900 mb-4">Update Status</h2>
@@ -208,19 +287,13 @@ export default function AdminOrderDetailPage() {
                             <div>
                                 <p className="text-xs text-slate-500">Name</p>
                                 <p className="font-medium text-slate-900">
-                                    {order.profiles?.full_name || 'Unknown'}
+                                    {order.profiles?.full_name || order.shipping_address?.fullName || 'Unknown'}
                                 </p>
                             </div>
                             <div>
                                 <p className="text-xs text-slate-500">Phone</p>
                                 <p className="font-medium text-slate-900">
-                                    {order.profiles?.phone || 'Not provided'}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-xs text-slate-500">User ID</p>
-                                <p className="font-mono text-sm text-slate-600">
-                                    {order.user_id.slice(0, 8)}...
+                                    {order.profiles?.phone || order.shipping_address?.phone || 'Not provided'}
                                 </p>
                             </div>
                         </div>

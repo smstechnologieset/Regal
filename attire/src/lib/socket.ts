@@ -16,13 +16,14 @@ interface SocketOptions {
  * Initialize the Socket.io connection
  */
 export function initSocket({ token }: SocketOptions): Socket {
-    if (socket?.connected) {
+    if (socket) {
         return socket;
     }
 
     socket = io({
         path: '/socket.io',
         auth: { token },
+        transports: ['websocket'], // Force websocket only to save HTTP connection slots
         autoConnect: true,
         reconnection: true,
         reconnectionAttempts: 5,

@@ -15,6 +15,7 @@ import Button from '@/components/ui/Button';
 function OrderConfirmationContent() {
     const searchParams = useSearchParams();
     const orderId = searchParams.get('orderId') || 'ORD-XXXXXX';
+    const conversationId = searchParams.get('conversationId');
 
     return (
         <div className="min-h-[70vh] flex items-center justify-center px-4 py-12">
@@ -82,7 +83,7 @@ function OrderConfirmationContent() {
                         <li className="flex items-start gap-2">
                             <span className="text-emerald-500 mt-0.5">✓</span>
                             <span>
-                                For Cash on Delivery orders, please have the exact amount ready.
+                                You can chat with our admin directly about this order using the button below.
                             </span>
                         </li>
                     </ul>
@@ -90,8 +91,15 @@ function OrderConfirmationContent() {
 
                 {/* Actions */}
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    {conversationId && (
+                        <Link href={`/attire/chat/${conversationId}`}>
+                            <Button variant="secondary" className="bg-rose-600 hover:bg-rose-700">
+                                Chat with Admin
+                            </Button>
+                        </Link>
+                    )}
                     <Link href="/attire/products">
-                        <Button variant="secondary">Continue Shopping</Button>
+                        <Button variant="outline">Continue Shopping</Button>
                     </Link>
                     <Link href="/">
                         <Button variant="outline">Back to Home</Button>

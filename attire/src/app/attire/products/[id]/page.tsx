@@ -19,7 +19,9 @@ import {
     ShieldCheck,
     ChevronRight,
     Minus,
-    Plus
+    Plus,
+    X,
+    ShoppingBag
 } from 'lucide-react';
 import { Product } from '@/types';
 import { getProductById, getRelatedProducts } from '@/lib/api';
@@ -159,8 +161,15 @@ export default function ProductPage({ params }: ProductPageProps) {
             <div className="container mx-auto px-4 py-8">
                 <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
                     {/* Image Gallery */}
-                    <div>
+                    <div className="relative">
                         <ImageGallery images={product.images} productName={product.name} />
+                        {discount > 0 && product.inStock && (
+                            <div className="absolute top-4 right-4 z-10">
+                                <span className="bg-rose-600 text-white text-sm font-bold px-3 py-1.5 rounded-lg shadow-lg">
+                                    -{discount}% OFF
+                                </span>
+                            </div>
+                        )}
                     </div>
 
                     {/* Product Info */}
@@ -270,16 +279,23 @@ export default function ProductPage({ params }: ProductPageProps) {
                             </div>
                         </div>
 
-                        {/* Stock Status */}
+                        {/* Stock Status & Urgency */}
                         <div className="mb-6">
-                            {product.inStock ? (
-                                <span className="text-sm text-emerald-600 font-medium">
-                                    ✓ In Stock ({product.stockCount} available)
-                                </span>
+                            {!product.inStock || (product.stockCount ?? 0) <= 0 ? (
+                                <div className="flex items-center gap-2 text-rose-600 font-semibold bg-rose-50 px-3 py-2 rounded-lg w-fit">
+                                    <X size={18} />
+                                    <span>Out of Stock</span>
+                                </div>
+                            ) : (product.stockCount ?? 0) <= 10 ? (
+                                <div className="flex items-center gap-2 text-amber-600 font-bold bg-amber-50 px-3 py-2 rounded-lg w-fit animate-pulse">
+                                    <ShoppingBag size={18} />
+                                    <span>Only {product.stockCount} left! - Order soon</span>
+                                </div>
                             ) : (
-                                <span className="text-sm text-rose-600 font-medium">
-                                    ✗ Out of Stock
-                                </span>
+                                <div className="flex items-center gap-2 text-emerald-600 font-medium">
+                                    <ShieldCheck size={18} />
+                                    <span>In Stock ({product.stockCount} available)</span>
+                                </div>
                             )}
                         </div>
 
@@ -290,7 +306,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                                 size="lg"
                                 variant="secondary"
                                 onClick={handleAddToCart}
-                                disabled={!product.inStock}
+                                disabled={!product.inStock || (product.stockCount ?? 0) <= 0}
                             >
                                 Add to Cart
                             </Button>
@@ -298,7 +314,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                                 fullWidth
                                 size="lg"
                                 onClick={handleBuyNow}
-                                disabled={!product.inStock}
+                                disabled={!product.inStock || (product.stockCount ?? 0) <= 0}
                             >
                                 Buy Now
                             </Button>

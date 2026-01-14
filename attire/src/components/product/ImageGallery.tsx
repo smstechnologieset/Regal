@@ -59,6 +59,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                             alt={`${productName} - View ${index + 1}`}
                             width={80}
                             height={96}
+                            unoptimized
                             className="w-full h-full object-cover"
                         />
                     </button>
@@ -78,6 +79,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                         alt={`${productName} - Main view`}
                         fill
                         priority
+                        unoptimized
                         sizes="(max-width: 1024px) 100vw, 50vw"
                         className={cn(
                             'object-cover transition-transform duration-200',

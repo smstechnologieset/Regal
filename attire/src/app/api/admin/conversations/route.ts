@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 /**
  * Admin Conversations API
  * 
@@ -49,10 +51,10 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json({ conversations: conversations || [] });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching conversations:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch conversations' },
+            { error: error.message || 'Failed to fetch conversations' },
             { status: 500 }
         );
     }
@@ -107,10 +109,10 @@ export async function PATCH(request: NextRequest) {
         }
 
         return NextResponse.json({ conversation: data });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error updating conversation:', error);
         return NextResponse.json(
-            { error: 'Failed to update conversation' },
+            { error: error.message || 'Failed to update conversation' },
             { status: 500 }
         );
     }

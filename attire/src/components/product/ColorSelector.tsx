@@ -23,39 +23,55 @@ export default function ColorSelector({
     onSelect,
 }: ColorSelectorProps) {
     return (
-        <div>
-            <div className="flex items-center gap-2 mb-3">
-                <label className="text-sm font-medium text-slate-700">Color:</label>
-                {selectedColor && (
-                    <span className="text-sm text-slate-500">{selectedColor.name}</span>
-                )}
+        <div className="space-y-3">
+            <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
+                    Color: <span className="text-slate-500 font-medium normal-case ml-1">{selectedColor?.name || 'Select a color'}</span>
+                </span>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
                 {colors.map((color) => {
                     const isSelected = selectedColor?.name === color.name;
                     const isLight = isLightColor(color.hex);
+                    const isWhite = color.hex.toUpperCase() === '#FFFFFF' || color.hex.toLowerCase() === 'white';
 
                     return (
                         <button
                             key={color.name}
                             onClick={() => onSelect(color)}
                             className={cn(
-                                'w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center',
+                                'relative w-11 h-11 rounded-full border-2 transition-all duration-300 ease-out flex items-center justify-center group',
                                 isSelected
-                                    ? 'border-slate-900 scale-110'
-                                    : 'border-slate-200 hover:border-slate-400',
-                                color.hex === '#FFFFFF' && 'border-slate-300'
+                                    ? 'border-slate-900 ring-2 ring-slate-900/10 ring-offset-2'
+                                    : 'border-transparent hover:border-slate-300 hover:scale-105',
+                                isWhite && !isSelected && 'border-slate-200'
                             )}
-                            style={{ backgroundColor: color.hex }}
                             title={color.name}
                             aria-label={`Select ${color.name} color`}
                         >
+                            <span 
+                                className={cn(
+                                    "w-8 h-8 rounded-full shadow-sm transition-transform duration-300",
+                                    isSelected ? "scale-90" : "group-hover:scale-95"
+                                )}
+                                style={{ backgroundColor: color.hex }}
+                            />
                             {isSelected && (
-                                <Check
-                                    size={16}
-                                    className={isLight ? 'text-slate-900' : 'text-white'}
-                                />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <Check
+                                        size={14}
+                                        className={cn(
+                                            'transition-opacity duration-300',
+                                            isLight ? 'text-slate-900' : 'text-white'
+                                        )}
+                                        strokeWidth={3}
+                                    />
+                                </div>
                             )}
+                            {/* Hover Tooltip (Optional, but nice for UX) */}
+                            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                                {color.name}
+                            </span>
                         </button>
                     );
                 })}

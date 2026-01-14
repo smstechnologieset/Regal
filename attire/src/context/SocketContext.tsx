@@ -55,21 +55,28 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
     // Initialize socket connection when session is available
     useEffect(() => {
+        console.log('SocketProvider: session effect triggered');
         if (!session?.access_token) {
+            console.log('SocketProvider: disconnecting (no token)');
             disconnectSocket();
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setSocket(null);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsConnected(false);
             return;
         }
 
+        console.log('SocketProvider: initializing socket...');
         const socketInstance = initSocket({ token: session.access_token });
         setSocket(socketInstance);
 
         const handleConnect = () => {
+            console.log('SocketProvider: handling connect event');
             setIsConnected(true);
         };
 
         const handleDisconnect = () => {
+            console.log('SocketProvider: handling disconnect event');
             setIsConnected(false);
         };
 
@@ -78,10 +85,12 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
 
         // Set initial connection state
         if (socketInstance.connected) {
+            console.log('SocketProvider: already connected on init');
             setIsConnected(true);
         }
 
         return () => {
+            console.log('SocketProvider: session effect cleanup');
             socketInstance.off('connect', handleConnect);
             socketInstance.off('disconnect', handleDisconnect);
         };
@@ -180,7 +189,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         return () => {};
     }, []);
 
-    const value: SocketContextType = {
+    const value: SocketContextType = React.useMemo(() => ({
         socket,
         isConnected,
         joinConversation,
@@ -192,7 +201,19 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         onNewMessage,
         onTypingUpdate,
         onMessagesRead,
-    };
+    }), [
+        socket,
+        isConnected,
+        joinConversation,
+        leaveConversation,
+        sendMessage,
+        startTyping,
+        stopTyping,
+        markAsRead,
+        onNewMessage,
+        onTypingUpdate,
+        onMessagesRead
+    ]);
 
     return (
         <SocketContext.Provider value={value}>

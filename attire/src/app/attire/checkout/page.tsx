@@ -36,7 +36,14 @@ export default function CheckoutPage() {
     const router = useRouter();
     const { items, getCartTotal, clearCart } = useCart();
     const { addToast } = useApp();
-    const { user } = useAuth();
+    const { user, isLoading: isAuthLoading } = useAuth();
+
+    // Redirect to login if not authenticated
+    React.useEffect(() => {
+        if (!isAuthLoading && !user) {
+            router.push('/login?redirect=/attire/checkout');
+        }
+    }, [user, isAuthLoading, router]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod');
@@ -48,7 +55,7 @@ export default function CheckoutPage() {
         city: '',
         state: '',
         zipCode: '',
-        country: 'United States',
+        country: 'Ethiopia',
     });
     const [errors, setErrors] = useState<Partial<ShippingForm>>({});
 
@@ -124,7 +131,7 @@ export default function CheckoutPage() {
 
         try {
             // Submit order to Supabase
-            const result = await submitOrder({
+            const { orderId, conversationId, success } = await submitOrder({
                 userId: user.id,
                 items: items.map((item) => ({
                     productId: item.product.id,
@@ -140,11 +147,11 @@ export default function CheckoutPage() {
                 total,
             });
 
-            if (result.success) {
+            if (success) {
                 // Clear cart and redirect to confirmation
                 clearCart();
                 addToast('Order placed successfully!', 'success');
-                router.push(`/attire/order-confirmation?orderId=${result.orderId}`);
+                router.push(`/attire/order-confirmation?orderId=${orderId}${conversationId ? `&conversationId=${conversationId}` : ''}`);
             } else {
                 addToast('Failed to place order. Please try again.', 'error');
             }
@@ -226,7 +233,7 @@ export default function CheckoutPage() {
                                         value={formData.phone}
                                         onChange={handleChange}
                                         error={errors.phone}
-                                        placeholder="+1 (555) 000-0000"
+                                        placeholder="+251 900 000 000"
                                     />
                                     <div className="md:col-span-2">
                                         <Input
@@ -272,6 +279,7 @@ export default function CheckoutPage() {
                                             onChange={handleChange}
                                             className="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
                                         >
+                                            <option value="Ethiopia">Ethiopia</option>
                                             <option value="United States">United States</option>
                                             <option value="Canada">Canada</option>
                                             <option value="United Kingdom">United Kingdom</option>
@@ -363,6 +371,7 @@ export default function CheckoutPage() {
                                                     alt={item.product.name}
                                                     width={64}
                                                     height={80}
+                                                    unoptimized
                                                     className="w-full h-full object-cover"
                                                 />
                                             </div>

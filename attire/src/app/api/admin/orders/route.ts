@@ -9,6 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdmin, forbiddenResponse, unauthorizedResponse } from '@/lib/admin-auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 
+export const runtime = 'nodejs';
+
 export async function GET(request: NextRequest) {
     // Verify admin access
     const { isAdmin, userId, error } = await verifyAdmin();
@@ -51,10 +53,10 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json({ orders: orders || [] });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching orders:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch orders' },
+            { error: error.message || 'Failed to fetch orders' },
             { status: 500 }
         );
     }
@@ -109,10 +111,10 @@ export async function PATCH(request: NextRequest) {
         }
 
         return NextResponse.json({ order: data });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error updating order:', error);
         return NextResponse.json(
-            { error: 'Failed to update order' },
+            { error: error.message || 'Failed to update order' },
             { status: 500 }
         );
     }

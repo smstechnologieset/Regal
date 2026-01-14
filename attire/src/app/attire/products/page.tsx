@@ -25,7 +25,7 @@ function ProductsContent() {
     const searchParams = useSearchParams();
 
     const [products, setProducts] = useState<Product[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
+    const { categories, categoriesLoading } = useApp();
     const [loading, setLoading] = useState(true);
     const [totalProducts, setTotalProducts] = useState(0);
     const [filters, setFilters] = useState<FilterOptions>({});
@@ -35,70 +35,90 @@ function ProductsContent() {
     const { addToCart, toggleCart } = useCart();
     const { addToast, searchQuery } = useApp();
 
-    // 1. Fetch categories once on mount
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const result = await getCategories();
-                setCategories(result);
-            } catch (error) {
-                console.error('Error fetching categories:', error);
-            }
-        };
-        fetchCategories();
-    }, []);
+    // Categories are now managed globally in AppContext
 
     // 2. Sync URL params to local state
     useEffect(() => {
         const category = searchParams.get('category');
         const subcategory = searchParams.get('subcategory');
-
-        const newFilters: FilterOptions = {};
-        if (category) newFilters.category = category;
-        if (subcategory) newFilters.subcategory = subcategory;
+        const filter = searchParams.get('filter');
+        const sale = searchParams.get('sale');
+        const sort = searchParams.get('sort');
 
         setFilters(prev => {
-            // Only update if actually different to avoid unnecessary cycles
-            if (prev.category === (category || undefined) &&
-                prev.subcategory === (subcategory || undefined)) {
-                return prev;
+            const newFilters: FilterOptions = { ...prev };
+            
+            // 1. Category & Subcategory
+            newFilters.category = category || undefined;
+            newFilters.subcategory = subcategory || undefined;
+            
+            // 2. Highlights (Mutually exclusive sections from landing page)
+            if (filter === 'new') {
+                newFilters.badges = ['new'];
+            } else if (filter === 'bestseller') {
+                newFilters.badges = ['bestseller'];
+            } else if (filter === null) {
+                // Only clear if the parameter is explicitly missing from a new navigation
+                newFilters.badges = undefined;
             }
-            return {
-                ...prev,
-                category: category || undefined,
-                subcategory: subcategory || undefined
-            };
+            
+            // 3. Sale status
+            if (sale === 'true') {
+                newFilters.onSale = true;
+            } else if (sale === null) {
+                newFilters.onSale = undefined;
+            }
+
+            // Only update if actually different to avoid unnecessary cycles
+            const isDifferent = 
+                prev.category !== newFilters.category ||
+                prev.subcategory !== newFilters.subcategory ||
+                JSON.stringify(prev.badges) !== JSON.stringify(newFilters.badges) ||
+                prev.onSale !== newFilters.onSale;
+
+            return isDifferent ? newFilters : prev;
         });
+
+        if (sort) {
+            setSortOption(sort as SortOption);
+        }
     }, [searchParams]);
 
     // 3. Fetch products whenever filters or sort changes
     useEffect(() => {
-        let isMounted = true;
+        const controller = new AbortController();
+        console.log('Attire Products: performFetch triggered', { filters, sortOption });
 
         const performFetch = async () => {
             setLoading(true);
             try {
-                const result = await getProducts(filters, sortOption, 1, 24);
-                if (isMounted) {
+                console.log('Attire Products: fetching products...');
+                const result = await getProducts(filters, sortOption, 1, 24, controller.signal);
+                
+                // If the signal was aborted, result will be a fallback/error from withRetry
+                // but we should still double check if it's the one we wanted
+                if (!controller.signal.aborted) {
+                    console.log('Attire Products: fetch success', { count: result.data.length, total: result.total });
                     setProducts(result.data);
                     setTotalProducts(result.total);
-                }
-            } catch (error) {
-                if (isMounted) {
-                    console.error('Error fetching products:', error);
-                    addToast('Failed to load products', 'error');
-                }
-            } finally {
-                if (isMounted) {
                     setLoading(false);
                 }
+            } catch (error: any) {
+                if (error.name === 'AbortError') {
+                    console.log('Attire Products: fetch aborted');
+                    return;
+                }
+                console.error('Attire Products: fetch error', error);
+                addToast('Failed to load products', 'error');
+                setLoading(false);
             }
         };
 
         performFetch();
 
         return () => {
-            isMounted = false;
+            console.log('Attire Products: cleanup (aborting fetch)');
+            controller.abort();
         };
     }, [filters, sortOption, addToast]);
 
@@ -125,7 +145,9 @@ function ProductsContent() {
         (filters.category ? 1 : 0) +
         (filters.subcategory ? 1 : 0) +
         (filters.sizes?.length || 0) +
-        (filters.priceRange ? 1 : 0);
+        (filters.priceRange ? 1 : 0) +
+        (filters.onSale ? 1 : 0) +
+        (filters.badges?.length || 0);
 
     return (
         <div className="min-h-screen bg-white">
@@ -196,6 +218,24 @@ function ProductsContent() {
                                             setFilters({
                                                 ...filters,
                                                 sizes: filters.sizes?.filter((s) => s !== size),
+                                            })
+                                        }
+                                    />
+                                ))}
+                                {filters.onSale && (
+                                    <FilterTag
+                                        label="On Sale"
+                                        onRemove={() => setFilters({ ...filters, onSale: undefined })}
+                                    />
+                                )}
+                                {filters.badges?.map((badge) => (
+                                    <FilterTag
+                                        key={badge}
+                                        label={badge === 'new' ? 'New Arrival' : 'Best Seller'}
+                                        onRemove={() =>
+                                            setFilters({
+                                                ...filters,
+                                                badges: filters.badges?.filter((b) => b !== badge),
                                             })
                                         }
                                     />

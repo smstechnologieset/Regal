@@ -9,6 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdmin, forbiddenResponse, unauthorizedResponse } from '@/lib/admin-auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 
+export const runtime = 'nodejs';
+
 export async function GET(request: NextRequest) {
     // Verify admin access
     const { isAdmin, userId, error } = await verifyAdmin();
@@ -101,10 +103,10 @@ export async function GET(request: NextRequest) {
             ordersByStatus,
             recentOrders: recentOrders || [],
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching admin stats:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch stats' },
+            { error: error.message || 'Failed to fetch stats' },
             { status: 500 }
         );
     }

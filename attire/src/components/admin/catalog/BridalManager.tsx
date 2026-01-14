@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2, X, Heart, Loader2, Sparkles, Scissors, Upload } from 'lucide-react';
 import ImageUpload from './ImageUpload';
 import { BRIDAL_SILHOUETTES } from '@/lib/constants';
+import { useApp } from '@/context/AppContext';
 
 interface Gown {
     id: string;
@@ -30,12 +31,13 @@ interface Service {
 }
 
 export default function BridalManager() {
+    const { addToast, showApiError } = useApp();
     const [activeTab, setActiveTab] = useState<'gowns' | 'services'>('gowns');
     const [gowns, setGowns] = useState<Gown[]>([]);
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingItem, setEditingItem] = useState<any | null>(null);
+    const [editingItem, setEditingItem] = useState<Gown | Service | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [sizeInput, setSizeInput] = useState('');
 
@@ -67,28 +69,30 @@ export default function BridalManager() {
             else setServices(data.services || []);
         } catch (error) {
             console.error('Error fetching bridal data:', error);
+            showApiError(error, 'Failed to fetch bridal data');
         } finally {
             setLoading(false);
         }
     }
 
-    const handleOpenModal = (item?: any) => {
+    const handleOpenModal = (item?: Gown | Service) => {
         if (activeTab === 'gowns') {
+            const gown = item as Gown;
             if (item) {
-                setEditingItem(item);
+                setEditingItem(gown);
                 setGownForm({
-                    name: item.name,
-                    designer: item.designer || '',
-                    style: item.style || '',
-                    silhouette: item.silhouette || '',
-                    price_rent: item.price_rent?.toString() || '',
-                    price_buy: item.price_buy?.toString() || '',
-                    sizes: item.sizes || [],
-                    images: item.images || [],
-                    description: item.description || '',
-                    is_new: item.is_new
+                    name: gown.name,
+                    designer: gown.designer || '',
+                    style: gown.style || '',
+                    silhouette: gown.silhouette || '',
+                    price_rent: gown.price_rent?.toString() || '',
+                    price_buy: gown.price_buy?.toString() || '',
+                    sizes: gown.sizes || [],
+                    images: gown.images || [],
+                    description: gown.description || '',
+                    is_new: gown.is_new
                 });
-                setSizeInput((item.sizes || []).join(', '));
+                setSizeInput((gown.sizes || []).join(', '));
             } else {
                 setEditingItem(null);
                 setGownForm({
@@ -99,15 +103,16 @@ export default function BridalManager() {
                 setSizeInput('');
             }
         } else {
+            const service = item as Service;
             if (item) {
-                setEditingItem(item);
+                setEditingItem(service);
                 setServiceForm({
-                    title: item.title,
-                    description: item.description || '',
-                    price_start: item.price_start?.toString() || '',
-                    duration: item.duration || '',
-                    type: item.type || 'makeup',
-                    image: item.image || ''
+                    title: service.title,
+                    description: service.description || '',
+                    price_start: service.price_start?.toString() || '',
+                    duration: service.duration || '',
+                    type: service.type || 'makeup',
+                    image: service.image || ''
                 });
             } else {
                 setEditingItem(null);
@@ -140,12 +145,13 @@ export default function BridalManager() {
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to save');
+            if (!response.ok) throw response;
             setIsModalOpen(false);
             fetchData();
+            addToast(`${activeTab === 'gowns' ? 'Gown' : 'Service'} saved successfully`, 'success');
         } catch (error) {
             console.error('Error saving:', error);
-            alert('Error saving');
+            showApiError(error, 'Failed to save');
         } finally {
             setSubmitting(false);
         }
@@ -156,10 +162,12 @@ export default function BridalManager() {
         try {
             const baseUrl = activeTab === 'gowns' ? '/api/admin/catalog/bridal/gowns' : '/api/admin/catalog/bridal/services';
             const response = await fetch(`${baseUrl}/${id}`, { method: 'DELETE' });
-            if (!response.ok) throw new Error('Failed to delete');
+            if (!response.ok) throw response;
+            addToast('Deleted successfully', 'success');
             fetchData();
         } catch (error) {
             console.error('Error deleting:', error);
+            showApiError(error, 'Failed to delete');
         }
     };
 

@@ -8,6 +8,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+
+export const runtime = 'nodejs';
 import { CartProvider } from "@/context/CartContext";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider } from "@/context/AuthContext";

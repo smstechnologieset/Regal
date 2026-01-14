@@ -90,6 +90,7 @@ export default function CartDrawer() {
                                             alt={item.product.name}
                                             width={80}
                                             height={96}
+                                            unoptimized
                                             className="w-full h-full object-cover"
                                         />
                                     </Link>

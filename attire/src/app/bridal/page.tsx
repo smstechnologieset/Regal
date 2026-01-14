@@ -15,6 +15,7 @@ export default function BridalPage() {
                     src="https://images.unsplash.com/photo-1595156360341-71fb5e783416?w=1920&h=1080&fit=crop"
                     alt="Bridal Elegance"
                     fill
+                    unoptimized
                     className="object-cover"
                     priority
                 />
@@ -122,6 +123,7 @@ export default function BridalPage() {
                                 src="https://images.unsplash.com/photo-1596483550605-d972f113840e?w=800&h=1000&fit=crop"
                                 alt="Bridal Fitting"
                                 fill
+                                unoptimized
                                 className="object-cover hover:scale-105 transition-transform duration-700"
                             />
                         </div>

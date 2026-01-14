@@ -67,34 +67,44 @@ app.prepare().then(() => {
             const token = socket.handshake.auth.token;
             
             if (!token) {
+                console.log('Socket connection denied: No token provided');
                 return next(new Error('Authentication required'));
             }
 
             // Verify the token with Supabase
-            const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+            console.log('Verifying socket token...');
+            const { data, error } = await supabaseAdmin.auth.getUser(token);
+            const user = data?.user;
             
             if (error || !user) {
+                console.error('Socket authentication error (Supabase):', error?.message || 'User not found');
                 return next(new Error('Invalid token'));
             }
 
             // Get user profile to check role
-            const { data: profile } = await supabaseAdmin
+            console.log(`Fetching profile for user: ${user.id}`);
+            const { data: profile, error: profileError } = await supabaseAdmin
                 .from('profiles')
                 .select('role, full_name')
                 .eq('id', user.id)
                 .single();
 
+            if (profileError) {
+                console.warn(`Profile fetch error for user ${user.id}:`, profileError.message);
+            }
+
             // Attach user info to socket
             socket.data.user = {
                 id: user.id,
-                email: user.email,
+                email: user.email || '',
                 fullName: profile?.full_name || 'User',
                 isAdmin: profile?.role === 'admin',
             };
 
+            console.log(`Socket authentication successful: ${user.email} (${socket.data.user.isAdmin ? 'Admin' : 'User'})`);
             next();
         } catch (error) {
-            console.error('Socket authentication error:', error);
+            console.error('Socket authentication exception:', error);
             next(new Error('Authentication failed'));
         }
     });

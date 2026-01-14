@@ -163,15 +163,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Sign out
     const signOut = async () => {
+        console.log('AuthContext: Initiating sign out...');
+        
+        // Immediately clear local state so UI reacts instantly
+        setUser(null);
+        setProfile(null);
+        setSession(null);
+        console.log('AuthContext: Local auth state cleared immediately');
+
         try {
-            await supabase.auth.signOut();
+            // Initiate Supabase sign out but don't let it hang the UI indefinitely
+            // We use a Promise.race to timeout if the network is really slow
+            const signOutPromise = supabase.auth.signOut();
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Sign out timed out')), 2000)
+            );
+
+            await Promise.race([signOutPromise, timeoutPromise]);
+            console.log('AuthContext: Supabase sign out signal sent successfully');
         } catch (error) {
-            console.error('Supabase signOut error:', error);
-        } finally {
-            // Always clear local state to prevent UI persistence
-            setUser(null);
-            setProfile(null);
-            setSession(null);
+            console.error('AuthContext: Sign out error or timeout:', error);
+            // Even if it errors or times out, we've already cleared local state
         }
     };
 

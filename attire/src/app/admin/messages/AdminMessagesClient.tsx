@@ -10,6 +10,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { MessageSquare, ChevronRight, Search, Clock, User } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
 
 interface Conversation {
     id: string;
@@ -23,9 +24,9 @@ interface Conversation {
 }
 
 export default function AdminMessagesClient() {
+    const { showApiError } = useApp();
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
 
@@ -37,16 +38,13 @@ export default function AdminMessagesClient() {
                 
                 const response = await fetch(`/api/admin/conversations?${params.toString()}`);
                 
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.error || 'Failed to fetch conversations');
-                }
+                if (!response.ok) throw response;
                 
                 const data = await response.json();
                 setConversations(data.conversations || []);
             } catch (err) {
                 console.error('Error fetching conversations:', err);
-                setError(err instanceof Error ? err.message : 'Failed to load conversations');
+                showApiError(err, 'Failed to load conversations');
             } finally {
                 setLoading(false);
             }

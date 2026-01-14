@@ -10,8 +10,9 @@
  * const { searchQuery, setSearchQuery, filters, setFilters } = useApp();
  */
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { FilterOptions, SortOption } from '@/types';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { FilterOptions, SortOption, Category } from '@/types';
+import { getCategories } from '@/lib/api';
 
 // App context interface
 interface AppContextType {
@@ -29,6 +30,11 @@ interface AppContextType {
     sortOption: SortOption;
     setSortOption: (option: SortOption) => void;
 
+    // Categories
+    categories: Category[];
+    categoriesLoading: boolean;
+    refreshCategories: () => Promise<void>;
+
     // UI State
     isMobileMenuOpen: boolean;
     toggleMobileMenu: () => void;
@@ -38,6 +44,7 @@ interface AppContextType {
     toasts: Toast[];
     addToast: (message: string, type?: ToastType) => void;
     removeToast: (id: string) => void;
+    showApiError: (error: any, defaultMessage?: string) => Promise<void>;
 }
 
 // Toast types
@@ -57,6 +64,9 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 // Provider component
 export function AppProvider({ children }: { children: React.ReactNode }) {
+    // Categories state
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [categoriesLoading, setCategoriesLoading] = useState(true);
     // Search state
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -71,6 +81,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     // Toast state
     const [toasts, setToasts] = useState<Toast[]>([]);
+
+    // Add toast notification
+    const addToast = useCallback((message: string, type: ToastType = 'info') => {
+        const id = `toast-${Date.now()}`;
+        setToasts(prev => [...prev, { id, message, type }]);
+
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            setToasts(prev => prev.filter(t => t.id !== id));
+        }, 3000);
+    }, []);
+
+    // Remove toast
+    const removeToast = useCallback((id: string) => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+    }, []);
+
+    // Centralized API Error handling
+    const showApiError = useCallback(async (error: any, defaultMessage: string = 'Something went wrong') => {
+        let message = defaultMessage;
+
+        try {
+            if (error instanceof Response) {
+                const data = await error.json();
+                message = data.error || data.message || message;
+            } else if (error && typeof error === 'object') {
+                message = error.message || error.error || message;
+            } else if (typeof error === 'string') {
+                message = error;
+            }
+        } catch (e) {
+            console.error('Failed to parse error response:', e);
+        }
+
+        addToast(message, 'error');
+    }, [addToast]);
 
     // Update a single filter
     const updateFilter = useCallback(<K extends keyof FilterOptions>(
@@ -95,21 +141,37 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setIsMobileMenuOpen(false);
     }, []);
 
-    // Add toast notification
-    const addToast = useCallback((message: string, type: ToastType = 'info') => {
-        const id = `toast-${Date.now()}`;
-        setToasts(prev => [...prev, { id, message, type }]);
+    // Fetch categories on mount
+    const fetchCategories = useCallback(async (signal?: AbortSignal) => {
+        setCategoriesLoading(true);
+        try {
+            const data = await getCategories(signal);
+            
+            if (signal?.aborted) return;
 
-        // Auto-remove after 3 seconds
-        setTimeout(() => {
-            setToasts(prev => prev.filter(t => t.id !== id));
-        }, 3000);
-    }, []);
+            if (data.length === 0) {
+                // ...
+            }
+            setCategories(data);
+        } catch (error) {
+            if (error instanceof Error && error.name === 'AbortError') return;
+            console.error('AppProvider: Error fetching categories:', error);
+            showApiError(error, 'Failed to load menu categories');
+        } finally {
+            if (!signal?.aborted) {
+                setCategoriesLoading(false);
+            }
+        }
+    }, [showApiError]);
 
-    // Remove toast
-    const removeToast = useCallback((id: string) => {
-        setToasts(prev => prev.filter(t => t.id !== id));
-    }, []);
+    useEffect(() => {
+        const controller = new AbortController();
+        fetchCategories(controller.signal);
+        
+        return () => {
+            controller.abort();
+        };
+    }, [fetchCategories]);
 
     const value: AppContextType = {
         searchQuery,
@@ -126,6 +188,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         toasts,
         addToast,
         removeToast,
+        showApiError,
+        categories,
+        categoriesLoading,
+        refreshCategories: fetchCategories,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

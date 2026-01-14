@@ -43,7 +43,8 @@ export default function AccountLayout({
         try {
             setIsLoggingOut(true);
             await signOut();
-            router.push('/');
+            // Use window.location.href for a full refresh to ensure all cookies and state are cleared
+            window.location.href = '/';
         } catch (error) {
             console.error('Sign out failed:', error);
             // Force redirect anyway to clear UI
@@ -55,8 +56,14 @@ export default function AccountLayout({
     React.useEffect(() => {
         if (!isLoading && !user && !isLoggingOut) {
             router.push('/login?redirect=' + encodeURIComponent(pathname));
+            return;
         }
-    }, [user, isLoading, router, pathname, isLoggingOut]);
+
+        // If user is admin, they don't belong in the /account section
+        if (!isLoading && user && isAdmin && !isLoggingOut) {
+            router.push('/admin');
+        }
+    }, [user, isLoading, isAdmin, router, pathname, isLoggingOut]);
 
     if (isLoading) {
         return (

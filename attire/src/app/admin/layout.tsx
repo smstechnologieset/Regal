@@ -26,11 +26,12 @@ import {
     LogOut,
     Home
 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth, Profile } from '@/context/AuthContext';
 
 const navItems = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Catalog', href: '/admin/catalog', icon: ShoppingBag },
+    { name: 'Categories', href: '/admin/catalog/categories', icon: LayoutDashboard },
     { name: 'Users', href: '/admin/users', icon: Users },
     {
         name: 'Orders',
@@ -58,7 +59,7 @@ function AdminSidebar({
     sidebarOpen: boolean;
     setSidebarOpen: (open: boolean) => void;
     pathname: string;
-    profile: any;
+    profile: Profile | null;
     handleSignOut: () => void;
 }) {
     const searchParams = useSearchParams();
@@ -203,7 +204,8 @@ export default function AdminLayout({
 
     const handleSignOut = async () => {
         await signOut();
-        router.push('/');
+        // Use window.location.href for a full refresh to ensure all cookies and state are cleared
+        window.location.href = '/';
     };
 
     return (

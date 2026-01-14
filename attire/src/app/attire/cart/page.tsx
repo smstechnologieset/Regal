@@ -9,13 +9,17 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 import Button from '@/components/ui/Button';
 import { formatPrice } from '@/lib/utils';
 
 export default function CartPage() {
+    const router = useRouter();
     const { items, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
+    const { user } = useAuth();
 
     const subtotal = getCartTotal();
     const shipping = subtotal >= 50 ? 0 : 9.99;
@@ -73,6 +77,7 @@ export default function CartPage() {
                                         alt={item.product.name}
                                         width={128}
                                         height={160}
+                                        unoptimized
                                         className="w-full h-full object-cover"
                                     />
                                 </Link>
@@ -223,11 +228,20 @@ export default function CartPage() {
                             </div>
 
                             {/* Checkout Button */}
-                            <Link href="/attire/checkout">
-                                <Button fullWidth size="lg" variant="secondary">
-                                    Proceed to Checkout
-                                </Button>
-                            </Link>
+                            <Button 
+                                fullWidth 
+                                size="lg" 
+                                variant="secondary"
+                                onClick={() => {
+                                    if (!user) {
+                                        window.location.href = '/login?redirect=/attire/checkout';
+                                    } else {
+                                        router.push('/attire/checkout');
+                                    }
+                                }}
+                            >
+                                Proceed to Checkout
+                            </Button>
 
                             {/* Payment Methods */}
                             <div className="mt-6 text-center">

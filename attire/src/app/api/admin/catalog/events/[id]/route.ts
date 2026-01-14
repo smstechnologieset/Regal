@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 /**
  * Admin Events Catalog API (Single Package)
  * 
@@ -29,11 +31,16 @@ export async function PATCH(
             .select()
             .single();
 
-        if (dbError) throw dbError;
+        if (dbError) {
+            if (dbError.code === '23505') {
+                return NextResponse.json({ error: 'Slug already exists on another package' }, { status: 400 });
+            }
+            throw dbError;
+        }
         return NextResponse.json({ package: data });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error updating event package:', error);
-        return NextResponse.json({ error: 'Failed to update package' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to update package' }, { status: 500 });
     }
 }
 
@@ -56,8 +63,8 @@ export async function DELETE(
 
         if (dbError) throw dbError;
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error deleting event package:', error);
-        return NextResponse.json({ error: 'Failed to delete package' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to delete package' }, { status: 500 });
     }
 }

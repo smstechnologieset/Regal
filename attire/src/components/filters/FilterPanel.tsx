@@ -85,7 +85,9 @@ export default function FilterPanel({
     const hasActiveFilters =
         filters.category ||
         (filters.sizes && filters.sizes.length > 0) ||
-        filters.priceRange;
+        filters.priceRange ||
+        filters.onSale !== undefined ||
+        (filters.badges && filters.badges.length > 0);
 
     return (
         <div className={cn('bg-white', isMobile && 'h-full overflow-y-auto')}>
@@ -223,23 +225,76 @@ export default function FilterPanel({
                     </div>
                 </FilterSection>
 
-                {/* In Stock Filter */}
-                <div className="pt-2">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            checked={filters.inStock === true}
-                            onChange={(e) =>
-                                onFilterChange({
-                                    ...filters,
-                                    inStock: e.target.checked ? true : undefined,
-                                })
-                            }
-                            className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
-                        />
-                        <span className="text-sm text-slate-700">In stock only</span>
-                    </label>
-                </div>
+                {/* In Stock & Sale Filters */}
+                <FilterSection
+                    title="Offers & Availability"
+                    isExpanded={expandedSections.includes('offers')}
+                    onToggle={() => toggleSection('offers')}
+                >
+                    <div className="space-y-3">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={filters.inStock === true}
+                                onChange={(e) =>
+                                    onFilterChange({
+                                        ...filters,
+                                        inStock: e.target.checked ? true : undefined,
+                                    })
+                                }
+                                className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
+                            />
+                            <span className="text-sm text-slate-700">In stock only</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={filters.onSale === true}
+                                onChange={(e) =>
+                                    onFilterChange({
+                                        ...filters,
+                                        onSale: e.target.checked ? true : undefined,
+                                    })
+                                }
+                                className="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500"
+                            />
+                            <span className="text-sm text-slate-700">On Sale</span>
+                        </label>
+                    </div>
+                </FilterSection>
+
+                {/* Badges Filter */}
+                <FilterSection
+                    title="Product Status"
+                    isExpanded={expandedSections.includes('badges')}
+                    onToggle={() => toggleSection('badges')}
+                >
+                    <div className="space-y-3">
+                        {[
+                            { label: 'New Arrivals', value: 'new' },
+                            { label: 'Best Sellers', value: 'bestseller' },
+                        ].map((badge) => (
+                            <label key={badge.value} className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={filters.badges?.includes(badge.value as any)}
+                                    onChange={(e) => {
+                                        const currentBadges = filters.badges || [];
+                                        const newBadges = e.target.checked
+                                            ? [...currentBadges, badge.value as any]
+                                            : currentBadges.filter((b) => b !== badge.value);
+                                        onFilterChange({
+                                            ...filters,
+                                            badges: newBadges.length > 0 ? newBadges : undefined,
+                                        });
+                                    }}
+                                    className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
+                                />
+                                <span className="text-sm text-slate-700">{badge.label}</span>
+                            </label>
+                        ))}
+                    </div>
+                </FilterSection>
             </div>
 
             {/* Mobile apply button */}

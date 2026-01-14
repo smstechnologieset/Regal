@@ -25,7 +25,7 @@ export async function getEventPackages(): Promise<EventPackage[]> {
     }
 
     // Transform database format to TypeScript interface format
-    return (data || []).map((pkg: Record<string, any>) => ({
+    return (data || []).map((pkg: Record<string, unknown>) => ({
         id: pkg.id as string,
         title: pkg.title as string,
         description: pkg.description as string,
@@ -55,7 +55,7 @@ export async function getEventPackagesByType(type: string): Promise<EventPackage
         return [];
     }
 
-    return (data || []).map((pkg: Record<string, any>) => ({
+    return (data || []).map((pkg: Record<string, unknown>) => ({
         id: pkg.id as string,
         title: pkg.title as string,
         description: pkg.description as string,

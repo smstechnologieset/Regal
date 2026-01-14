@@ -25,7 +25,7 @@ export async function getCateringPackages(): Promise<CateringPackage[]> {
     }
 
     // Transform database format to TypeScript interface format
-    return (data || []).map((pkg: Record<string, any>) => ({
+    return (data || []).map((pkg: Record<string, unknown>) => ({
         id: pkg.id as string,
         name: pkg.name as string,
         description: pkg.description as string,
@@ -80,7 +80,7 @@ export async function getMenuItems(): Promise<MenuItem[]> {
         return [];
     }
 
-    return (data || []).map((item: Record<string, any>) => ({
+    return (data || []).map((item: Record<string, unknown>) => ({
         id: item.id as string,
         name: item.name as string,
         description: item.description as string,
@@ -107,7 +107,7 @@ export async function getMenuItemsByCategory(category: string): Promise<MenuItem
         return [];
     }
 
-    return (data || []).map((item: Record<string, any>) => ({
+    return (data || []).map((item: Record<string, unknown>) => ({
         id: item.id as string,
         name: item.name as string,
         description: item.description as string,

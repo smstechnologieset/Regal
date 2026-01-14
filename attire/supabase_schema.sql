@@ -28,13 +28,16 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 -- Function to check if user is admin (prevents RLS recursion)
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN AS $$
+DECLARE
+  user_role TEXT;
 BEGIN
-  RETURN EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = auth.uid() AND role = 'admin'
-  );
+  SELECT role INTO user_role
+  FROM public.profiles
+  WHERE id = auth.uid();
+  
+  RETURN user_role = 'admin';
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Policies for profiles
 DO $$ 
@@ -334,6 +337,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
   details JSONB DEFAULT '{}',
   total DECIMAL(10, 2) DEFAULT 0,
   notes TEXT,
+  shipping_address JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -355,6 +359,11 @@ BEGIN
     END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can update all orders') THEN
         CREATE POLICY "Admins can update all orders" ON public.orders FOR UPDATE USING (public.is_admin());
+    END IF;
+
+    -- Ensure shipping_address column exists
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='orders' AND column_name='shipping_address') THEN
+        ALTER TABLE public.orders ADD COLUMN shipping_address JSONB DEFAULT '{}';
     END IF;
 END $$;
 

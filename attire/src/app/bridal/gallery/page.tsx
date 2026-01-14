@@ -78,6 +78,7 @@ export default function BridalGalleryPage() {
                                         src={gown.images[0]}
                                         alt={gown.name}
                                         fill
+                                        unoptimized
                                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                                     />
                                     {gown.isNew && (

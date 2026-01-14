@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 /**
  * Admin Bridal Catalog API (Single Gown)
  * 
@@ -29,11 +31,16 @@ export async function PATCH(
             .select()
             .single();
 
-        if (dbError) throw dbError;
+        if (dbError) {
+            if (dbError.code === '23505') {
+                return NextResponse.json({ error: 'Slug already exists on another gown' }, { status: 400 });
+            }
+            throw dbError;
+        }
         return NextResponse.json({ gown: data });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error updating bridal gown:', error);
-        return NextResponse.json({ error: 'Failed to update gown' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to update gown' }, { status: 500 });
     }
 }
 
@@ -56,8 +63,8 @@ export async function DELETE(
 
         if (dbError) throw dbError;
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error deleting bridal gown:', error);
-        return NextResponse.json({ error: 'Failed to delete gown' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Failed to delete gown' }, { status: 500 });
     }
 }

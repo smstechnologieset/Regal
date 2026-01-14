@@ -1,12 +1,70 @@
-/**
- * Attire Service API
- * 
- * Handles all attire-related data fetching and order submissions.
- * Uses the standard public Supabase client for client-side and server-side compatibility.
- */
-
 import { getSupabaseClient } from '@/lib/supabase/client';
-import { Product, Category, FilterOptions, SortOption, PaginatedResponse } from '@/types';
+import { Product, Category, FilterOptions, SortOption, PaginatedResponse, ProductColor, ProductBadge } from '@/types';
+
+/**
+ * Utility to retry a Supabase query with exponential backoff
+ */
+async function withRetry<T>(
+    fn: (signal?: AbortSignal) => Promise<{ data: T | null; error: any; count?: number | null }>,
+    retries = 3,
+    delay = 500,
+    timeoutMs = 15000, // Reduced to 15s - if it takes longer, better to retry or fail early than hog slots
+    signal?: AbortSignal
+): Promise<{ data: T | null; error: any; count?: number | null }> {
+    let lastError: any;
+    
+    // If the external signal is already aborted, don't even start
+    if (signal?.aborted) {
+        return { data: null, error: new Error('Request aborted'), count: 0 };
+    }
+
+    for (let i = 0; i < retries; i++) {
+        const attempt = i + 1;
+        const timestamp = new Date().toLocaleTimeString();
+        
+        // Create an internal timeout controller
+        const timeoutController = new AbortController();
+        const timeoutId = setTimeout(() => timeoutController.abort(), timeoutMs);
+
+        try {
+            console.log(`[${timestamp}] FETCH START: Attempt ${attempt}/${retries}`);
+            
+            // Execute the function, passing it a signal that combines the external and timeout signals
+            // (In recent Node/Browsers we can use AbortSignal.any, but for compatibility we'll manually check)
+            const result = await fn(timeoutController.signal);
+            
+            if (!result.error) {
+                console.log(`[${timestamp}] FETCH SUCCESS on attempt ${attempt}`);
+                return result;
+            }
+            
+            lastError = result.error;
+            console.warn(`[${timestamp}] FETCH FAILURE: Attempt ${attempt} failed with:`, lastError.message || lastError);
+            
+            if (lastError.code === 'PGRST116') return result;
+            
+        } catch (err: any) {
+            lastError = err;
+            if (err.name === 'AbortError' || err.message?.includes('timed out')) {
+                console.warn(`[${timestamp}] FETCH TIMEOUT/ABORT on attempt ${attempt}`);
+            } else {
+                console.error(`[${timestamp}] FETCH CRITICAL: Error on attempt ${attempt}:`, err.message || err);
+            }
+        } finally {
+            clearTimeout(timeoutId);
+        }
+        
+        if (i < retries - 1 && !signal?.aborted) {
+            const backoff = delay * Math.pow(2, i);
+            console.log(`[${timestamp}] FETCH RETRY: Waiting ${backoff}ms before attempt ${attempt + 1}...`);
+            await new Promise(resolve => setTimeout(resolve, backoff));
+        }
+        
+        if (signal?.aborted) break;
+    }
+    
+    return { data: null, error: lastError || new Error('Request failed after retries'), count: 0 };
+}
 
 /**
  * Fetch products from the database with filtering, sorting, and pagination.
@@ -15,54 +73,35 @@ export async function getProducts(
     options: FilterOptions = {},
     sort: SortOption = 'newest',
     page: number = 1,
-    pageSize: number = 12
+    pageSize: number = 12,
+    signal?: AbortSignal
 ): Promise<PaginatedResponse<Product>> {
-    const supabase = getSupabaseClient();
+    console.log(`Fetching products: page=${page}, size=${pageSize}, sort=${sort}`);
+    const { data, error, count } = await withRetry((retrySignal) => {
+        let q = getSupabaseClient()
+            .from('products')
+            .select('*', { count: 'exact' });
 
-    // Build query
-    let query = supabase
-        .from('products')
-        .select('*', { count: 'exact' });
+        if (retrySignal) q = q.abortSignal(retrySignal);
 
-    // Apply filters
-    if (options.category) {
-        query = query.eq('category', options.category);
-    }
-    if (options.subcategory) {
-        query = query.eq('subcategory', options.subcategory);
-    }
-    if (options.sizes && options.sizes.length > 0) {
-        query = query.contains('sizes', options.sizes);
-    }
-    if (options.priceRange) {
-        query = query.gte('price', options.priceRange.min).lte('price', options.priceRange.max);
-    }
-    if (options.inStock !== undefined) {
-        query = query.eq('in_stock', options.inStock);
-    }
+        if (options.category) q = q.eq('category', options.category);
+        if (options.subcategory) q = q.eq('subcategory', options.subcategory);
+        if (options.sizes && options.sizes.length > 0) q = q.contains('sizes', options.sizes);
+        if (options.priceRange) q = q.gte('price', options.priceRange.min).lte('price', options.priceRange.max);
+        if (options.inStock !== undefined) q = q.eq('in_stock', options.inStock);
+        if (options.badges && options.badges.length > 0) q = q.contains('badges', options.badges);
 
-    // Apply sorting
-    switch (sort) {
-        case 'newest':
-            query = query.order('created_at', { ascending: false });
-            break;
-        case 'price-asc':
-            query = query.order('price', { ascending: true });
-            break;
-        case 'price-desc':
-            query = query.order('price', { ascending: false });
-            break;
-        case 'popularity':
-            query = query.order('popularity', { ascending: false });
-            break;
-    }
+        switch (sort) {
+            case 'newest': q = q.order('created_at', { ascending: false }); break;
+            case 'price-asc': q = q.order('price', { ascending: true }); break;
+            case 'price-desc': q = q.order('price', { ascending: false }); break;
+            case 'popularity': q = q.order('popularity', { ascending: false }); break;
+        }
 
-    // Apply pagination
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize - 1;
-    query = query.range(from, to);
-
-    const { data, error, count } = await query;
+        const from = (page - 1) * pageSize;
+        const to = from + pageSize - 1;
+        return q.range(from, to);
+    });
 
     if (error) {
         console.error('Error fetching products:', error);
@@ -78,8 +117,8 @@ export async function getProducts(
     const total = count || 0;
     const totalPages = Math.ceil(total / pageSize);
 
-    // Transform database format to TypeScript interface format
-    const transformedData = (data || []).map((item: Record<string, any>) => ({
+    // Filter by onSale if requested (client-side filter on the current page of results)
+    let finalData = ((data as any[]) || []).map((item: any) => ({
         id: item.id as string,
         name: item.name as string,
         description: item.description as string,
@@ -88,9 +127,9 @@ export async function getProducts(
         category: item.category as string,
         subcategory: item.subcategory as string,
         sizes: (item.sizes as string[]) || [],
-        colors: (item.colors as any[]) || [],
+        colors: (item.colors as ProductColor[]) || [],
         images: (item.images as string[]) || [],
-        badges: (item.badges as any[]) || [],
+        badges: (item.badges as ProductBadge[]) || [],
         rating: item.rating as number,
         reviewCount: item.review_count as number,
         popularity: item.popularity as number,
@@ -99,8 +138,16 @@ export async function getProducts(
         stockCount: item.stock_count as number,
     }));
 
+    if (options.onSale !== undefined) {
+        if (options.onSale) {
+            finalData = finalData.filter((p: Product) => (p.originalPrice ?? 0) > p.price);
+        } else {
+            finalData = finalData.filter((p: Product) => !( (p.originalPrice ?? 0) > p.price ));
+        }
+    }
+
     return {
-        data: transformedData,
+        data: finalData,
         total,
         page,
         pageSize,
@@ -111,58 +158,67 @@ export async function getProducts(
 /**
  * Fetch a single product by its ID
  */
-export async function getProductById(id: string): Promise<Product | null> {
+export async function getProductById(id: string, signal?: AbortSignal): Promise<Product | null> {
     const supabase = getSupabaseClient();
 
-    const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .single();
+    const { data, error } = await withRetry((retrySignal) => {
+        let q = supabase
+            .from('products')
+            .select('*')
+            .eq('id', id)
+            .single();
+        
+        if (retrySignal) q = q.abortSignal(retrySignal);
+        return q;
+    }, 3, 500, 15000, signal);
 
     if (error || !data) {
         console.error('Error fetching product:', error);
         return null;
     }
 
+    const p = data as any;
     return {
-        id: data.id,
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        originalPrice: data.original_price,
-        category: data.category,
-        subcategory: data.subcategory,
-        sizes: data.sizes || [],
-        colors: data.colors || [],
-        images: data.images || [],
-        badges: data.badges || [],
-        rating: data.rating,
-        reviewCount: data.review_count,
-        popularity: data.popularity,
-        createdAt: data.created_at,
-        inStock: data.in_stock,
-        stockCount: data.stock_count,
+        id: p.id,
+        name: p.name,
+        description: p.description,
+        price: p.price,
+        originalPrice: p.original_price,
+        category: p.category,
+        subcategory: p.subcategory,
+        sizes: p.sizes || [],
+        colors: p.colors || [],
+        images: p.images || [],
+        badges: p.badges || [],
+        rating: p.rating,
+        reviewCount: p.review_count,
+        popularity: p.popularity,
+        createdAt: p.created_at,
+        inStock: p.in_stock,
+        stockCount: p.stock_count,
     };
 }
 
 /**
  * Fetch all attire categories
  */
-export async function getCategories(): Promise<Category[]> {
-    const supabase = getSupabaseClient();
-
-    const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name', { ascending: true });
+export async function getCategories(signal?: AbortSignal): Promise<Category[]> {
+    const { data, error } = await withRetry((retrySignal) => {
+        let q = getSupabaseClient()
+            .from('categories')
+            .select('*')
+            .order('name', { ascending: true });
+        
+        if (retrySignal) q = q.abortSignal(retrySignal);
+        return q;
+    }, 3, 500, 15000, signal);
 
     if (error) {
         console.error('Error fetching categories:', error);
         return [];
     }
 
-    return (data || []).map((cat: Record<string, any>) => ({
+    return ((data as any[]) || []).map((cat: any) => ({
         id: cat.id as string,
         name: cat.name as string,
         slug: cat.slug as string,
@@ -174,44 +230,64 @@ export async function getCategories(): Promise<Category[]> {
 /**
  * Fetch featured products for the landing page
  */
-export async function getFeaturedProducts(): Promise<{
+export async function getFeaturedProducts(signal?: AbortSignal): Promise<{
     newArrivals: Product[];
     bestsellers: Product[];
     onSale: Product[];
 }> {
-    const { data: products } = await getProducts({}, 'newest', 1, 100);
+    console.log('Fetching featured products (sequential with cancellation support)...');
+    
+    try {
+        // Sequentialize to avoid hitting browser connection limits
+        const newRes = await getProducts({ badges: ['new'] }, 'newest', 1, 8, signal);
+        const bestRes = await getProducts({ badges: ['bestseller'] }, 'popularity', 1, 8, signal);
+        const saleRes = await getProducts({ onSale: true }, 'newest', 1, 8, signal);
 
-    return {
-        newArrivals: products.filter((p: Product) => p.badges.includes('new')).slice(0, 8),
-        bestsellers: products.filter((p: Product) => p.badges.includes('bestseller')).slice(0, 8),
-        onSale: products.filter((p: Product) => p.badges.includes('sale')).slice(0, 8),
-    };
+        return {
+            newArrivals: newRes.data || [],
+            bestsellers: bestRes.data || [],
+            onSale: saleRes.data || [],
+        };
+    } catch (error) {
+        console.error('Error in getFeaturedProducts:', error);
+        return {
+            newArrivals: [],
+            bestsellers: [],
+            onSale: [],
+        };
+    }
 }
 
 /**
  * Fetch related products for a given product
  */
-export async function getRelatedProducts(productId: string, limit: number = 4): Promise<Product[]> {
+export async function getRelatedProducts(productId: string, limit: number = 4, signal?: AbortSignal): Promise<Product[]> {
     const supabase = getSupabaseClient();
 
     // First get the current product's category
-    const { data: product } = await supabase
+    let q1 = supabase
         .from('products')
         .select('category')
         .eq('id', productId)
         .single();
+    
+    if (signal) q1 = q1.abortSignal(signal);
+    const { data: product } = await q1;
 
     if (!product) return [];
 
     // Then find other products in the same category
-    const { data: related } = await supabase
+    let q2 = supabase
         .from('products')
         .select('*')
         .eq('category', product.category)
         .neq('id', productId)
         .limit(limit);
+    
+    if (signal) q2 = q2.abortSignal(signal);
+    const { data: related } = await q2;
 
-    return (related || []).map((item: Record<string, any>) => ({
+    return (related || []).map((item: Record<string, unknown>) => ({
         id: item.id as string,
         name: item.name as string,
         description: item.description as string,
@@ -233,16 +309,35 @@ export async function getRelatedProducts(productId: string, limit: number = 4): 
 /**
  * Create a new order (Cash on Delivery)
  */
-export async function createOrder(orderData: any): Promise<{ orderId: string; success: boolean }> {
+export async function createOrder(orderData: Record<string, unknown>): Promise<{ orderId: string; conversationId: string; success: boolean }> {
     const supabase = getSupabaseClient();
 
-    const { data, error } = await supabase
+    // 1. Verify stock availability for all items first
+    for (const item of orderData.items as any[]) {
+        const { data: product, error: stockCheckError } = await supabase
+            .from('products')
+            .select('stock_count, in_stock, name')
+            .eq('id', item.productId)
+            .single();
+
+        if (stockCheckError || !product) {
+            console.error(`Error checking stock for ${item.product.id}:`, stockCheckError);
+            return { orderId: '', conversationId: '', success: false };
+        }
+
+        if (!product.in_stock || product.stock_count < item.quantity) {
+            console.error(`Insufficient stock for ${product.name}. Requested: ${item.quantity}, Available: ${product.stock_count}`);
+            return { orderId: '', conversationId: '', success: false };
+        }
+    }
+
+    // 2. Create the order
+    const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
             user_id: orderData.userId,
             total: orderData.total,
             status: 'pending',
-            payment_method: 'cod',
             details: orderData.items,
             shipping_address: orderData.shippingAddress,
             service_type: 'attire',
@@ -250,10 +345,67 @@ export async function createOrder(orderData: any): Promise<{ orderId: string; su
         .select()
         .single();
 
-    if (error || !data) {
-        console.error('Error creating order:', error);
-        return { orderId: '', success: false };
+    if (orderError || !order) {
+        console.error('Error creating order:', orderError);
+        return { orderId: '', conversationId: '', success: false };
     }
 
-    return { orderId: data.id, success: true };
+    // 3. Decrement stock for each item
+    for (const item of orderData.items as any[]) {
+        const { data: currentProduct } = await supabase
+            .from('products')
+            .select('stock_count')
+            .eq('id', item.productId)
+            .single();
+
+        if (currentProduct) {
+            const newCount = Math.max(0, currentProduct.stock_count - item.quantity);
+            await supabase
+                .from('products')
+                .update({ 
+                    stock_count: newCount,
+                    in_stock: newCount > 0
+                })
+                .eq('id', item.productId);
+        }
+    }
+
+    try {
+        // 4. Create an associated conversation
+        const { data: conversation, error: convError } = await supabase
+            .from('conversations')
+            .insert({
+                user_id: orderData.userId,
+                order_id: order.id,
+                service_type: 'attire',
+                subject: `Order #${order.id.slice(0, 8)}`,
+                status: 'open',
+            })
+            .select()
+            .single();
+
+        if (convError || !conversation) {
+            console.error('Error creating conversation:', convError);
+            // We still have the order, so return success but without conversation
+            return { orderId: order.id, conversationId: '', success: true };
+        }
+
+        // 3. Create initial message
+        const { error: msgError } = await supabase
+            .from('messages')
+            .insert({
+                conversation_id: conversation.id,
+                sender_id: orderData.userId,
+                content: `New order placed! Order ID: ${order.id}. I have a question about this order.`,
+            });
+
+        if (msgError) {
+            console.error('Error creating initial message:', msgError);
+        }
+
+        return { orderId: order.id, conversationId: conversation.id, success: true };
+    } catch (err) {
+        console.error('Unexpected error in order flow:', err);
+        return { orderId: order.id, conversationId: '', success: true };
+    }
 }
