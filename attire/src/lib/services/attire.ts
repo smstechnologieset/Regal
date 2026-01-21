@@ -173,7 +173,10 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
     }, 3, 500, 15000, signal);
 
     if (error || !data) {
-        console.error('Error fetching product:', error);
+        // Only log actual errors, not "not found" (PGRST116)
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error fetching product:', error);
+        }
         return null;
     }
 
