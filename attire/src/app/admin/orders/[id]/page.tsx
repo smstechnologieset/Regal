@@ -8,7 +8,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2, Package, User, Calendar, DollarSign, MessageSquare, ShoppingBag, Truck } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import { useApp } from '@/context/AppContext';
@@ -32,11 +32,13 @@ const statusOptions = ['pending', 'confirmed', 'in_progress', 'completed', 'canc
 
 export default function AdminOrderDetailPage() {
     const params = useParams();
+    const router = useRouter();
     const orderId = params.id as string;
     const { addToast } = useApp();
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [messaging, setMessaging] = useState(false);
 
     useEffect(() => {
         async function fetchOrder() {
@@ -147,6 +149,51 @@ export default function AdminOrderDetailPage() {
             addToast('An error occurred while updating the order', 'error');
         } finally {
             setUpdating(false);
+        }
+    };
+
+    const handleMessageCustomer = async () => {
+        if (!order) return;
+        setMessaging(true);
+
+        try {
+            const supabase = getSupabaseClient();
+
+            // 1. Check for existing conversation for this order
+            const { data: existingConv } = await supabase
+                .from('conversations')
+                .select('id')
+                .eq('order_id', orderId)
+                .maybeSingle();
+
+            if (existingConv) {
+                router.push(`/admin/messages/${existingConv.id}`);
+                return;
+            }
+
+            // 2. If no conversation exists, create a new one
+            const { data: newConv, error: createError } = await supabase
+                .from('conversations')
+                .insert({
+                    user_id: order.user_id,
+                    order_id: orderId,
+                    service_type: order.service_type,
+                    subject: `Order #${orderId.slice(0, 8)}`,
+                    status: 'open'
+                })
+                .select()
+                .single();
+
+            if (createError) throw createError;
+
+            if (newConv) {
+                router.push(`/admin/messages/${newConv.id}`);
+            }
+        } catch (err: any) {
+            console.error('Error starting conversation:', err);
+            addToast('Failed to start conversation', 'error');
+        } finally {
+            setMessaging(false);
         }
     };
 
@@ -363,8 +410,18 @@ export default function AdminOrderDetailPage() {
                     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
                         <h3 className="font-semibold text-slate-900 mb-4">Quick Actions</h3>
                         <div className="space-y-2">
-                            <Button variant="outline" fullWidth size="sm">
-                                <MessageSquare size={16} className="mr-2" />
+                            <Button
+                                variant="outline"
+                                fullWidth
+                                size="sm"
+                                onClick={handleMessageCustomer}
+                                disabled={messaging}
+                            >
+                                {messaging ? (
+                                    <Loader2 size={16} className="mr-2 animate-spin" />
+                                ) : (
+                                    <MessageSquare size={16} className="mr-2" />
+                                )}
                                 Message Customer
                             </Button>
                         </div>
