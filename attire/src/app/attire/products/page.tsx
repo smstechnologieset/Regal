@@ -17,6 +17,7 @@ import { ProductGridSkeleton } from '@/components/skeletons/ProductCardSkeleton'
 import FilterPanel from '@/components/filters/FilterPanel';
 import SortDropdown from '@/components/filters/SortDropdown';
 import Button from '@/components/ui/Button';
+import Loader from '@/components/ui/Loader';
 import { useCart } from '@/context/CartContext';
 import { useApp } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
@@ -47,11 +48,11 @@ function ProductsContent() {
 
         setFilters(prev => {
             const newFilters: FilterOptions = { ...prev };
-            
+
             // 1. Category & Subcategory
             newFilters.category = category || undefined;
             newFilters.subcategory = subcategory || undefined;
-            
+
             // 2. Highlights (Mutually exclusive sections from landing page)
             if (filter === 'new') {
                 newFilters.badges = ['new'];
@@ -61,7 +62,7 @@ function ProductsContent() {
                 // Only clear if the parameter is explicitly missing from a new navigation
                 newFilters.badges = undefined;
             }
-            
+
             // 3. Sale status
             if (sale === 'true') {
                 newFilters.onSale = true;
@@ -70,7 +71,7 @@ function ProductsContent() {
             }
 
             // Only update if actually different to avoid unnecessary cycles
-            const isDifferent = 
+            const isDifferent =
                 prev.category !== newFilters.category ||
                 prev.subcategory !== newFilters.subcategory ||
                 JSON.stringify(prev.badges) !== JSON.stringify(newFilters.badges) ||
@@ -94,7 +95,7 @@ function ProductsContent() {
             try {
                 console.log('Attire Products: fetching products...');
                 const result = await getProducts(filters, sortOption, 1, 24, controller.signal);
-                
+
                 // If the signal was aborted, result will be a fallback/error from withRetry
                 // but we should still double check if it's the one we wanted
                 if (!controller.signal.aborted) {
@@ -160,7 +161,12 @@ function ProductsContent() {
                             : 'All Products'}
                     </h1>
                     <p className="text-slate-500 mt-1">
-                        {loading ? 'Loading...' : `${totalProducts} products`}
+                        {loading ? (
+                            <span className="flex items-center gap-2">
+                                <span className="w-4 h-4 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+                                Loading...
+                            </span>
+                        ) : `${totalProducts} products`}
                     </p>
                 </div>
             </div>

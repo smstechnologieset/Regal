@@ -9,6 +9,7 @@ import { CateringPackage, MenuItem } from '@/types';
 import { CATERING_CATEGORIES } from '@/lib/constants';
 import Button from '@/components/ui/Button';
 import { formatPrice } from '@/lib/utils';
+import Loader from '@/components/ui/Loader';
 
 export default function CateringMenuPage() {
     const [activeCategory, setActiveCategory] = useState('all');
@@ -53,8 +54,8 @@ export default function CateringMenuPage() {
                 </div>
 
                 {loading ? (
-                    <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+                    <div className="py-20">
+                        <Loader />
                     </div>
                 ) : (
                     <>

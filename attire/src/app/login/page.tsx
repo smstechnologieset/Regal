@@ -105,7 +105,7 @@ function LoginContent() {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-block mb-2">
-                        <span className="text-3xl font-bold bg-gradient-to-r from-rose-600 to-purple-600 bg-clip-text text-transparent">
+                        <span className="text-secondary font-bold text-3xl">
                             REGAL
                         </span>
                     </Link>

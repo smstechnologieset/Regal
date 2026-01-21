@@ -7,6 +7,7 @@ import { ArrowLeft, Calendar, CheckCircle, Clock } from 'lucide-react';
 import { getBridalServices, bookBridalAppointment } from '@/lib/services/bridal';
 import { BridalService } from '@/types';
 import Button from '@/components/ui/Button';
+import Loader from '@/components/ui/Loader';
 import Input from '@/components/ui/Input';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
@@ -175,7 +176,9 @@ export default function BridalAppointmentPage() {
                                     <label className="block text-sm font-medium text-slate-700 mb-3">Select Service</label>
                                     <div className="grid gap-3">
                                         {loadingServices ? (
-                                            <div className="text-center py-4 text-slate-500">Loading services...</div>
+                                            <div className="py-8">
+                                                <Loader />
+                                            </div>
                                         ) : services.map((service: BridalService) => (
                                             <label
                                                 key={service.id}

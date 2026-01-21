@@ -9,6 +9,7 @@ import { getEventPackages } from '@/lib/services/events';
 import { EventPackage } from '@/types';
 import EventPackageCard from '@/components/events/EventPackageCard';
 import Button from '@/components/ui/Button';
+import Loader from '@/components/ui/Loader';
 
 export default function EventsPage() {
     const [selectedType, setSelectedType] = useState<string>('all');
@@ -101,8 +102,8 @@ export default function EventsPage() {
             <section className="py-16 md:py-24">
                 <div className="container mx-auto px-4">
                     {loading ? (
-                        <div className="flex flex-center justify-center py-20">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600"></div>
+                        <div className="py-20">
+                            <Loader />
                         </div>
                     ) : (
                         <>
