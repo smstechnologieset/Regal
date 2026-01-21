@@ -55,8 +55,8 @@ export default function CateringManager() {
     async function fetchData() {
         setLoading(true);
         try {
-            const url = activeTab === 'packages' 
-                ? '/api/admin/catalog/catering/packages' 
+            const url = activeTab === 'packages'
+                ? '/api/admin/catalog/catering/packages'
                 : '/api/admin/catalog/catering/items';
             const res = await fetch(url);
             const data = await res.json();
@@ -121,8 +121,8 @@ export default function CateringManager() {
         try {
             const baseUrl = activeTab === 'packages' ? '/api/admin/catalog/catering/packages' : '/api/admin/catalog/catering/items';
             const url = editingItem ? `${baseUrl}/${editingItem.id}` : baseUrl;
-            
-            const payload = activeTab === 'packages' 
+
+            const payload = activeTab === 'packages'
                 ? { ...packageForm, price_per_guest: packageForm.price_per_guest ? parseFloat(packageForm.price_per_guest) : null, min_guests: packageForm.min_guests ? parseInt(packageForm.min_guests) : null }
                 : { ...itemForm, price: itemForm.price ? parseFloat(itemForm.price) : null };
 
@@ -230,13 +230,13 @@ export default function CateringManager() {
             <div className="flex justify-between items-center bg-white p-1 rounded-xl border border-slate-200 w-fit">
                 <button
                     onClick={() => setActiveTab('packages')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'packages' ? 'bg-emerald-100 text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'packages' ? 'bg-emerald-100 text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-primary'}`}
                 >
                     Dining Packages
                 </button>
                 <button
                     onClick={() => setActiveTab('items')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'items' ? 'bg-emerald-100 text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'items' ? 'bg-emerald-100 text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-primary'}`}
                 >
                     Menu Items
                 </button>
@@ -253,7 +253,7 @@ export default function CateringManager() {
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+                    className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                 >
                     <Plus size={18} />
                     Add {activeTab === 'packages' ? 'Package' : 'Item'}
@@ -287,7 +287,7 @@ export default function CateringManager() {
                             </div>
                             <div className="p-5">
                                 <div className="flex justify-between items-start mb-2">
-                                    <h3 className="font-bold text-slate-900 truncate">{pkg.name}</h3>
+                                    <h3 className="font-bold text-primary truncate">{pkg.name}</h3>
                                     <span className="text-emerald-600 font-bold">${pkg.price_per_guest}<span className="text-[10px] text-slate-400 font-normal">/pp</span></span>
                                 </div>
                                 <p className="text-xs text-slate-500 mb-4 line-clamp-2">{pkg.description}</p>
@@ -322,7 +322,7 @@ export default function CateringManager() {
                             {items.map((item) => (
                                 <tr key={item.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="px-6 py-4">
-                                        <p className="font-medium text-slate-900">{item.name}</p>
+                                        <p className="font-medium text-primary">{item.name}</p>
                                         <p className="text-xs text-slate-500 line-clamp-1">{item.description}</p>
                                     </td>
                                     <td className="px-6 py-4">
@@ -368,19 +368,19 @@ export default function CateringManager() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2 space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Package Name</label>
-                                        <input required type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={packageForm.name} onChange={e => setPackageForm({...packageForm, name: e.target.value})} />
+                                        <input required type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={packageForm.name} onChange={e => setPackageForm({ ...packageForm, name: e.target.value })} />
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Price per Guest ($)</label>
-                                        <input required type="number" step="0.01" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={packageForm.price_per_guest} onChange={e => setPackageForm({...packageForm, price_per_guest: e.target.value})} />
+                                        <input required type="number" step="0.01" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={packageForm.price_per_guest} onChange={e => setPackageForm({ ...packageForm, price_per_guest: e.target.value })} />
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Min Guests</label>
-                                        <input type="number" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={packageForm.min_guests} onChange={e => setPackageForm({...packageForm, min_guests: e.target.value})} />
+                                        <input type="number" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={packageForm.min_guests} onChange={e => setPackageForm({ ...packageForm, min_guests: e.target.value })} />
                                     </div>
                                     <div className="col-span-2 space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Description</label>
-                                        <textarea rows={2} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={packageForm.description} onChange={e => setPackageForm({...packageForm, description: e.target.value})} />
+                                        <textarea rows={2} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={packageForm.description} onChange={e => setPackageForm({ ...packageForm, description: e.target.value })} />
                                     </div>
                                     <div className="col-span-2 space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Inclusions</label>
@@ -407,7 +407,7 @@ export default function CateringManager() {
                                                     <span className="text-xs text-slate-400 italic py-1">No inclusions added yet...</span>
                                                 ) : (
                                                     packageForm.includes.map((inc, index) => (
-                                                        <div 
+                                                        <div
                                                             key={index}
                                                             className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-sm font-medium animate-in fade-in zoom-in duration-200"
                                                         >
@@ -432,27 +432,34 @@ export default function CateringManager() {
                                             value={packageForm.image}
                                             onChange={(url) => setPackageForm({ ...packageForm, image: url })}
                                         />
+                                        <input
+                                            type="text"
+                                            placeholder="Or paste an image URL..."
+                                            className="w-full mt-2 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
+                                            value={packageForm.image}
+                                            onChange={(e) => setPackageForm({ ...packageForm, image: e.target.value })}
+                                        />
                                     </div>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2 space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Item Name</label>
-                                        <input required type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={itemForm.name} onChange={e => setItemForm({...itemForm, name: e.target.value})} />
+                                        <input required type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={itemForm.name} onChange={e => setItemForm({ ...itemForm, name: e.target.value })} />
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Category</label>
-                                        <select className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={itemForm.category} onChange={e => setItemForm({...itemForm, category: e.target.value})}>
+                                        <select className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={itemForm.category} onChange={e => setItemForm({ ...itemForm, category: e.target.value })}>
                                             {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                                         </select>
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Price ($)</label>
-                                        <input required type="number" step="0.01" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={itemForm.price} onChange={e => setItemForm({...itemForm, price: e.target.value})} />
+                                        <input required type="number" step="0.01" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={itemForm.price} onChange={e => setItemForm({ ...itemForm, price: e.target.value })} />
                                     </div>
                                     <div className="col-span-2 space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Description</label>
-                                        <textarea rows={2} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={itemForm.description} onChange={e => setItemForm({...itemForm, description: e.target.value})} />
+                                        <textarea rows={2} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500/20 outline-none" value={itemForm.description} onChange={e => setItemForm({ ...itemForm, description: e.target.value })} />
                                     </div>
                                     <div className="col-span-2 space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Dietary Info</label>
@@ -479,7 +486,7 @@ export default function CateringManager() {
                                                     <span className="text-xs text-slate-400 italic py-1">No dietary added yet...</span>
                                                 ) : (
                                                     itemForm.dietary.map((diet, index) => (
-                                                        <div 
+                                                        <div
                                                             key={index}
                                                             className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-sm font-medium animate-in fade-in zoom-in duration-200"
                                                         >
@@ -503,6 +510,13 @@ export default function CateringManager() {
                                             bucket="catering"
                                             value={itemForm.image}
                                             onChange={(url) => setItemForm({ ...itemForm, image: url })}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Or paste an image URL..."
+                                            className="w-full mt-2 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
+                                            value={itemForm.image}
+                                            onChange={(e) => setItemForm({ ...itemForm, image: e.target.value })}
                                         />
                                     </div>
                                 </div>

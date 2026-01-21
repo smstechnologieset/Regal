@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
                     <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <CheckCircle size={32} className="text-emerald-600" />
                     </div>
-                    <h1 className="text-2xl font-bold text-slate-900 mb-2">Check Your Email</h1>
+                    <h1 className="text-2xl font-bold text-primary mb-2">Check Your Email</h1>
                     <p className="text-slate-600 mb-8">
                         We&apos;ve sent a password reset link to <strong>{email}</strong>.
                         Please check your inbox and follow the instructions.
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
                             REGAL
                         </span>
                     </Link>
-                    <h1 className="text-2xl font-bold text-slate-900 mb-2">Reset Password</h1>
+                    <h1 className="text-2xl font-bold text-primary mb-2">Reset Password</h1>
                     <p className="text-slate-600">Enter your email and we&apos;ll send you a reset link</p>
                 </div>
 
@@ -112,7 +112,7 @@ export default function ForgotPasswordPage() {
 
                 {/* Back to Login */}
                 <p className="text-center mt-6">
-                    <Link href="/login" className="text-slate-600 hover:text-slate-900 flex items-center justify-center gap-2">
+                    <Link href="/login" className="text-slate-600 hover:text-primary flex items-center justify-center gap-2">
                         <ArrowLeft size={16} />
                         Back to Login
                     </Link>

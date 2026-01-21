@@ -91,7 +91,7 @@ function CateringQuoteForm() {
                 <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle size={40} className="text-emerald-600" />
                 </div>
-                <h2 className="text-3xl font-bold text-slate-900 mb-2 font-serif">Request Received</h2>
+                <h2 className="text-3xl font-bold text-primary mb-2 font-serif">Request Received</h2>
                 <p className="text-slate-600 mb-8">
                     We&apos;ve received your catering inquiry. Our culinary team will review your requirements and send a customized proposal to your email within 24 hours.
                 </p>
@@ -110,7 +110,7 @@ function CateringQuoteForm() {
     return (
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
             <div className="grid md:grid-cols-3">
-                <div className="bg-slate-900 p-8 text-white">
+                <div className="bg-primary p-8 text-white">
                     <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
                         <Utensils size={20} /> Catering Details
                     </h3>
@@ -168,7 +168,7 @@ function CateringQuoteForm() {
                             </div>
                         </div>
 
-                        <h3 className="text-sm font-medium text-slate-900 pt-4 border-t border-slate-100">Contact & Details</h3>
+                        <h3 className="text-sm font-medium text-primary pt-4 border-t border-slate-100">Contact & Details</h3>
 
                         <div className="grid sm:grid-cols-2 gap-4">
                             <Input
@@ -230,11 +230,11 @@ export default function CateringQuotePage() {
         <div className="min-h-screen bg-slate-50 py-12">
             <div className="container mx-auto px-4">
                 <div className="max-w-2xl mx-auto mb-8 text-center">
-                    <Link href="/catering" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-4">
+                    <Link href="/catering" className="inline-flex items-center gap-2 text-slate-500 hover:text-primary mb-4">
                         <ArrowLeft size={20} />
                         Back to Catering
                     </Link>
-                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 font-serif mb-2">Request a Quote</h1>
+                    <h1 className="text-3xl md:text-4xl font-bold text-primary font-serif mb-2">Request a Quote</h1>
                     <p className="text-slate-600">Tell us about your event, and we&apos;ll craft the perfect menu.</p>
                 </div>
 

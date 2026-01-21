@@ -15,13 +15,10 @@ export default function CateringMenuPage() {
     const [packages, setPackages] = useState<CateringPackage[]>([]);
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [mounted, setMounted] = useState(false);
 
     const categories = ['all', ...CATERING_CATEGORIES.map(c => c.value)];
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setMounted(true);
         async function fetchData() {
             const [pkgData, itemData] = await Promise.all([
                 getCateringPackages(),
@@ -38,18 +35,17 @@ export default function CateringMenuPage() {
         ? menuItems
         : menuItems.filter(item => item.category === activeCategory);
 
-    if (!mounted) return null;
 
     return (
         <div className="min-h-screen bg-slate-50 py-12">
             <div className="container mx-auto px-4">
                 <div className="mb-8">
-                    <Link href="/catering" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-4">
+                    <Link href="/catering" className="inline-flex items-center gap-2 text-slate-500 hover:text-primary mb-4">
                         <ArrowLeft size={20} />
                         Back to Catering
                     </Link>
                     <div className="text-center max-w-2xl mx-auto">
-                        <h1 className="text-3xl md:text-5xl font-bold text-slate-900 font-serif mb-4">Our Menu</h1>
+                        <h1 className="text-3xl md:text-5xl font-bold text-primary font-serif mb-4">Our Menu</h1>
                         <p className="text-slate-600">
                             Explore our selection of gourmet dishes and curated packages.
                         </p>
@@ -64,7 +60,7 @@ export default function CateringMenuPage() {
                     <>
                         {/* Packages Section */}
                         <div className="mb-16">
-                            <h2 className="text-2xl font-bold text-slate-900 mb-8 font-serif">Featured Packages</h2>
+                            <h2 className="text-2xl font-bold text-primary mb-8 font-serif">Featured Packages</h2>
                             <div className="grid md:grid-cols-3 gap-8">
                                 {packages.map(pkg => (
                                     <div key={pkg.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-slate-100 flex flex-col">
@@ -76,12 +72,12 @@ export default function CateringMenuPage() {
                                                 unoptimized
                                                 className="object-cover"
                                             />
-                                            <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold text-slate-900 shadow-sm">
+                                            <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold text-primary shadow-sm">
                                                 ${pkg.pricePerGuest}/guest
                                             </div>
                                         </div>
                                         <div className="p-6 flex flex-col flex-1">
-                                            <h3 className="text-xl font-bold text-slate-900 mb-2 font-serif">{pkg.name}</h3>
+                                            <h3 className="text-xl font-bold text-primary mb-2 font-serif">{pkg.name}</h3>
                                             <p className="text-slate-600 text-sm mb-4">{pkg.description}</p>
 
                                             <div className="flex-1">
@@ -97,7 +93,7 @@ export default function CateringMenuPage() {
                                             </div>
 
                                             <Link href={`/catering/quote?package=${pkg.id}`}>
-                                                <Button fullWidth className="bg-slate-900 hover:bg-slate-800">
+                                                <Button fullWidth className="bg-primary hover:bg-slate-800">
                                                     Select Package
                                                 </Button>
                                             </Link>
@@ -109,7 +105,7 @@ export default function CateringMenuPage() {
 
                         {/* A La Carte Section */}
                         <div>
-                            <h2 className="text-2xl font-bold text-slate-900 mb-6 font-serif">A La Carte Selections</h2>
+                            <h2 className="text-2xl font-bold text-primary mb-6 font-serif">A La Carte Selections</h2>
 
                             {/* Category Filter */}
                             <div className="flex flex-wrap justify-center gap-2 mb-10">
@@ -141,7 +137,7 @@ export default function CateringMenuPage() {
                                         </div>
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
-                                                <h3 className="font-bold text-slate-900 font-serif text-lg">{item.name}</h3>
+                                                <h3 className="font-bold text-primary font-serif text-lg">{item.name}</h3>
                                                 {item.dietary && item.dietary.map(d => (
                                                     <span key={d} className="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded uppercase">
                                                         {d}

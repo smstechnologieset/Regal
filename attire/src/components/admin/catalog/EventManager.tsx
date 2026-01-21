@@ -177,7 +177,7 @@ export default function EventManager() {
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+                    className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                 >
                     <Plus size={18} />
                     Add Package
@@ -211,7 +211,7 @@ export default function EventManager() {
                                     <div className="flex justify-between items-start mb-2">
                                         <div>
                                             <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest mb-1 block">{pkg.type}</span>
-                                            <h3 className="text-xl font-bold text-slate-900">{pkg.title}</h3>
+                                            <h3 className="text-xl font-bold text-primary">{pkg.title}</h3>
                                         </div>
                                         <div className="text-right">
                                             <span className="text-sm text-slate-500 block">Starts from</span>

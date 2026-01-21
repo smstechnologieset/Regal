@@ -51,7 +51,7 @@ export default function QuantitySelector({
     );
 
     const inputClasses = cn(
-        'text-center border-y border-slate-300 font-medium text-slate-900',
+        'text-center border-y border-slate-300 font-medium text-primary',
         'focus:outline-none focus:bg-slate-50',
         size === 'sm' ? 'w-10 h-8 text-sm' : 'w-14 h-10'
     );

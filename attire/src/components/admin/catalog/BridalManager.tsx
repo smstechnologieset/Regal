@@ -60,8 +60,8 @@ export default function BridalManager() {
     async function fetchData() {
         setLoading(true);
         try {
-            const url = activeTab === 'gowns' 
-                ? '/api/admin/catalog/bridal/gowns' 
+            const url = activeTab === 'gowns'
+                ? '/api/admin/catalog/bridal/gowns'
                 : '/api/admin/catalog/bridal/services';
             const res = await fetch(url);
             const data = await res.json();
@@ -131,8 +131,8 @@ export default function BridalManager() {
         try {
             const baseUrl = activeTab === 'gowns' ? '/api/admin/catalog/bridal/gowns' : '/api/admin/catalog/bridal/services';
             const url = editingItem ? `${baseUrl}/${editingItem.id}` : baseUrl;
-            
-            const payload = activeTab === 'gowns' 
+
+            const payload = activeTab === 'gowns'
                 ? { ...gownForm, price_rent: gownForm.price_rent ? parseFloat(gownForm.price_rent) : null, price_buy: gownForm.price_buy ? parseFloat(gownForm.price_buy) : null }
                 : { ...serviceForm, price_start: serviceForm.price_start ? parseFloat(serviceForm.price_start) : null };
 
@@ -176,13 +176,13 @@ export default function BridalManager() {
             <div className="flex justify-between items-center bg-white p-1 rounded-xl border border-slate-200 w-fit">
                 <button
                     onClick={() => setActiveTab('gowns')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'gowns' ? 'bg-pink-100 text-pink-700 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'gowns' ? 'bg-pink-100 text-pink-700 shadow-sm' : 'text-slate-500 hover:text-primary'}`}
                 >
                     Bridal Gowns
                 </button>
                 <button
                     onClick={() => setActiveTab('services')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'services' ? 'bg-pink-100 text-pink-700 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'services' ? 'bg-pink-100 text-pink-700 shadow-sm' : 'text-slate-500 hover:text-primary'}`}
                 >
                     Styling Services
                 </button>
@@ -199,7 +199,7 @@ export default function BridalManager() {
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+                    className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
                 >
                     <Plus size={18} />
                     Add {activeTab === 'gowns' ? 'Gown' : 'Service'}
@@ -237,7 +237,7 @@ export default function BridalManager() {
                                 )}
                             </div>
                             <div className="p-4">
-                                <h3 className="font-bold text-slate-900 mb-1">{gown.name}</h3>
+                                <h3 className="font-bold text-primary mb-1">{gown.name}</h3>
                                 <p className="text-xs text-slate-500 mb-2 truncate">{gown.designer} • {gown.style}</p>
                                 <div className="flex gap-2 text-xs font-medium text-pink-600">
                                     {gown.price_rent && <span>Rent: ${gown.price_rent}</span>}
@@ -261,7 +261,7 @@ export default function BridalManager() {
                             <div className="flex-1 flex flex-col justify-between">
                                 <div>
                                     <div className="flex justify-between items-start">
-                                        <h3 className="font-bold text-slate-900">{service.title}</h3>
+                                        <h3 className="font-bold text-primary">{service.title}</h3>
                                         <span className="text-sm font-bold text-pink-600">${service.price_start}</span>
                                     </div>
                                     <p className="text-xs text-slate-500 mt-1 line-clamp-2">{service.description}</p>
@@ -298,18 +298,18 @@ export default function BridalManager() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2 space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Gown Name</label>
-                                        <input required type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={gownForm.name} onChange={e => setGownForm({...gownForm, name: e.target.value})} />
+                                        <input required type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={gownForm.name} onChange={e => setGownForm({ ...gownForm, name: e.target.value })} />
                                     </div>
                                     <div className="space-y-1 text-xs">
                                         <label className="text-sm font-medium text-slate-700">Designer</label>
-                                        <input type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={gownForm.designer} onChange={e => setGownForm({...gownForm, designer: e.target.value})} />
+                                        <input type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={gownForm.designer} onChange={e => setGownForm({ ...gownForm, designer: e.target.value })} />
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Silhouette</label>
-                                        <select 
-                                            className="w-full px-4 py-2 border border-slate-200 rounded-lg" 
-                                            value={gownForm.silhouette} 
-                                            onChange={e => setGownForm({...gownForm, silhouette: e.target.value})}
+                                        <select
+                                            className="w-full px-4 py-2 border border-slate-200 rounded-lg"
+                                            value={gownForm.silhouette}
+                                            onChange={e => setGownForm({ ...gownForm, silhouette: e.target.value })}
                                         >
                                             <option value="">Select Silhouette</option>
                                             {BRIDAL_SILHOUETTES.map(s => (
@@ -319,11 +319,11 @@ export default function BridalManager() {
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Rent Price ($)</label>
-                                        <input type="number" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={gownForm.price_rent} onChange={e => setGownForm({...gownForm, price_rent: e.target.value})} />
+                                        <input type="number" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={gownForm.price_rent} onChange={e => setGownForm({ ...gownForm, price_rent: e.target.value })} />
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Buy Price ($)</label>
-                                        <input type="number" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={gownForm.price_buy} onChange={e => setGownForm({...gownForm, price_buy: e.target.value})} />
+                                        <input type="number" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={gownForm.price_buy} onChange={e => setGownForm({ ...gownForm, price_buy: e.target.value })} />
                                     </div>
                                     <div className="col-span-2 space-y-2">
                                         <label className="text-sm font-medium text-slate-700">Gown Images</label>
@@ -355,6 +355,38 @@ export default function BridalManager() {
                                                 />
                                             )}
                                         </div>
+                                        <div className="flex gap-2 mt-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Or paste an image URL..."
+                                                className="flex-1 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 text-sm"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        const input = e.target as HTMLInputElement;
+                                                        const url = input.value.trim();
+                                                        if (url && gownForm.images.length < 6) {
+                                                            setGownForm({ ...gownForm, images: [...gownForm.images, url] });
+                                                            input.value = '';
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    const input = (e.target as HTMLElement).previousElementSibling as HTMLInputElement;
+                                                    const url = input.value.trim();
+                                                    if (url && gownForm.images.length < 6) {
+                                                        setGownForm({ ...gownForm, images: [...gownForm.images, url] });
+                                                        input.value = '';
+                                                    }
+                                                }}
+                                                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium border border-slate-200 text-sm"
+                                            >
+                                                Add URL
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="col-span-2 space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Sizes (Comma separated)</label>
@@ -374,7 +406,7 @@ export default function BridalManager() {
                                         />
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <input type="checkbox" id="is_new" checked={gownForm.is_new} onChange={e => setGownForm({...gownForm, is_new: e.target.checked})} />
+                                        <input type="checkbox" id="is_new" checked={gownForm.is_new} onChange={e => setGownForm({ ...gownForm, is_new: e.target.checked })} />
                                         <label htmlFor="is_new" className="text-sm text-slate-700">New Arrival</label>
                                     </div>
                                 </div>
@@ -382,7 +414,7 @@ export default function BridalManager() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2 space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Service Title</label>
-                                        <input required type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={serviceForm.title} onChange={e => setServiceForm({...serviceForm, title: e.target.value})} />
+                                        <input required type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={serviceForm.title} onChange={e => setServiceForm({ ...serviceForm, title: e.target.value })} />
                                     </div>
                                     <div className="col-span-2 space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Service Image</label>
@@ -391,18 +423,25 @@ export default function BridalManager() {
                                             value={serviceForm.image}
                                             onChange={(url) => setServiceForm({ ...serviceForm, image: url })}
                                         />
+                                        <input
+                                            type="text"
+                                            placeholder="Or paste an image URL..."
+                                            className="w-full mt-2 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 text-sm"
+                                            value={serviceForm.image}
+                                            onChange={(e) => setServiceForm({ ...serviceForm, image: e.target.value })}
+                                        />
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Starting Price ($)</label>
-                                        <input required type="number" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={serviceForm.price_start} onChange={e => setServiceForm({...serviceForm, price_start: e.target.value})} />
+                                        <input required type="number" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={serviceForm.price_start} onChange={e => setServiceForm({ ...serviceForm, price_start: e.target.value })} />
                                     </div>
                                     <div className="space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Duration</label>
-                                        <input type="text" placeholder="e.g. 2 Hours" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={serviceForm.duration} onChange={e => setServiceForm({...serviceForm, duration: e.target.value})} />
+                                        <input type="text" placeholder="e.g. 2 Hours" className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={serviceForm.duration} onChange={e => setServiceForm({ ...serviceForm, duration: e.target.value })} />
                                     </div>
                                     <div className="col-span-2 space-y-1">
                                         <label className="text-sm font-medium text-slate-700">Description</label>
-                                        <textarea rows={3} className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={serviceForm.description} onChange={e => setServiceForm({...serviceForm, description: e.target.value})} />
+                                        <textarea rows={3} className="w-full px-4 py-2 border border-slate-200 rounded-lg" value={serviceForm.description} onChange={e => setServiceForm({ ...serviceForm, description: e.target.value })} />
                                     </div>
                                 </div>
                             )}

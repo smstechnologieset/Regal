@@ -79,7 +79,7 @@ function AdminSidebar({
 
             {/* Sidebar */}
             <aside className={`
-                fixed top-0 left-0 h-full w-72 bg-slate-900 text-white z-50
+                fixed top-0 left-0 h-full w-72 bg-primary text-white z-50
                 transform transition-transform duration-300 lg:translate-x-0
                 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
@@ -88,7 +88,7 @@ function AdminSidebar({
                         <span className="text-2xl font-bold bg-gradient-to-r from-rose-400 to-purple-400 bg-clip-text text-transparent">
                             REGAL
                         </span>
-                        <span className="text-xs bg-rose-600 px-2 py-0.5 rounded-full">Admin</span>
+                        <span className="text-xs bg-secondary px-2 py-0.5 rounded-full">Admin</span>
                     </Link>
                     <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-1">
                         <X size={20} />
@@ -188,7 +188,7 @@ function AdminSidebar({
 
 function SidebarFallback() {
     return (
-        <aside className="fixed top-0 left-0 h-full w-72 bg-slate-900 z-50 animate-pulse" />
+        <aside className="fixed top-0 left-0 h-full w-72 bg-primary z-50 animate-pulse" />
     );
 }
 
@@ -211,7 +211,7 @@ export default function AdminLayout({
     return (
         <div className="min-h-screen bg-slate-100">
             {/* Mobile Header */}
-            <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-slate-900 text-white flex items-center justify-between px-4 z-50">
+            <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-primary text-white flex items-center justify-between px-4 z-50">
                 <button onClick={() => setSidebarOpen(true)} className="p-2">
                     <Menu size={24} />
                 </button>

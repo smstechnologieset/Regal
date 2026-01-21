@@ -32,7 +32,7 @@ export default function CartPage() {
                 <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-6">
                     <ShoppingBag size={40} className="text-slate-400" />
                 </div>
-                <h1 className="text-2xl font-bold text-slate-900 mb-2">Your cart is empty</h1>
+                <h1 className="text-2xl font-bold text-primary mb-2">Your cart is empty</h1>
                 <p className="text-slate-500 mb-8 text-center">
                     Looks like you haven&apos;t added anything to your cart yet.
                 </p>
@@ -48,12 +48,12 @@ export default function CartPage() {
             <div className="container mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+                    <h1 className="text-2xl md:text-3xl font-bold text-primary">
                         Shopping Cart ({items.length} {items.length === 1 ? 'item' : 'items'})
                     </h1>
                     <button
                         onClick={clearCart}
-                        className="text-sm text-slate-500 hover:text-rose-600 transition-colors"
+                        className="text-sm text-slate-500 hover:text-secondary transition-colors"
                     >
                         Clear Cart
                     </button>
@@ -87,7 +87,7 @@ export default function CartPage() {
                                     <div className="flex-1">
                                         <Link
                                             href={`/products/${item.product.id}`}
-                                            className="text-lg font-medium text-slate-900 hover:text-rose-600 transition-colors line-clamp-2"
+                                            className="text-lg font-medium text-primary hover:text-secondary transition-colors line-clamp-2"
                                         >
                                             {item.product.name}
                                         </Link>
@@ -97,7 +97,7 @@ export default function CartPage() {
 
                                         {/* Price */}
                                         <div className="flex items-center gap-2 mt-2">
-                                            <span className="text-lg font-semibold text-slate-900">
+                                            <span className="text-lg font-semibold text-primary">
                                                 {formatPrice(item.product.price)}
                                             </span>
                                             {item.product.originalPrice && (
@@ -146,7 +146,7 @@ export default function CartPage() {
 
                                         {/* Line Total & Remove */}
                                         <div className="flex items-center gap-4">
-                                            <span className="font-semibold text-slate-900">
+                                            <span className="font-semibold text-primary">
                                                 {formatPrice(item.product.price * item.quantity)}
                                             </span>
                                             <button
@@ -157,7 +157,7 @@ export default function CartPage() {
                                                         item.selectedColor.name
                                                     )
                                                 }
-                                                className="p-2 text-slate-400 hover:text-rose-600 transition-colors"
+                                                className="p-2 text-slate-400 hover:text-secondary transition-colors"
                                                 aria-label="Remove item"
                                             >
                                                 <Trash2 size={18} />
@@ -171,7 +171,7 @@ export default function CartPage() {
                         {/* Continue Shopping */}
                         <Link
                             href="/attire/products"
-                            className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
+                            className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-primary transition-colors"
                         >
                             <ArrowLeft size={16} />
                             Continue Shopping
@@ -181,7 +181,7 @@ export default function CartPage() {
                     {/* Order Summary */}
                     <div className="lg:col-span-1">
                         <div className="bg-white rounded-xl p-6 sticky top-24">
-                            <h2 className="text-lg font-semibold text-slate-900 mb-4">
+                            <h2 className="text-lg font-semibold text-primary mb-4">
                                 Order Summary
                             </h2>
 
@@ -204,8 +204,8 @@ export default function CartPage() {
                             </div>
 
                             <div className="flex justify-between pt-4 mb-6">
-                                <span className="text-lg font-semibold text-slate-900">Total</span>
-                                <span className="text-lg font-bold text-slate-900">
+                                <span className="text-lg font-semibold text-primary">Total</span>
+                                <span className="text-lg font-bold text-primary">
                                     {formatPrice(total)}
                                 </span>
                             </div>

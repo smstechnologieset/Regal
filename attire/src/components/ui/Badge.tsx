@@ -16,7 +16,7 @@ interface BadgeProps {
 
 const badgeStyles: Record<string, string> = {
     new: 'bg-emerald-500 text-white',
-    sale: 'bg-rose-600 text-white',
+    sale: 'bg-secondary text-white',
     bestseller: 'bg-amber-500 text-white',
     limited: 'bg-purple-600 text-white',
     outOfStock: 'bg-slate-500 text-white',

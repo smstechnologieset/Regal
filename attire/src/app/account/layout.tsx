@@ -89,7 +89,7 @@ export default function AccountLayout({
                                         {profile?.full_name?.charAt(0) || 'U'}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="font-semibold text-slate-900 truncate">
+                                        <h3 className="font-semibold text-primary truncate">
                                             {profile?.full_name || 'User'}
                                         </h3>
                                         <p className="text-sm text-slate-500 truncate">
@@ -102,7 +102,7 @@ export default function AccountLayout({
                                 {isAdmin && (
                                     <Link
                                         href="/admin"
-                                        className="mt-4 flex items-center justify-between p-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
+                                        className="mt-4 flex items-center justify-between p-3 bg-primary text-white rounded-lg hover:bg-slate-800 transition-colors"
                                     >
                                         <span className="flex items-center gap-2">
                                             <LayoutDashboard size={18} />
@@ -124,7 +124,7 @@ export default function AccountLayout({
                                                     href={item.href}
                                                     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
                                                         ? 'bg-rose-50 text-rose-700'
-                                                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                                        : 'text-slate-600 hover:bg-slate-50 hover:text-primary'
                                                         }`}
                                                 >
                                                     <item.icon size={20} />

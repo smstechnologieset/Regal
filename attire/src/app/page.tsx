@@ -36,7 +36,7 @@ const services = [
         icon: Shirt,
         image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&h=600&fit=crop',
         href: '/attire',
-        color: 'from-rose-500 to-pink-600',
+        color: 'from-primary/80 to-primary',
         available: true,
     },
     {
@@ -47,8 +47,8 @@ const services = [
         icon: PartyPopper,
         image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop',
         href: '/events',
-        color: 'from-purple-500 to-indigo-600',
-        available: false,
+        color: 'from-secondary/80 to-secondary',
+        available: true,
     },
     {
         id: 'bridal',
@@ -58,8 +58,8 @@ const services = [
         icon: Heart,
         image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop',
         href: '/bridal',
-        color: 'from-pink-400 to-rose-500',
-        available: false,
+        color: 'from-primary/80 to-primary',
+        available: true,
     },
     {
         id: 'catering',
@@ -69,8 +69,8 @@ const services = [
         icon: UtensilsCrossed,
         image: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800&h=600&fit=crop',
         href: '/catering',
-        color: 'from-amber-500 to-orange-600',
-        available: false,
+        color: 'from-secondary/80 to-secondary',
+        available: true,
     },
 ];
 
@@ -86,7 +86,7 @@ export default function RegalLandingPage() {
     return (
         <div className="min-h-screen">
             {/* Hero Section */}
-            <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-slate-900">
+            <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-primary text-white">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-10">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
@@ -106,10 +106,7 @@ export default function RegalLandingPage() {
 
                         {/* Main Heading */}
                         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 animate-fade-in-up">
-                            Welcome to{' '}
-                            <span className="bg-gradient-to-r from-rose-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
-                                Regal
-                            </span>
+                            Welcome to{' '}<span className="text-secondary">Regal</span>
                         </h1>
 
                         {/* Tagline */}
@@ -125,7 +122,7 @@ export default function RegalLandingPage() {
                                 </Button>
                             </Link>
                             <Link href="/attire">
-                                <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white hover:text-slate-900">
+                                <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white hover:text-primary">
                                     Shop Attire
                                 </Button>
                             </Link>
@@ -146,8 +143,8 @@ export default function RegalLandingPage() {
                 <div className="container mx-auto px-4">
                     {/* Section Header */}
                     <div className="text-center max-w-3xl mx-auto mb-16">
-                        <span className="text-rose-600 font-medium text-sm uppercase tracking-wider">Our Services</span>
-                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mt-4 mb-6">
+                        <span className="text-secondary font-medium text-sm uppercase tracking-wider">Our Services</span>
+                        <h2 className="text-3xl md:text-5xl font-bold text-primary mt-4 mb-6">
                             Everything You Need, All in One Place
                         </h2>
                         <p className="text-lg text-slate-600">
@@ -221,10 +218,10 @@ export default function RegalLandingPage() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                         {stats.map((stat, index) => (
                             <div key={index} className="text-center">
-                                <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
+                                <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center">
                                     <stat.icon size={24} />
                                 </div>
-                                <div className="text-3xl md:text-4xl font-bold text-slate-900 mb-1">
+                                <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
                                     {stat.value}
                                 </div>
                                 <div className="text-slate-600">{stat.label}</div>
@@ -242,7 +239,7 @@ export default function RegalLandingPage() {
                         <div className="relative">
                             <div className="aspect-square rounded-2xl overflow-hidden">
                                 <Image
-                                    src="https://images.unsplash.com/photo-1529543544277-750e1a223f71?w=800&h=800&fit=crop"
+                                    src="https://images.unsplash.com/photo-1614317354806-860a3bf79069?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                     alt="Regal Team"
                                     fill
                                     unoptimized
@@ -258,7 +255,7 @@ export default function RegalLandingPage() {
                                         ))}
                                     </div>
                                     <div className="text-sm">
-                                        <div className="font-semibold text-slate-900">1000+ Reviews</div>
+                                        <div className="font-semibold text-primary">1000+ Reviews</div>
                                         <div className="text-slate-500">on Google</div>
                                     </div>
                                 </div>
@@ -273,8 +270,8 @@ export default function RegalLandingPage() {
 
                         {/* Content */}
                         <div>
-                            <span className="text-rose-600 font-medium text-sm uppercase tracking-wider">Why Choose Regal</span>
-                            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mt-4 mb-6">
+                            <span className="text-secondary font-medium text-sm uppercase tracking-wider">Why Choose Regal</span>
+                            <h2 className="text-3xl md:text-4xl font-bold text-primary mt-4 mb-6">
                                 We Turn Your Dreams Into Reality
                             </h2>
                             <p className="text-lg text-slate-600 mb-8">
@@ -290,7 +287,7 @@ export default function RegalLandingPage() {
                                     '24/7 customer support',
                                 ].map((item, index) => (
                                     <div key={index} className="flex items-center gap-3">
-                                        <div className="w-6 h-6 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0">
+                                        <div className="w-6 h-6 rounded-full bg-rose-100 text-secondary flex items-center justify-center flex-shrink-0">
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                             </svg>
@@ -328,7 +325,7 @@ export default function RegalLandingPage() {
                             </Button>
                         </Link>
                         <Link href="/register">
-                            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white hover:text-slate-900">
+                            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white hover:text-primary">
                                 Create Account
                             </Button>
                         </Link>

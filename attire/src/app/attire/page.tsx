@@ -56,7 +56,6 @@ export default function AttireHomePage() {
     onSale: Product[];
   } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const { addToCart, toggleCart } = useCart();
@@ -65,13 +64,12 @@ export default function AttireHomePage() {
   useEffect(() => {
     const controller = new AbortController();
     console.log('AttireHomePage: Mount Effect Triggered');
-    setMounted(true);
-    
+
     const fetchData = async () => {
       console.log('AttireHomePage: Starting fetchData...');
       try {
         const productsData = await getFeaturedProducts(controller.signal);
-        
+
         if (!controller.signal.aborted) {
           console.log('AttireHomePage: fetchData Success', !!productsData);
           setFeaturedProducts(productsData);
@@ -115,7 +113,6 @@ export default function AttireHomePage() {
     }
   };
 
-  if (!mounted) return null;
 
   return (
     <div className="min-h-screen">
@@ -174,7 +171,7 @@ export default function AttireHomePage() {
       </section>
 
       {/* Features Bar */}
-      <section className="bg-slate-900 text-white py-6">
+      <section className="bg-primary text-white py-6">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {features.map((feature, index) => (
@@ -195,7 +192,7 @@ export default function AttireHomePage() {
       {/* Category Grid */}
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-primary mb-8 text-center">
             Shop by Category
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -235,12 +232,12 @@ export default function AttireHomePage() {
       <section className="py-12 md:py-16 bg-slate-50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary">
               New Arrivals
             </h2>
             <Link
               href="/attire/products?filter=new"
-              className="text-sm font-medium text-slate-900 flex items-center gap-1 hover:text-rose-600 transition-colors"
+              className="text-sm font-medium text-primary flex items-center gap-1 hover:text-secondary transition-colors"
             >
               View All <ArrowRight size={14} />
             </Link>
@@ -300,12 +297,12 @@ export default function AttireHomePage() {
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary">
               Bestsellers
             </h2>
             <Link
               href="/attire/products?sort=popularity"
-              className="text-sm font-medium text-slate-900 flex items-center gap-1 hover:text-rose-600 transition-colors"
+              className="text-sm font-medium text-primary flex items-center gap-1 hover:text-secondary transition-colors"
             >
               View All <ArrowRight size={14} />
             </Link>
@@ -331,12 +328,12 @@ export default function AttireHomePage() {
       <section className="py-12 md:py-16 bg-slate-50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900">
+            <h2 className="text-2xl md:text-3xl font-bold text-primary">
               On Sale
             </h2>
             <Link
               href="/attire/products?sale=true"
-              className="text-sm font-medium text-slate-900 flex items-center gap-1 hover:text-rose-600 transition-colors"
+              className="text-sm font-medium text-primary flex items-center gap-1 hover:text-secondary transition-colors"
             >
               View All <ArrowRight size={14} />
             </Link>
@@ -359,7 +356,7 @@ export default function AttireHomePage() {
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-16 md:py-24 bg-slate-900 text-white">
+      <section className="py-16 md:py-24 bg-primary text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-4xl font-bold mb-4">
             Join the Attire Community

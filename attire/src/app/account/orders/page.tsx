@@ -86,7 +86,7 @@ export default function OrdersPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">My Orders</h1>
+                    <h1 className="text-2xl font-bold text-primary">My Orders</h1>
                     <p className="text-slate-600">Track and manage all your orders</p>
                 </div>
             </div>
@@ -98,7 +98,7 @@ export default function OrdersPage() {
                         key={status}
                         onClick={() => setFilter(status)}
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-all capitalize ${filter === status
-                            ? 'bg-slate-900 text-white'
+                            ? 'bg-primary text-white'
                             : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
                             }`}
                     >
@@ -128,7 +128,7 @@ export default function OrdersPage() {
                                             {getStatusIcon(order.status)}
                                         </div>
                                         <div>
-                                            <p className="font-medium text-slate-900">
+                                            <p className="font-medium text-primary">
                                                 Order #{order.id.slice(0, 8)}
                                             </p>
                                             <p className="text-sm text-slate-500">
@@ -138,7 +138,7 @@ export default function OrdersPage() {
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <div className="text-right">
-                                            <p className="font-semibold text-slate-900">
+                                            <p className="font-semibold text-primary">
                                                 ${order.total.toFixed(2)}
                                             </p>
                                             <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full capitalize ${getStatusBadge(order.status)}`}>
@@ -154,7 +154,7 @@ export default function OrdersPage() {
                 ) : (
                     <div className="p-12 text-center">
                         <Package size={48} className="mx-auto text-slate-300 mb-4" />
-                        <h3 className="text-lg font-medium text-slate-900 mb-2">
+                        <h3 className="text-lg font-medium text-primary mb-2">
                             {filter === 'all' ? 'No orders yet' : `No ${filter.replace('_', ' ')} orders`}
                         </h3>
                         <p className="text-slate-500 mb-6">

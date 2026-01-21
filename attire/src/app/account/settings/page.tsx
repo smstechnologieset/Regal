@@ -52,14 +52,14 @@ export default function SettingsPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-slate-900">Account Settings</h1>
+                <h1 className="text-2xl font-bold text-primary">Account Settings</h1>
                 <p className="text-slate-600">Manage your profile and preferences</p>
             </div>
 
             {/* Profile Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-6 border-b border-slate-100">
-                    <h2 className="text-lg font-semibold text-slate-900">Profile Information</h2>
+                    <h2 className="text-lg font-semibold text-primary">Profile Information</h2>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -77,7 +77,7 @@ export default function SettingsPage() {
                             </button>
                         </div>
                         <div>
-                            <p className="font-medium text-slate-900">Profile Photo</p>
+                            <p className="font-medium text-primary">Profile Photo</p>
                             <p className="text-sm text-slate-500">Click the camera icon to upload</p>
                         </div>
                     </div>
@@ -137,12 +137,12 @@ export default function SettingsPage() {
             {/* Account Info */}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-6 border-b border-slate-100">
-                    <h2 className="text-lg font-semibold text-slate-900">Account Details</h2>
+                    <h2 className="text-lg font-semibold text-primary">Account Details</h2>
                 </div>
                 <div className="p-6 space-y-4">
                     <div className="flex items-center justify-between py-3 border-b border-slate-100">
                         <div>
-                            <p className="font-medium text-slate-900">Account Type</p>
+                            <p className="font-medium text-primary">Account Type</p>
                             <p className="text-sm text-slate-500">Your account role</p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${profile?.role === 'admin'
@@ -154,7 +154,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="flex items-center justify-between py-3">
                         <div>
-                            <p className="font-medium text-slate-900">Member Since</p>
+                            <p className="font-medium text-primary">Member Since</p>
                             <p className="text-sm text-slate-500">When you joined Regal</p>
                         </div>
                         <span className="text-slate-600">

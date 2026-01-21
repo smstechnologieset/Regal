@@ -19,6 +19,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
 import ToastContainer from "@/components/ui/Toast";
+import ScrollToTop from "@/components/layout/ScrollToTop";
 
 // Load Inter font with next/font for optimal performance
 const inter = Inter({
@@ -57,6 +58,7 @@ export default function RootLayout({
                   <Footer />
                   <CartDrawer />
                   <ToastContainer />
+                  <ScrollToTop />
                 </CartProvider>
               </WishlistProvider>
             </AppProvider>

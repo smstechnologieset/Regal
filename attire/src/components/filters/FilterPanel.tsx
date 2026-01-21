@@ -93,12 +93,12 @@ export default function FilterPanel({
         <div className={cn('bg-white', isMobile && 'h-full overflow-y-auto')}>
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-slate-200">
-                <h2 className="text-lg font-semibold text-slate-900">Filters</h2>
+                <h2 className="text-lg font-semibold text-primary">Filters</h2>
                 <div className="flex items-center gap-2">
                     {hasActiveFilters && (
                         <button
                             onClick={clearAllFilters}
-                            className="text-sm text-rose-600 hover:text-rose-700"
+                            className="text-sm text-secondary hover:text-secondary/80"
                         >
                             Clear all
                         </button>
@@ -127,11 +127,11 @@ export default function FilterPanel({
                                         name="category"
                                         checked={filters.category === category.slug}
                                         onChange={() => handleCategoryChange(category.slug)}
-                                        className="w-4 h-4 text-slate-900 border-slate-300 focus:ring-slate-900"
+                                        className="w-4 h-4 text-primary border-slate-300 focus:ring-slate-900"
                                     />
                                     <span className={cn(
                                         "text-sm transition-colors",
-                                        filters.category === category.slug ? "text-slate-900 font-medium" : "text-slate-700 group-hover:text-slate-900"
+                                        filters.category === category.slug ? "text-primary font-medium" : "text-slate-700 group-hover:text-primary"
                                     )}>
                                         {category.name}
                                     </span>
@@ -149,11 +149,11 @@ export default function FilterPanel({
                                                     type="checkbox"
                                                     checked={filters.subcategory === sub.slug}
                                                     onChange={() => handleSubcategoryChange(sub.slug)}
-                                                    className="w-3.5 h-3.5 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
+                                                    className="w-3.5 h-3.5 text-primary border-slate-300 rounded focus:ring-slate-900"
                                                 />
                                                 <span className={cn(
                                                     "text-xs transition-colors",
-                                                    filters.subcategory === sub.slug ? "text-slate-900 font-medium" : "text-slate-500 group-hover/sub:text-slate-700"
+                                                    filters.subcategory === sub.slug ? "text-primary font-medium" : "text-slate-500 group-hover/sub:text-slate-700"
                                                 )}>
                                                     {sub.name}
                                                 </span>
@@ -180,8 +180,8 @@ export default function FilterPanel({
                                 className={cn(
                                     'min-w-[40px] h-9 px-2 text-sm font-medium rounded border transition-colors',
                                     filters.sizes?.includes(size)
-                                        ? 'bg-slate-900 text-white border-slate-900'
-                                        : 'bg-white text-slate-700 border-slate-300 hover:border-slate-900'
+                                        ? 'bg-primary text-white border-primary'
+                                        : 'bg-white text-slate-700 border-slate-300 hover:border-primary'
                                 )}
                             >
                                 {size}
@@ -217,7 +217,7 @@ export default function FilterPanel({
                                         filters.priceRange?.max === range.max
                                     }
                                     onChange={() => handlePriceChange(range.min, range.max)}
-                                    className="w-4 h-4 text-slate-900 border-slate-300 focus:ring-slate-900"
+                                    className="w-4 h-4 text-primary border-slate-300 focus:ring-slate-900"
                                 />
                                 <span className="text-sm text-slate-700">{range.label}</span>
                             </label>
@@ -242,7 +242,7 @@ export default function FilterPanel({
                                         inStock: e.target.checked ? true : undefined,
                                     })
                                 }
-                                className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
+                                className="w-4 h-4 text-primary border-slate-300 rounded focus:ring-slate-900"
                             />
                             <span className="text-sm text-slate-700">In stock only</span>
                         </label>
@@ -256,7 +256,7 @@ export default function FilterPanel({
                                         onSale: e.target.checked ? true : undefined,
                                     })
                                 }
-                                className="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500"
+                                className="w-4 h-4 text-secondary border-slate-300 rounded focus:ring-rose-500"
                             />
                             <span className="text-sm text-slate-700">On Sale</span>
                         </label>
@@ -288,7 +288,7 @@ export default function FilterPanel({
                                             badges: newBadges.length > 0 ? newBadges : undefined,
                                         });
                                     }}
-                                    className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
+                                    className="w-4 h-4 text-primary border-slate-300 rounded focus:ring-slate-900"
                                 />
                                 <span className="text-sm text-slate-700">{badge.label}</span>
                             </label>
@@ -329,7 +329,7 @@ function FilterSection({
                 onClick={onToggle}
                 className="flex items-center justify-between w-full py-2 text-left"
             >
-                <span className="font-medium text-slate-900">{title}</span>
+                <span className="font-medium text-primary">{title}</span>
                 {isExpanded ? (
                     <ChevronUp size={18} className="text-slate-500" />
                 ) : (

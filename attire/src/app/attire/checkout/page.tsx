@@ -167,7 +167,7 @@ export default function CheckoutPage() {
     if (items.length === 0) {
         return (
             <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
-                <h1 className="text-2xl font-bold text-slate-900 mb-4">Your cart is empty</h1>
+                <h1 className="text-2xl font-bold text-primary mb-4">Your cart is empty</h1>
                 <Link href="/attire/products">
                     <Button>Continue Shopping</Button>
                 </Link>
@@ -181,13 +181,13 @@ export default function CheckoutPage() {
                 {/* Back button */}
                 <Link
                     href="/attire/cart"
-                    className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 mb-6"
+                    className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-primary mb-6"
                 >
                     <ChevronLeft size={16} />
                     Back to Cart
                 </Link>
 
-                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">
+                <h1 className="text-2xl md:text-3xl font-bold text-primary mb-8">
                     Checkout
                 </h1>
 
@@ -201,7 +201,7 @@ export default function CheckoutPage() {
                                     <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
                                         <Truck size={20} className="text-slate-600" />
                                     </div>
-                                    <h2 className="text-lg font-semibold text-slate-900">
+                                    <h2 className="text-lg font-semibold text-primary">
                                         Shipping Information
                                     </h2>
                                 </div>
@@ -294,7 +294,7 @@ export default function CheckoutPage() {
                                     <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
                                         <CreditCard size={20} className="text-slate-600" />
                                     </div>
-                                    <h2 className="text-lg font-semibold text-slate-900">
+                                    <h2 className="text-lg font-semibold text-primary">
                                         Payment Method
                                     </h2>
                                 </div>
@@ -303,7 +303,7 @@ export default function CheckoutPage() {
                                     {/* Cash on Delivery */}
                                     <label
                                         className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors ${paymentMethod === 'cod'
-                                            ? 'border-slate-900 bg-slate-50'
+                                            ? 'border-primary bg-slate-50'
                                             : 'border-slate-200 hover:border-slate-300'
                                             }`}
                                     >
@@ -313,11 +313,11 @@ export default function CheckoutPage() {
                                             value="cod"
                                             checked={paymentMethod === 'cod'}
                                             onChange={() => setPaymentMethod('cod')}
-                                            className="w-5 h-5 text-slate-900"
+                                            className="w-5 h-5 text-primary"
                                         />
                                         <Banknote size={24} className="text-slate-600" />
                                         <div className="flex-1">
-                                            <span className="font-medium text-slate-900">
+                                            <span className="font-medium text-primary">
                                                 Cash on Delivery
                                             </span>
                                             <p className="text-sm text-slate-500">
@@ -354,7 +354,7 @@ export default function CheckoutPage() {
                         {/* Order Summary */}
                         <div className="lg:col-span-1">
                             <div className="bg-white rounded-xl p-6 sticky top-24">
-                                <h2 className="text-lg font-semibold text-slate-900 mb-4">
+                                <h2 className="text-lg font-semibold text-primary mb-4">
                                     Order Summary
                                 </h2>
 
@@ -376,13 +376,13 @@ export default function CheckoutPage() {
                                                 />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-slate-900 truncate">
+                                                <p className="text-sm font-medium text-primary truncate">
                                                     {item.product.name}
                                                 </p>
                                                 <p className="text-xs text-slate-500">
                                                     {item.selectedSize} / {item.selectedColor.name} × {item.quantity}
                                                 </p>
-                                                <p className="text-sm font-medium text-slate-900 mt-1">
+                                                <p className="text-sm font-medium text-primary mt-1">
                                                     {formatPrice(item.product.price * item.quantity)}
                                                 </p>
                                             </div>
@@ -404,8 +404,8 @@ export default function CheckoutPage() {
                                 </div>
 
                                 <div className="flex justify-between pt-4 mb-6">
-                                    <span className="text-lg font-semibold text-slate-900">Total</span>
-                                    <span className="text-lg font-bold text-slate-900">
+                                    <span className="text-lg font-semibold text-primary">Total</span>
+                                    <span className="text-lg font-bold text-primary">
                                         {formatPrice(total)}
                                     </span>
                                 </div>

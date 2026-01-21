@@ -121,13 +121,13 @@ function CustomEventForm() {
             {/* Progress Bar */}
             <div className="bg-slate-50 border-b border-slate-200 px-8 py-4">
                 <div className="flex items-center justify-between text-sm font-medium text-slate-500 mb-2">
-                    <span className={step >= 1 ? 'text-rose-600' : ''}>Event Details</span>
-                    <span className={step >= 2 ? 'text-rose-600' : ''}>Preferences</span>
-                    <span className={step >= 3 ? 'text-rose-600' : ''}>Contact Info</span>
+                    <span className={step >= 1 ? 'text-secondary' : ''}>Event Details</span>
+                    <span className={step >= 2 ? 'text-secondary' : ''}>Preferences</span>
+                    <span className={step >= 3 ? 'text-secondary' : ''}>Contact Info</span>
                 </div>
                 <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
                     <div
-                        className="h-full bg-rose-600 transition-all duration-300 ease-out"
+                        className="h-full bg-secondary transition-all duration-300 ease-out"
                         style={{ width: `${((step - 1) / 2) * 100}%` }}
                     />
                 </div>
@@ -136,7 +136,7 @@ function CustomEventForm() {
             <form onSubmit={handleSubmit} className="p-8">
                 {step === 1 && (
                     <div className="space-y-6 animate-fade-in">
-                        <h2 className="text-2xl font-bold text-slate-900">Tell us about your event</h2>
+                        <h2 className="text-2xl font-bold text-primary">Tell us about your event</h2>
 
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-slate-700">Event Type</label>
@@ -209,7 +209,7 @@ function CustomEventForm() {
 
                 {step === 2 && (
                     <div className="space-y-6 animate-fade-in">
-                        <h2 className="text-2xl font-bold text-slate-900">Customize your experience</h2>
+                        <h2 className="text-2xl font-bold text-primary">Customize your experience</h2>
 
                         <div className="space-y-4">
                             <label className="block text-sm font-medium text-slate-700">Select Services Needed</label>
@@ -226,7 +226,7 @@ function CustomEventForm() {
                                             type="checkbox"
                                             checked={formData.features.includes(feature.label)}
                                             onChange={() => toggleFeature(feature.label)}
-                                            className="w-5 h-5 text-rose-600 rounded focus:ring-rose-500"
+                                            className="w-5 h-5 text-secondary rounded focus:ring-rose-500"
                                         />
                                         <span className="text-sm font-medium text-slate-700">{feature.label}</span>
                                     </label>
@@ -250,7 +250,7 @@ function CustomEventForm() {
 
                 {step === 3 && (
                     <div className="space-y-6 animate-fade-in">
-                        <h2 className="text-2xl font-bold text-slate-900">Contact Information</h2>
+                        <h2 className="text-2xl font-bold text-primary">Contact Information</h2>
 
                         <div className="space-y-4">
                             <Input
@@ -319,11 +319,11 @@ export default function CustomEventPage() {
         <div className="min-h-screen bg-slate-50 py-12 md:py-20">
             <div className="container mx-auto px-4">
                 <div className="mb-8">
-                    <Link href="/events" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-4">
+                    <Link href="/events" className="inline-flex items-center gap-2 text-slate-500 hover:text-primary mb-4">
                         <ArrowLeft size={20} />
                         Back to Events
                     </Link>
-                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 text-center">
+                    <h1 className="text-3xl md:text-4xl font-bold text-primary text-center">
                         Plan Your Custom Event
                     </h1>
                     <p className="text-center text-slate-600 mt-2">

@@ -96,7 +96,7 @@ export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
                     {/* Discount badge */}
                     {discount > 0 && product.inStock && (
                         <div className="absolute top-2 right-2">
-                            <span className="bg-rose-600 text-white text-xs font-bold px-2 py-1 rounded">
+                            <span className="bg-secondary text-white text-xs font-bold px-2 py-1 rounded">
                                 -{discount}%
                             </span>
                         </div>
@@ -109,8 +109,8 @@ export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
                             'absolute top-2 right-2 p-2 rounded-full transition-all duration-200',
                             discount > 0 ? 'top-10' : 'top-2',
                             isWishlisted
-                                ? 'bg-rose-100 text-rose-600'
-                                : 'bg-white/80 text-slate-600 hover:bg-white hover:text-rose-600',
+                                ? 'bg-secondary/10 text-secondary'
+                                : 'bg-white/80 text-slate-600 hover:bg-white hover:text-secondary',
                             'opacity-0 group-hover:opacity-100'
                         )}
                         aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
@@ -122,7 +122,7 @@ export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
                     {product.inStock && (product.stockCount ?? 0) > 0 && onQuickAdd && (
                         <button
                             onClick={handleQuickAdd}
-                            className="absolute bottom-2 left-2 right-2 py-2.5 bg-slate-900 text-white text-sm font-medium rounded-lg opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2"
+                            className="absolute bottom-2 left-2 right-2 py-2.5 bg-primary text-white text-sm font-medium rounded-lg opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2"
                         >
                             <ShoppingBag size={16} />
                             Quick Add
@@ -142,13 +142,13 @@ export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
                 </div>
 
                 {/* Name */}
-                <h3 className="font-medium text-slate-900 group-hover:text-rose-600 transition-colors line-clamp-2">
+                <h3 className="font-medium text-primary group-hover:text-secondary transition-colors line-clamp-2">
                     {product.name}
                 </h3>
 
                 {/* Price */}
                 <div className="flex items-center gap-2">
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-semibold text-primary">
                         {formatPrice(product.price)}
                     </span>
                     {product.originalPrice && (

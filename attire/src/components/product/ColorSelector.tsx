@@ -25,7 +25,7 @@ export default function ColorSelector({
     return (
         <div className="space-y-3">
             <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
+                <span className="text-sm font-semibold text-primary uppercase tracking-wider">
                     Color: <span className="text-slate-500 font-medium normal-case ml-1">{selectedColor?.name || 'Select a color'}</span>
                 </span>
             </div>
@@ -42,7 +42,7 @@ export default function ColorSelector({
                             className={cn(
                                 'relative w-11 h-11 rounded-full border-2 transition-all duration-300 ease-out flex items-center justify-center group',
                                 isSelected
-                                    ? 'border-slate-900 ring-2 ring-slate-900/10 ring-offset-2'
+                                    ? 'border-primary ring-2 ring-slate-900/10 ring-offset-2'
                                     : 'border-transparent hover:border-slate-300 hover:scale-105',
                                 isWhite && !isSelected && 'border-slate-200'
                             )}
@@ -62,7 +62,7 @@ export default function ColorSelector({
                                         size={14}
                                         className={cn(
                                             'transition-opacity duration-300',
-                                            isLight ? 'text-slate-900' : 'text-white'
+                                            isLight ? 'text-primary' : 'text-white'
                                         )}
                                         strokeWidth={3}
                                     />

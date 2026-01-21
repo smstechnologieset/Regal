@@ -28,14 +28,14 @@ export default function EventPackageCard({ eventPackage }: EventPackageCardProps
 
                 {/* Type Badge */}
                 <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-xs font-semibold uppercase tracking-wider text-slate-900 rounded-full">
+                    <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-xs font-semibold uppercase tracking-wider text-primary rounded-full">
                         {eventPackage.type}
                     </span>
                 </div>
 
                 {/* Price Tag */}
                 <div className="absolute bottom-4 right-4">
-                    <div className="px-4 py-2 bg-rose-600 text-white font-bold rounded-lg shadow-lg">
+                    <div className="px-4 py-2 bg-secondary text-white font-bold rounded-lg shadow-lg">
                         From {formatPrice(eventPackage.priceStart)}
                     </div>
                 </div>
@@ -43,7 +43,7 @@ export default function EventPackageCard({ eventPackage }: EventPackageCardProps
 
             {/* Content */}
             <div className="p-6 flex-1 flex flex-col">
-                <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-rose-600 transition-colors">
+                <h3 className="text-xl font-bold text-primary mb-2 group-hover:text-secondary transition-colors">
                     {eventPackage.title}
                 </h3>
 

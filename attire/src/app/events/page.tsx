@@ -14,11 +14,8 @@ export default function EventsPage() {
     const [selectedType, setSelectedType] = useState<string>('all');
     const [packages, setPackages] = useState<EventPackage[]>([]);
     const [loading, setLoading] = useState(true);
-    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setMounted(true);
         async function fetchPackages() {
             const data = await getEventPackages();
             setPackages(data);
@@ -31,20 +28,19 @@ export default function EventsPage() {
         ? packages
         : packages.filter(pkg => pkg.type === selectedType);
 
-    if (!mounted) return null;
 
     return (
         <div className="min-h-screen bg-slate-50">
             {/* Hero Section */}
             <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
                 <Image
-                    src="https://images.unsplash.com/photo-1519225468359-e9ffa5f7406b?w=1920&h=1080&fit=crop"
+                    src="https://plus.unsplash.com/premium_photo-1664474653221-8412b8dfca3e?q=80&w=869&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                     alt="Event Planning"
                     fill
                     unoptimized
                     className="object-cover"
                 />
-                <div className="absolute inset-0 bg-slate-900/60" />
+                <div className="absolute inset-0 bg-primary/60" />
 
                 <div className="container mx-auto px-4 relative z-10 text-center">
                     <span className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white font-medium text-sm mb-6 animate-fade-in-up">
@@ -79,7 +75,7 @@ export default function EventsPage() {
                         <button
                             onClick={() => setSelectedType('all')}
                             className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${selectedType === 'all'
-                                ? 'bg-rose-600 text-white shadow-lg shadow-rose-200'
+                                ? 'bg-secondary text-white shadow-lg shadow-rose-200'
                                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                 }`}
                         >
@@ -90,7 +86,7 @@ export default function EventsPage() {
                                 key={type.value}
                                 onClick={() => setSelectedType(type.value)}
                                 className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${selectedType === type.value
-                                    ? 'bg-rose-600 text-white shadow-lg shadow-rose-200'
+                                    ? 'bg-secondary text-white shadow-lg shadow-rose-200'
                                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                     }`}
                             >
@@ -127,8 +123,8 @@ export default function EventsPage() {
             </section>
 
             {/* Custom Event CTA */}
-            <section className="py-20 bg-slate-900 text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-1/2 h-full bg-rose-600/10 rounded-full blur-3xl transform translate-x-1/3" />
+            <section className="py-20 bg-primary text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/2 h-full bg-secondary/10 rounded-full blur-3xl transform translate-x-1/3" />
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="max-w-3xl mx-auto text-center">
                         <Sparkles size={48} className="text-rose-400 mx-auto mb-6" />

@@ -117,7 +117,7 @@ export default function RegisterPage() {
                             REGAL
                         </span>
                     </Link>
-                    <h1 className="text-2xl font-bold text-slate-900 mb-2">Create Account</h1>
+                    <h1 className="text-2xl font-bold text-primary mb-2">Create Account</h1>
                     <p className="text-slate-600">Join us and start your journey</p>
                 </div>
 
@@ -198,15 +198,15 @@ export default function RegisterPage() {
                                     name="acceptTerms"
                                     checked={formData.acceptTerms}
                                     onChange={handleChange}
-                                    className="w-4 h-4 mt-0.5 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
+                                    className="w-4 h-4 mt-0.5 text-primary border-slate-300 rounded focus:ring-slate-900"
                                 />
                                 <span className="text-sm text-slate-600">
                                     I agree to the{' '}
-                                    <Link href="/terms" className="text-rose-600 hover:text-rose-700">
+                                    <Link href="/terms" className="text-secondary hover:text-secondary/80">
                                         Terms of Service
                                     </Link>{' '}
                                     and{' '}
-                                    <Link href="/privacy" className="text-rose-600 hover:text-rose-700">
+                                    <Link href="/privacy" className="text-secondary hover:text-secondary/80">
                                         Privacy Policy
                                     </Link>
                                 </span>
@@ -278,7 +278,7 @@ export default function RegisterPage() {
                 {/* Sign In Link */}
                 <p className="text-center mt-6 text-slate-600">
                     Already have an account?{' '}
-                    <Link href="/login" className="text-rose-600 hover:text-rose-700 font-medium">
+                    <Link href="/login" className="text-secondary hover:text-secondary/80 font-medium">
                         Sign in
                     </Link>
                 </p>

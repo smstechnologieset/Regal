@@ -26,7 +26,7 @@ function OrderConfirmationContent() {
                 </div>
 
                 {/* Heading */}
-                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
+                <h1 className="text-2xl md:text-3xl font-bold text-primary mb-2">
                     Order Confirmed!
                 </h1>
                 <p className="text-slate-600 mb-6">
@@ -37,7 +37,7 @@ function OrderConfirmationContent() {
                 {/* Order ID */}
                 <div className="bg-slate-50 rounded-xl p-6 mb-8">
                     <p className="text-sm text-slate-500 mb-1">Order Number</p>
-                    <p className="text-xl font-bold text-slate-900 font-mono">{orderId}</p>
+                    <p className="text-xl font-bold text-primary font-mono">{orderId}</p>
                 </div>
 
                 {/* Order Status */}
@@ -70,7 +70,7 @@ function OrderConfirmationContent() {
 
                 {/* What's Next */}
                 <div className="bg-white border border-slate-200 rounded-xl p-6 mb-8 text-left">
-                    <h2 className="font-semibold text-slate-900 mb-4">What&apos;s Next?</h2>
+                    <h2 className="font-semibold text-primary mb-4">What&apos;s Next?</h2>
                     <ul className="space-y-3 text-sm text-slate-600">
                         <li className="flex items-start gap-2">
                             <span className="text-emerald-500 mt-0.5">✓</span>
@@ -93,7 +93,7 @@ function OrderConfirmationContent() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     {conversationId && (
                         <Link href={`/attire/chat/${conversationId}`}>
-                            <Button variant="secondary" className="bg-rose-600 hover:bg-rose-700">
+                            <Button variant="secondary" className="bg-secondary hover:opacity-90">
                                 Chat with Admin
                             </Button>
                         </Link>

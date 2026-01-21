@@ -13,7 +13,7 @@ export default function CatalogClient() {
     const [activeTab, setActiveTab] = useState<Category>('attire');
 
     const tabs = [
-        { id: 'attire', name: 'Attire', icon: ShoppingBag, color: 'text-rose-600', bg: 'bg-rose-50' },
+        { id: 'attire', name: 'Attire', icon: ShoppingBag, color: 'text-secondary', bg: 'bg-rose-50' },
         { id: 'events', name: 'Events', icon: Calendar, color: 'text-amber-600', bg: 'bg-amber-50' },
         { id: 'bridal', name: 'Bridal', icon: Heart, color: 'text-pink-600', bg: 'bg-pink-50' },
         { id: 'catering', name: 'Catering', icon: UtensilsCrossed, color: 'text-emerald-600', bg: 'bg-emerald-50' },
@@ -33,7 +33,7 @@ export default function CatalogClient() {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Catalog Management</h1>
+                    <h1 className="text-2xl font-bold text-primary">Catalog Management</h1>
                     <p className="text-slate-600">Manage products, packages, and services across categories</p>
                 </div>
             </div>
@@ -49,7 +49,7 @@ export default function CatalogClient() {
                             onClick={() => setActiveTab(tab.id as Category)}
                             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${isActive
                                     ? `bg-white ${tab.color} shadow-sm`
-                                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                                    : 'text-slate-600 hover:text-primary hover:bg-white/50'
                                 }`}
                         >
                             <Icon size={18} />

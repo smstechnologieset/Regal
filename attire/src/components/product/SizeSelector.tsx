@@ -27,7 +27,7 @@ export default function SizeSelector({
         <div>
             <div className="flex items-center justify-between mb-3">
                 <label className="text-sm font-medium text-slate-700">Size</label>
-                <button className="text-sm text-slate-500 hover:text-slate-900 underline">
+                <button className="text-sm text-slate-500 hover:text-primary underline">
                     Size Guide
                 </button>
             </div>
@@ -44,8 +44,8 @@ export default function SizeSelector({
                             className={cn(
                                 'min-w-[48px] h-11 px-3 rounded-lg border text-sm font-medium transition-all',
                                 isSelected
-                                    ? 'bg-slate-900 text-white border-slate-900'
-                                    : 'bg-white text-slate-700 border-slate-300 hover:border-slate-900',
+                                    ? 'bg-primary text-white border-primary'
+                                    : 'bg-white text-slate-700 border-slate-300 hover:border-primary',
                                 isOutOfStock && 'opacity-40 cursor-not-allowed line-through'
                             )}
                         >

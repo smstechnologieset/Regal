@@ -29,6 +29,8 @@ export default function BridalAppointmentPage() {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [loadingServices, setLoadingServices] = useState(true);
+    const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+    const [fetchingSlots, setFetchingSlots] = useState(false);
 
     // Fetch services from database
     useEffect(() => {
@@ -39,6 +41,30 @@ export default function BridalAppointmentPage() {
         }
         fetchServices();
     }, []);
+
+    // Fetch booked slots when date changes
+    useEffect(() => {
+        async function fetchBookedSlots() {
+            if (!date) {
+                setBookedSlots([]);
+                return;
+            }
+
+            setFetchingSlots(true);
+            try {
+                const res = await fetch(`/api/bridal/appointments/booked-slots?date=${date}`);
+                const data = await res.json();
+                if (data.bookedSlots) {
+                    setBookedSlots(data.bookedSlots);
+                }
+            } catch (error) {
+                console.error('Error fetching booked slots:', error);
+            } finally {
+                setFetchingSlots(false);
+            }
+        }
+        fetchBookedSlots();
+    }, [date]);
 
     // Mock time slots
     const timeSlots = ['10:00 AM', '11:00 AM', '01:00 PM', '02:00 PM', '04:00 PM'];
@@ -92,9 +118,9 @@ export default function BridalAppointmentPage() {
             <div className="min-h-screen bg-slate-50 flex items-center justify-center py-20 px-4">
                 <div className="bg-white rounded-2xl shadow-xl p-8 max-w-lg w-full text-center">
                     <div className="w-20 h-20 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <CheckCircle size={40} className="text-rose-600" />
+                        <CheckCircle size={40} className="text-secondary" />
                     </div>
-                    <h2 className="text-3xl font-bold text-slate-900 mb-2 font-serif">Appointment Confirmed!</h2>
+                    <h2 className="text-3xl font-bold text-primary mb-2 font-serif">Appointment Confirmed!</h2>
                     <p className="text-slate-600 mb-8">
                         Thank you, {formData.name}. We look forward to seeing you on {new Date(date).toLocaleDateString()} at {time}.
                         A confirmation email has been sent to {formData.email}.
@@ -116,11 +142,11 @@ export default function BridalAppointmentPage() {
         <div className="min-h-screen bg-slate-50 py-12">
             <div className="container mx-auto px-4">
                 <div className="max-w-2xl mx-auto mb-8">
-                    <Link href="/bridal" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-4">
+                    <Link href="/bridal" className="inline-flex items-center gap-2 text-slate-500 hover:text-primary mb-4">
                         <ArrowLeft size={20} />
                         Back to Bridal
                     </Link>
-                    <h1 className="text-3xl md:text-4xl font-bold text-slate-900 font-serif mb-2">Book an Appointment</h1>
+                    <h1 className="text-3xl md:text-4xl font-bold text-primary font-serif mb-2">Book an Appointment</h1>
                     <p className="text-slate-600">Schedule your private consultation with our bridal experts.</p>
                 </div>
 
@@ -164,11 +190,11 @@ export default function BridalAppointmentPage() {
                                                     value={service.id}
                                                     checked={selectedService === service.id}
                                                     onChange={(e) => setSelectedService(e.target.value)}
-                                                    className="mt-1 w-4 h-4 text-rose-600 border-slate-300 focus:ring-rose-500"
+                                                    className="mt-1 w-4 h-4 text-secondary border-slate-300 focus:ring-rose-500"
                                                     required
                                                 />
                                                 <div>
-                                                    <div className="font-medium text-slate-900">{service.title}</div>
+                                                    <div className="font-medium text-primary">{service.title}</div>
                                                     <div className="text-xs text-slate-500">{service.duration} • Starts at ${service.priceStart}</div>
                                                 </div>
                                             </label>
@@ -195,14 +221,19 @@ export default function BridalAppointmentPage() {
                                             <select
                                                 value={time}
                                                 onChange={(e) => setTime(e.target.value)}
-                                                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none appearance-none"
+                                                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 outline-none appearance-none disabled:bg-slate-50 disabled:text-slate-400"
                                                 required
-                                                disabled={!date}
+                                                disabled={!date || fetchingSlots}
                                             >
-                                                <option value="">Select Time</option>
-                                                {timeSlots.map(t => (
-                                                    <option key={t} value={t}>{t}</option>
-                                                ))}
+                                                <option value="">{fetchingSlots ? 'Loading slots...' : 'Select Time'}</option>
+                                                {timeSlots.map(t => {
+                                                    const isBooked = bookedSlots.includes(t);
+                                                    return (
+                                                        <option key={t} value={t} disabled={isBooked}>
+                                                            {t} {isBooked ? '(Already Booked)' : ''}
+                                                        </option>
+                                                    );
+                                                })}
                                             </select>
                                             <Clock size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                                         </div>
@@ -211,7 +242,7 @@ export default function BridalAppointmentPage() {
 
                                 {/* Contact Details */}
                                 <div className="space-y-4">
-                                    <h3 className="text-sm font-medium text-slate-900 pt-4 border-t border-slate-100">Contact Information</h3>
+                                    <h3 className="text-sm font-medium text-primary pt-4 border-t border-slate-100">Contact Information</h3>
                                     <div className="grid sm:grid-cols-2 gap-4">
                                         <Input
                                             label="Full Name"

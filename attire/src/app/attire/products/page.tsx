@@ -154,7 +154,7 @@ function ProductsContent() {
             {/* Page Header */}
             <div className="bg-slate-50 border-b border-slate-200">
                 <div className="container mx-auto px-4 py-8">
-                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+                    <h1 className="text-2xl md:text-3xl font-bold text-primary">
                         {filters.category
                             ? filters.category.charAt(0).toUpperCase() + filters.category.slice(1)
                             : 'All Products'}
@@ -190,7 +190,7 @@ function ProductsContent() {
                                 <SlidersHorizontal size={18} />
                                 Filters
                                 {activeFilterCount > 0 && (
-                                    <span className="ml-1 px-1.5 py-0.5 bg-slate-900 text-white text-xs rounded-full">
+                                    <span className="ml-1 px-1.5 py-0.5 bg-primary text-white text-xs rounded-full">
                                         {activeFilterCount}
                                     </span>
                                 )}
@@ -243,7 +243,7 @@ function ProductsContent() {
                                 {activeFilterCount > 0 && (
                                     <button
                                         onClick={() => setFilters({})}
-                                        className="text-sm text-rose-600 hover:text-rose-700"
+                                        className="text-sm text-secondary hover:text-secondary/80"
                                     >
                                         Clear all
                                     </button>
@@ -316,7 +316,7 @@ function FilterTag({ label, onRemove }: { label: string; onRemove: () => void })
     return (
         <span className="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 text-slate-700 text-sm rounded-full">
             {label}
-            <button onClick={onRemove} className="hover:text-rose-600">
+            <button onClick={onRemove} className="hover:text-secondary">
                 <X size={14} />
             </button>
         </span>
@@ -340,7 +340,7 @@ function EmptyState({
             <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center">
                 <Filter size={24} className="text-slate-400" />
             </div>
-            <h3 className="text-lg font-medium text-slate-900 mb-2">{title}</h3>
+            <h3 className="text-lg font-medium text-primary mb-2">{title}</h3>
             <p className="text-slate-500 mb-6">{description}</p>
             <Button variant="outline" onClick={onClear}>
                 Clear Filters

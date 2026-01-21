@@ -12,7 +12,7 @@ export default function BridalPage() {
             {/* Hero Section */}
             <section className="relative h-[70vh] min-h-[600px] flex items-center justify-center overflow-hidden">
                 <Image
-                    src="https://images.unsplash.com/photo-1595156360341-71fb5e783416?w=1920&h=1080&fit=crop"
+                    src="https://images.unsplash.com/photo-1549488497-94b52bddac5d?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                     alt="Bridal Elegance"
                     fill
                     unoptimized
@@ -57,7 +57,7 @@ export default function BridalPage() {
             <section className="py-20 md:py-28 bg-slate-50">
                 <div className="container mx-auto px-4">
                     <div className="text-center max-w-2xl mx-auto mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 font-serif">
+                        <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4 font-serif">
                             Complete Bridal Services
                         </h2>
                         <p className="text-slate-600">
@@ -68,45 +68,45 @@ export default function BridalPage() {
                     <div className="grid md:grid-cols-3 gap-8">
                         {/* Gowns */}
                         <div className="group bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100">
-                            <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 transition-transform">
+                            <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-secondary mb-6 group-hover:scale-110 transition-transform">
                                 <Heart size={32} />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Designer Gowns</h3>
+                            <h3 className="text-xl font-bold text-primary mb-3">Designer Gowns</h3>
                             <p className="text-slate-600 mb-6">
                                 Explore our curated collection of luxury gowns from top designers.
                                 Available for rent or purchase.
                             </p>
-                            <Link href="/bridal/gallery" className="inline-flex items-center text-rose-600 font-medium hover:gap-2 transition-all">
+                            <Link href="/bridal/gallery" className="inline-flex items-center text-secondary font-medium hover:gap-2 transition-all">
                                 Browse Collection <ArrowRight size={16} className="ml-1" />
                             </Link>
                         </div>
 
                         {/* Beauty */}
                         <div className="group bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100">
-                            <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 transition-transform">
+                            <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-secondary mb-6 group-hover:scale-110 transition-transform">
                                 <Sparkles size={32} />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Hair & Makeup</h3>
+                            <h3 className="text-xl font-bold text-primary mb-3">Hair & Makeup</h3>
                             <p className="text-slate-600 mb-6">
                                 Professional bridal beauty services including trials,
                                 airbrush makeup, and updos.
                             </p>
-                            <Link href="/bridal/appointments?type=beauty" className="inline-flex items-center text-rose-600 font-medium hover:gap-2 transition-all">
+                            <Link href="/bridal/appointments?type=beauty" className="inline-flex items-center text-secondary font-medium hover:gap-2 transition-all">
                                 View Packages <ArrowRight size={16} className="ml-1" />
                             </Link>
                         </div>
 
                         {/* Fittings */}
                         <div className="group bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100">
-                            <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-rose-600 mb-6 group-hover:scale-110 transition-transform">
+                            <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center text-secondary mb-6 group-hover:scale-110 transition-transform">
                                 <Scissors size={32} />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Personal Styling</h3>
+                            <h3 className="text-xl font-bold text-primary mb-3">Personal Styling</h3>
                             <p className="text-slate-600 mb-6">
                                 Private fitting sessions with our expert stylists to ensure
                                 the perfect fit and look.
                             </p>
-                            <Link href="/bridal/appointments" className="inline-flex items-center text-rose-600 font-medium hover:gap-2 transition-all">
+                            <Link href="/bridal/appointments" className="inline-flex items-center text-secondary font-medium hover:gap-2 transition-all">
                                 Book Consultation <ArrowRight size={16} className="ml-1" />
                             </Link>
                         </div>
@@ -120,7 +120,7 @@ export default function BridalPage() {
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl">
                             <Image
-                                src="https://images.unsplash.com/photo-1596483550605-d972f113840e?w=800&h=1000&fit=crop"
+                                src="https://images.unsplash.com/photo-1584126467121-0db1e6bb47a7?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                 alt="Bridal Fitting"
                                 fill
                                 unoptimized
@@ -131,7 +131,7 @@ export default function BridalPage() {
                             <div className="inline-flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-700 rounded-full text-sm font-medium">
                                 <Calendar size={16} /> Now Accepting 2026 Bookings
                             </div>
-                            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 font-serif leading-tight">
+                            <h2 className="text-3xl md:text-5xl font-bold text-primary font-serif leading-tight">
                                 Private Showroom <br />Experience
                             </h2>
                             <p className="text-lg text-slate-600 leading-relaxed">

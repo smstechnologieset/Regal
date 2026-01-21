@@ -82,6 +82,21 @@ export async function bookBridalAppointment(bookingData: {
 }): Promise<{ orderId: string; conversationId: string; success: boolean }> {
     const supabase = getSupabaseClient();
 
+    // Check for double booking using the API (which uses admin privileges)
+    try {
+        const checkRes = await fetch(`${window.location.origin}/api/bridal/appointments/booked-slots?date=${bookingData.appointmentDate}`);
+        const { bookedSlots } = await checkRes.json();
+
+        if (bookedSlots && bookedSlots.includes(bookingData.appointmentTime)) {
+            console.warn('Double booking attempted for:', bookingData.appointmentDate, bookingData.appointmentTime);
+            return { orderId: '', conversationId: '', success: false };
+        }
+    } catch (apiError) {
+        console.error('Error checking availability via API:', apiError);
+        // Continue if API fails? Or block? Let's block for safety.
+        return { orderId: '', conversationId: '', success: false };
+    }
+
     // Create the order entry
     const { data: order, error: orderError } = await supabase
         .from('orders')

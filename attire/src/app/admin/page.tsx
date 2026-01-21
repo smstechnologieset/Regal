@@ -121,7 +121,7 @@ export default function AdminDashboard() {
     ];
 
     const serviceCards = [
-        { name: 'Attire', count: stats.ordersByService.attire, icon: ShoppingBag, color: 'text-rose-600 bg-rose-50' },
+        { name: 'Attire', count: stats.ordersByService.attire, icon: ShoppingBag, color: 'text-secondary bg-rose-50' },
         { name: 'Events', count: stats.ordersByService.events, icon: Calendar, color: 'text-blue-600 bg-blue-50' },
         { name: 'Bridal', count: stats.ordersByService.bridal, icon: Heart, color: 'text-pink-600 bg-pink-50' },
         { name: 'Catering', count: stats.ordersByService.catering, icon: UtensilsCrossed, color: 'text-amber-600 bg-amber-50' },
@@ -131,7 +131,7 @@ export default function AdminDashboard() {
         <div className="space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
+                <h1 className="text-3xl font-bold text-primary">Dashboard</h1>
                 <p className="text-slate-600">Welcome back! Here&apos;s what&apos;s happening.</p>
             </div>
 
@@ -149,7 +149,7 @@ export default function AdminDashboard() {
                                 </span>
                             )}
                         </div>
-                        <p className="text-2xl font-bold text-slate-900">{loading ? '...' : stat.value}</p>
+                        <p className="text-2xl font-bold text-primary">{loading ? '...' : stat.value}</p>
                         <p className="text-sm text-slate-500">{stat.label}</p>
                     </div>
                 ))}
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
 
             {/* Orders by Service */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h2 className="text-lg font-semibold text-slate-900 mb-6">Orders by Service</h2>
+                <h2 className="text-lg font-semibold text-primary mb-6">Orders by Service</h2>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {serviceCards.map((service) => (
                         <Link
@@ -169,7 +169,7 @@ export default function AdminDashboard() {
                                 <service.icon size={24} />
                             </div>
                             <div>
-                                <p className="text-2xl font-bold text-slate-900">{loading ? '...' : service.count}</p>
+                                <p className="text-2xl font-bold text-primary">{loading ? '...' : service.count}</p>
                                 <p className="text-sm text-slate-500">{service.name}</p>
                             </div>
                         </Link>
@@ -181,8 +181,8 @@ export default function AdminDashboard() {
                 {/* Recent Orders */}
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                        <h2 className="text-lg font-semibold text-slate-900">Recent Orders</h2>
-                        <Link href="/admin/orders" className="text-sm text-rose-600 hover:text-rose-700 flex items-center gap-1">
+                        <h2 className="text-lg font-semibold text-primary">Recent Orders</h2>
+                        <Link href="/admin/orders" className="text-sm text-secondary hover:text-secondary/80 flex items-center gap-1">
                             View All <ArrowUpRight size={14} />
                         </Link>
                     </div>
@@ -203,7 +203,7 @@ export default function AdminDashboard() {
                                             <Package size={18} className="text-slate-600" />
                                         </div>
                                         <div>
-                                            <p className="font-medium text-slate-900 text-sm">
+                                            <p className="font-medium text-primary text-sm">
                                                 #{order.id.slice(0, 8)}
                                             </p>
                                             <p className="text-xs text-slate-500">
@@ -212,7 +212,7 @@ export default function AdminDashboard() {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-medium text-slate-900 text-sm">${order.total}</p>
+                                        <p className="font-medium text-primary text-sm">${order.total}</p>
                                         <p className="text-xs text-slate-500 capitalize">{order.status}</p>
                                     </div>
                                 </Link>
@@ -225,18 +225,18 @@ export default function AdminDashboard() {
 
                 {/* Quick Actions */}
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                    <h2 className="text-lg font-semibold text-slate-900 mb-6">Quick Actions</h2>
+                    <h2 className="text-lg font-semibold text-primary mb-6">Quick Actions</h2>
                     <div className="space-y-3">
                         <Link
                             href="/admin/messages"
                             className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-rose-200 hover:bg-rose-50 transition-all"
                         >
                             <div className="flex items-center gap-3">
-                                <MessageSquare className="text-rose-600" size={20} />
-                                <span className="font-medium text-slate-900">View Messages</span>
+                                <MessageSquare className="text-secondary" size={20} />
+                                <span className="font-medium text-primary">View Messages</span>
                             </div>
                             {stats.unreadMessages > 0 && (
-                                <span className="bg-rose-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                                <span className="bg-secondary text-white text-xs font-bold px-2 py-1 rounded-full">
                                     {stats.unreadMessages}
                                 </span>
                             )}
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
                         >
                             <div className="flex items-center gap-3">
                                 <Clock className="text-amber-600" size={20} />
-                                <span className="font-medium text-slate-900">Pending Orders</span>
+                                <span className="font-medium text-primary">Pending Orders</span>
                             </div>
                         </Link>
                         <Link
@@ -256,7 +256,7 @@ export default function AdminDashboard() {
                         >
                             <div className="flex items-center gap-3">
                                 <Users className="text-purple-600" size={20} />
-                                <span className="font-medium text-slate-900">Manage Users</span>
+                                <span className="font-medium text-primary">Manage Users</span>
                             </div>
                         </Link>
                     </div>

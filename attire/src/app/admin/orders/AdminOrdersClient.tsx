@@ -89,7 +89,7 @@ export default function AdminOrdersClient() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-slate-900">Orders</h1>
+                <h1 className="text-2xl font-bold text-primary">Orders</h1>
                 <p className="text-slate-600">Manage all customer orders</p>
             </div>
 
@@ -157,7 +157,7 @@ export default function AdminOrdersClient() {
                                 {filteredOrders.map((order) => (
                                     <tr key={order.id} className="hover:bg-slate-50">
                                         <td className="px-6 py-4">
-                                            <p className="font-medium text-slate-900">#{order.id.slice(0, 8)}</p>
+                                            <p className="font-medium text-primary">#{order.id.slice(0, 8)}</p>
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
                                             {order.profiles?.full_name || 'Unknown'}
@@ -173,7 +173,7 @@ export default function AdminOrdersClient() {
                                                 {order.status.replace('_', ' ')}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 font-medium text-slate-900">
+                                        <td className="px-6 py-4 font-medium text-primary">
                                             ${order.total.toFixed(2)}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600">
@@ -182,7 +182,7 @@ export default function AdminOrdersClient() {
                                         <td className="px-6 py-4 text-right">
                                             <Link
                                                 href={`/admin/orders/${order.id}`}
-                                                className="text-rose-600 hover:text-rose-700"
+                                                className="text-secondary hover:text-secondary/80"
                                             >
                                                 <ChevronRight size={20} />
                                             </Link>

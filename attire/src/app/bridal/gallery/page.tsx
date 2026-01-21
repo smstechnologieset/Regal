@@ -36,13 +36,13 @@ export default function BridalGalleryPage() {
         <div className="min-h-screen bg-slate-50 py-12">
             <div className="container mx-auto px-4">
                 <div className="mb-8">
-                    <Link href="/bridal" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-4">
+                    <Link href="/bridal" className="inline-flex items-center gap-2 text-slate-500 hover:text-primary mb-4">
                         <ArrowLeft size={20} />
                         Back to Bridal
                     </Link>
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                         <div>
-                            <h1 className="text-3xl md:text-5xl font-bold text-slate-900 font-serif">Bridal Collection</h1>
+                            <h1 className="text-3xl md:text-5xl font-bold text-primary font-serif">Bridal Collection</h1>
                             <p className="text-slate-600 mt-2">Exquisite gowns for your perfect moment.</p>
                         </div>
                     </div>
@@ -55,7 +55,7 @@ export default function BridalGalleryPage() {
                             key={s}
                             onClick={() => setFilter(s)}
                             className={`px-4 py-2 rounded-full text-sm font-medium transition-all capitalize ${filter === s
-                                ? 'bg-slate-900 text-white'
+                                ? 'bg-primary text-white'
                                 : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
                                 }`}
                         >
@@ -67,7 +67,7 @@ export default function BridalGalleryPage() {
                 {/* Grid */}
                 {loading ? (
                     <div className="flex justify-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900"></div>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                     </div>
                 ) : (
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -89,7 +89,7 @@ export default function BridalGalleryPage() {
                                     <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                                         <div className="flex gap-2">
                                             <Link href={`/bridal/appointments?package=${gown.id}`} className="flex-1">
-                                                <Button size="sm" className="w-full bg-white text-slate-900 hover:bg-slate-100">
+                                                <Button size="sm" className="w-full bg-white text-primary hover:bg-slate-100">
                                                     Book Fitting
                                                 </Button>
                                             </Link>
@@ -102,11 +102,11 @@ export default function BridalGalleryPage() {
                                 <div className="p-5">
                                     <div className="flex justify-between items-start mb-2">
                                         <div>
-                                            <h3 className="font-bold text-lg text-slate-900 font-serif">{gown.name}</h3>
+                                            <h3 className="font-bold text-lg text-primary font-serif">{gown.name}</h3>
                                             <p className="text-sm text-slate-500">{gown.designer}</p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-sm font-medium text-slate-900">Rent: {formatPrice(gown.priceRent)}</p>
+                                            <p className="text-sm font-medium text-primary">Rent: {formatPrice(gown.priceRent)}</p>
                                             <p className="text-xs text-slate-500">Buy: {formatPrice(gown.priceBuy)}</p>
                                         </div>
                                     </div>

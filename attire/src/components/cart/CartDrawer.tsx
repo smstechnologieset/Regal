@@ -63,7 +63,7 @@ export default function CartDrawer() {
                         <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-4">
                             <ShoppingBag size={32} className="text-slate-400" />
                         </div>
-                        <h3 className="text-lg font-medium text-slate-900 mb-2">
+                        <h3 className="text-lg font-medium text-primary mb-2">
                             Your cart is empty
                         </h3>
                         <p className="text-slate-500 mb-6">
@@ -100,14 +100,14 @@ export default function CartDrawer() {
                                         <Link
                                             href={`/products/${item.product.id}`}
                                             onClick={closeCart}
-                                            className="font-medium text-slate-900 hover:text-rose-600 line-clamp-2 transition-colors"
+                                            className="font-medium text-primary hover:text-secondary line-clamp-2 transition-colors"
                                         >
                                             {item.product.name}
                                         </Link>
                                         <p className="text-sm text-slate-500 mt-1">
                                             {item.selectedSize} / {item.selectedColor.name}
                                         </p>
-                                        <p className="font-semibold text-slate-900 mt-1">
+                                        <p className="font-semibold text-primary mt-1">
                                             {formatPrice(item.product.price)}
                                         </p>
 
@@ -152,7 +152,7 @@ export default function CartDrawer() {
                                                         item.selectedColor.name
                                                     )
                                                 }
-                                                className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"
+                                                className="p-1.5 text-slate-400 hover:text-secondary transition-colors"
                                             >
                                                 <Trash2 size={16} />
                                             </button>
@@ -166,7 +166,7 @@ export default function CartDrawer() {
                         <div className="p-4 border-t border-slate-200 space-y-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-slate-600">Subtotal</span>
-                                <span className="font-semibold text-slate-900">
+                                <span className="font-semibold text-primary">
                                     {formatPrice(total)}
                                 </span>
                             </div>

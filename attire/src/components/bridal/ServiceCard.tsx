@@ -27,17 +27,17 @@ export default function ServiceCard({ title, description, image, link, priceStar
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <div className="p-6 flex flex-col flex-1">
-                <h3 className="text-xl font-bold text-slate-900 mb-2 font-serif">{title}</h3>
+                <h3 className="text-xl font-bold text-primary mb-2 font-serif">{title}</h3>
                 <p className="text-slate-600 mb-4 flex-1 text-sm leading-relaxed">
                     {description}
                 </p>
                 {priceStart !== undefined && (
-                    <p className="text-sm font-medium text-slate-900 mb-4">
+                    <p className="text-sm font-medium text-primary mb-4">
                         Starts at ${priceStart}
                     </p>
                 )}
                 <Link href={link}>
-                    <Button variant="outline" className="w-full group-hover:bg-rose-50 group-hover:text-rose-700 group-hover:border-rose-200">
+                    <Button variant="outline" className="w-full group-hover:bg-rose-50 group-hover:text-secondary/80 group-hover:border-rose-200">
                         Learn More
                     </Button>
                 </Link>

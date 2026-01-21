@@ -82,7 +82,7 @@ export default function MessagesPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Messages</h1>
+                    <h1 className="text-2xl font-bold text-primary">Messages</h1>
                     <p className="text-slate-600">Chat with our support team</p>
                 </div>
                 <Button onClick={startNewConversation}>
@@ -111,11 +111,11 @@ export default function MessagesPage() {
                                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${conv.status === 'open' ? 'bg-rose-100' : 'bg-slate-100'
                                             }`}>
                                             <MessageSquare size={20} className={
-                                                conv.status === 'open' ? 'text-rose-600' : 'text-slate-400'
+                                                conv.status === 'open' ? 'text-secondary' : 'text-slate-400'
                                             } />
                                         </div>
                                         <div>
-                                            <p className="font-medium text-slate-900">
+                                            <p className="font-medium text-primary">
                                                 {conv.subject || 'Support Request'}
                                             </p>
                                             <p className="text-sm text-slate-500">
@@ -139,7 +139,7 @@ export default function MessagesPage() {
                 ) : (
                     <div className="p-12 text-center">
                         <MessageSquare size={48} className="mx-auto text-slate-300 mb-4" />
-                        <h3 className="text-lg font-medium text-slate-900 mb-2">No messages yet</h3>
+                        <h3 className="text-lg font-medium text-primary mb-2">No messages yet</h3>
                         <p className="text-slate-500 mb-6">
                             Start a conversation with our support team!
                         </p>

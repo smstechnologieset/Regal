@@ -49,7 +49,7 @@ export default function CateringPage() {
                             <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mx-auto mb-6">
                                 <ChefHat size={32} />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Master Chefs</h3>
+                            <h3 className="text-xl font-bold text-primary mb-3">Master Chefs</h3>
                             <p className="text-slate-600">
                                 Our culinary team brings decades of experience from top restaurants around the world.
                             </p>
@@ -58,7 +58,7 @@ export default function CateringPage() {
                             <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mx-auto mb-6">
                                 <Utensils size={32} />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Full Service</h3>
+                            <h3 className="text-xl font-bold text-primary mb-3">Full Service</h3>
                             <p className="text-slate-600">
                                 From table settings to service staff, we handle every detail of your dining experience.
                             </p>
@@ -67,7 +67,7 @@ export default function CateringPage() {
                             <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mx-auto mb-6">
                                 <Coffee size={32} />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Custom Menus</h3>
+                            <h3 className="text-xl font-bold text-primary mb-3">Custom Menus</h3>
                             <p className="text-slate-600">
                                 We tailor every menu to your specific tastes, dietary requirements, and event theme.
                             </p>
@@ -79,7 +79,7 @@ export default function CateringPage() {
             {/* CTA Section */}
             <section className="py-20 bg-white">
                 <div className="container mx-auto px-4">
-                    <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-12 bg-slate-900 rounded-2xl overflow-hidden shadow-2xl">
+                    <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-12 bg-primary rounded-2xl overflow-hidden shadow-2xl">
                         <div className="relative w-full md:w-1/2 aspect-video md:aspect-auto md:self-stretch min-h-[300px]">
                             <Image
                                 src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&fit=crop"

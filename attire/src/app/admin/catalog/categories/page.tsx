@@ -207,7 +207,7 @@ export default function CategoriesPage() {
         <div className="p-6 max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Category Management</h1>
+                    <h1 className="text-2xl font-bold text-primary">Category Management</h1>
                     <p className="text-slate-500">Manage attire categories and their nested subcategories</p>
                 </div>
                 <Button onClick={() => handleOpenCatModal()} className="flex items-center gap-2">
@@ -260,7 +260,7 @@ export default function CategoriesPage() {
                                         )}
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-slate-900">{cat.name}</h3>
+                                        <h3 className="font-semibold text-primary">{cat.name}</h3>
                                         <p className="text-xs text-slate-500 font-mono">{cat.slug}</p>
                                     </div>
                                     <div className="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-bold text-slate-500 uppercase">
@@ -285,7 +285,7 @@ export default function CategoriesPage() {
                                     </button>
                                     <button 
                                         onClick={() => handleDeleteCat(cat.id)}
-                                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                        className="p-2 text-slate-400 hover:text-secondary hover:bg-rose-50 rounded-lg transition-colors"
                                     >
                                         <Trash2 size={18} />
                                     </button>
@@ -312,7 +312,7 @@ export default function CategoriesPage() {
                                                         </button>
                                                         <button 
                                                             onClick={() => handleDeleteSub(cat, sub.id)}
-                                                            className="p-1.5 text-slate-400 hover:text-rose-600 rounded"
+                                                            className="p-1.5 text-slate-400 hover:text-secondary rounded"
                                                         >
                                                             <Trash2 size={14} />
                                                         </button>
@@ -334,10 +334,10 @@ export default function CategoriesPage() {
 
             {/* Category Modal */}
             {isCatModalOpen && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-primary/50 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-slate-900">
+                            <h2 className="text-xl font-bold text-primary">
                                 {editingCategory ? 'Edit Category' : 'Create Category'}
                             </h2>
                             <button onClick={() => setIsCatModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100">
@@ -388,11 +388,11 @@ export default function CategoriesPage() {
 
             {/* Subcategory Modal */}
             {isSubModalOpen && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-primary/50 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                             <div>
-                                <h2 className="text-xl font-bold text-slate-900">
+                                <h2 className="text-xl font-bold text-primary">
                                     {editingSubcategory ? 'Edit Subcategory' : 'Add Subcategory'}
                                 </h2>
                                 <p className="text-xs text-slate-500 mt-1">To: <span className="font-semibold">{parentCategory?.name}</span></p>

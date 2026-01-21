@@ -75,7 +75,7 @@ export default function AdminMessagesClient() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-2xl font-bold text-slate-900">Messages</h1>
+                <h1 className="text-2xl font-bold text-primary">Messages</h1>
                 <p className="text-slate-600">Manage customer conversations</p>
             </div>
 
@@ -123,11 +123,11 @@ export default function AdminMessagesClient() {
                                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${conv.status === 'open' ? 'bg-rose-100' : 'bg-slate-100'
                                         }`}>
                                         <MessageSquare size={20} className={
-                                            conv.status === 'open' ? 'text-rose-600' : 'text-slate-400'
+                                            conv.status === 'open' ? 'text-secondary' : 'text-slate-400'
                                         } />
                                     </div>
                                     <div>
-                                        <p className="font-medium text-slate-900">
+                                        <p className="font-medium text-primary">
                                             {conv.subject || 'Support Request'}
                                         </p>
                                         <div className="flex items-center gap-2 text-sm text-slate-500">

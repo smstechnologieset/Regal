@@ -48,13 +48,13 @@ export default function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className="bg-slate-900 text-white">
+        <footer className="bg-primary text-white">
             {/* Newsletter section */}
-            <div className="border-b border-slate-800">
+            <div className="border-b border-white/10">
                 <div className="container mx-auto px-4 py-12">
                     <div className="max-w-2xl mx-auto text-center">
                         <h3 className="text-2xl font-bold mb-2">Stay Connected with Regal</h3>
-                        <p className="text-slate-400 mb-6">
+                        <p className="text-white/60 mb-6">
                             Subscribe to get updates on all our services, special offers, and exclusive deals.
                         </p>
                         <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
@@ -63,13 +63,13 @@ export default function Footer() {
                                     type="email"
                                     placeholder="Enter your email"
                                     suppressHydrationWarning
-                                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:border-rose-500 transition-colors"
+                                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-secondary transition-colors"
                                 />
-                                <Mail size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                                <Mail size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40" />
                             </div>
                             <button
                                 type="submit"
-                                className="px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-lg transition-colors"
+                                className="px-6 py-3 bg-secondary hover:opacity-90 text-white font-medium rounded-lg transition-colors"
                             >
                                 Subscribe
                             </button>
@@ -82,9 +82,9 @@ export default function Footer() {
             <div className="container mx-auto px-4 py-12">
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
                     {/* Brand section */}
-                    <div className="col-span-2 md:col-span-1 mb-6 lg:mb-0">
+                    <div className="col-span-2 md-col-span-1 mb-6 lg:mb-0">
                         <Link href="/" className="inline-block mb-4">
-                            <span className="text-2xl font-bold bg-gradient-to-r from-rose-400 to-purple-400 bg-clip-text text-transparent">
+                            <span className="text-2xl font-bold text-secondary">
                                 REGAL
                             </span>
                         </Link>

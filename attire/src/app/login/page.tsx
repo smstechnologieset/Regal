@@ -109,7 +109,7 @@ function LoginContent() {
                             REGAL
                         </span>
                     </Link>
-                    <h1 className="text-2xl font-bold text-slate-900 mb-2">Welcome Back</h1>
+                    <h1 className="text-2xl font-bold text-primary mb-2">Welcome Back</h1>
                     <p className="text-slate-600">Sign in to your account to continue</p>
                 </div>
 
@@ -167,13 +167,13 @@ function LoginContent() {
                                     name="rememberMe"
                                     checked={formData.rememberMe}
                                     onChange={handleChange}
-                                    className="w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-slate-900"
+                                    className="w-4 h-4 text-primary border-slate-300 rounded focus:ring-slate-900"
                                 />
                                 <span className="text-sm text-slate-600">Remember me</span>
                             </label>
                             <Link
                                 href="/forgot-password"
-                                className="text-sm text-rose-600 hover:text-rose-700"
+                                className="text-sm text-secondary hover:text-secondary/80"
                             >
                                 Forgot password?
                             </Link>
@@ -241,7 +241,7 @@ function LoginContent() {
                 {/* Sign Up Link */}
                 <p className="text-center mt-6 text-slate-600">
                     Don&apos;t have an account?{' '}
-                    <Link href="/register" className="text-rose-600 hover:text-rose-700 font-medium">
+                    <Link href="/register" className="text-secondary hover:text-secondary/80 font-medium">
                         Sign up
                     </Link>
                 </p>

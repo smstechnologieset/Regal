@@ -83,7 +83,7 @@ export default function AdminUsersPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Users</h1>
+                    <h1 className="text-2xl font-bold text-primary">Users</h1>
                     <p className="text-slate-600">Manage user accounts and permissions</p>
                 </div>
             </div>
@@ -141,7 +141,7 @@ export default function AdminUsersPage() {
                                                     {user.full_name?.charAt(0) || 'U'}
                                                 </div>
                                                 <div>
-                                                    <p className="font-medium text-slate-900">{user.full_name || 'Unknown'}</p>
+                                                    <p className="font-medium text-primary">{user.full_name || 'Unknown'}</p>
                                                     <p className="text-sm text-slate-500">{user.id.slice(0, 8)}...</p>
                                                 </div>
                                             </div>

@@ -50,7 +50,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                         className={cn(
                             'flex-shrink-0 w-16 h-20 lg:w-20 lg:h-24 rounded-lg overflow-hidden border-2 transition-all',
                             selectedIndex === index
-                                ? 'border-slate-900'
+                                ? 'border-primary'
                                 : 'border-transparent hover:border-slate-300'
                         )}
                     >
