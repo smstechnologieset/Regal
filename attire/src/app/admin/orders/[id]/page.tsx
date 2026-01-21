@@ -172,13 +172,19 @@ export default function AdminOrderDetailPage() {
             }
 
             // 2. If no conversation exists, create a new one
+            const items = Array.isArray(order.details) ? order.details : [];
+            const firstItemName = items[0]?.productName || items[0]?.product?.name || items[0]?.name || 'Attire Order';
+            const displaySubject = items.length > 1
+                ? `${firstItemName} +${items.length - 1} more`
+                : firstItemName;
+
             const { data: newConv, error: createError } = await supabase
                 .from('conversations')
                 .insert({
                     user_id: order.user_id,
                     order_id: orderId,
                     service_type: order.service_type,
-                    subject: `Order #${orderId.slice(0, 8)}`,
+                    subject: displaySubject,
                     status: 'open'
                 })
                 .select()

@@ -354,6 +354,12 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
     }
 
     // 3. Create an associated conversation
+    const items = orderData.items as any[];
+    const firstItemName = items[0]?.productName || items[0]?.product?.name || items[0]?.name || 'Attire Order';
+    const displaySubject = items.length > 1
+        ? `${firstItemName} +${items.length - 1} more`
+        : firstItemName;
+
     try {
         const { data: conversation, error: convError } = await supabase
             .from('conversations')
@@ -361,7 +367,7 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
                 user_id: orderData.userId,
                 order_id: order.id,
                 service_type: 'attire',
-                subject: `Order #${order.id.slice(0, 8)}`,
+                subject: displaySubject,
                 status: 'open',
             })
             .select()
@@ -389,6 +395,8 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
         return { orderId: order.id, conversationId: conversation.id, success: true };
     } catch (err) {
         console.error('Unexpected error in order flow:', err);
+        // If conversation or message creation fails, we still consider the order placed successfully
+        // but return without conversation ID.
         return { orderId: order.id, conversationId: '', success: true };
     }
 }
