@@ -9,6 +9,9 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+// import { Link } from 'lucide-react';
+import Link from "next/link";
+
 
 interface SizeSelectorProps {
     sizes: string[];
@@ -27,9 +30,13 @@ export default function SizeSelector({
         <div>
             <div className="flex items-center justify-between mb-3">
                 <label className="text-sm font-medium text-slate-700">Size</label>
-                <button className="text-sm text-slate-500 hover:text-primary underline">
+
+                <Link href="/size-guide" className="text-sm text-slate-500 hover:text-primary underline" > Size Guide </Link>
+                {/* <button className="text-sm text-slate-500 hover:text-primary underline">
                     Size Guide
-                </button>
+
+                </button> */}
+
             </div>
             <div className="flex flex-wrap gap-2">
                 {sizes.map((size) => {
