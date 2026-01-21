@@ -86,7 +86,7 @@ export default function RegalLandingPage() {
     return (
         <div className="min-h-screen">
             {/* Hero Section */}
-            <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-primary text-white">
+            <section className="relative min-h-screen flex items-center overflow-hidden bg-primary text-white">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-10">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />

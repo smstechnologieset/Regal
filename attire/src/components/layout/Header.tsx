@@ -24,12 +24,11 @@ import {
     UtensilsCrossed,
     LogOut
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useCart } from '@/context/CartContext';
 import { useApp } from '@/context/AppContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
-import { getCategories } from '@/lib/api';
-import { Category } from '@/types';
 
 // Services for main navigation
 const services = [
@@ -50,19 +49,18 @@ export default function Header() {
     const [localSearch, setLocalSearch] = useState(searchQuery);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [isServicesOpen, setIsServicesOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Categories are now managed globally in AppContext
-
     const { itemCount: wishlistCount } = useWishlist();
-
     const cartCount = getCartItemCount();
 
     // Check if we're in the Attire section
     const isAttireSection = pathname.startsWith('/attire');
     const isMainPage = pathname === '/';
     const isAdminPage = pathname.startsWith('/admin');
+
     // Handle search submission
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -77,6 +75,17 @@ export default function Header() {
             searchInputRef.current.focus();
         }
     }, [isSearchOpen]);
+
+    // Handle scroll for transparent header
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const isTransparent = isMainPage && !scrolled;
 
     // Handle dropdown hover
     const handleMouseEnter = (categoryId: string) => {
@@ -94,17 +103,21 @@ export default function Header() {
 
     const handleSignOut = async () => {
         await signOut();
-        // Use window.location.href for a full refresh to ensure all cookies and state are cleared
         window.location.href = '/';
         closeMobileMenu();
     };
 
-    // Don't show the main header on admin pages - move after all hooks to comply with React rules
     if (isAdminPage) return null;
 
     return (
         <>
-            <header className="sticky top-0 z-50 bg-white border-b border-slate-200">
+            <header className={cn(
+                "z-50 transition-all duration-300 w-full",
+                isMainPage ? "fixed top-0 left-0" : "sticky top-0",
+                isTransparent
+                    ? "bg-transparent border-transparent pt-2"
+                    : "bg-white/50 backdrop-blur-md border-b border-slate-200 shadow-sm"
+            )}>
                 {/* Top promotional banner - only show in Attire section */}
                 {isAttireSection && (
                     <div className="bg-primary text-white text-center py-2 text-sm border-b border-white/10">
@@ -120,7 +133,10 @@ export default function Header() {
                         {/* Mobile menu button */}
                         <button
                             onClick={toggleMobileMenu}
-                            className="lg:hidden p-2 -ml-2 text-slate-700 hover:text-primary transition-colors"
+                            className={cn(
+                                "lg:hidden p-2 -ml-2 transition-colors",
+                                isTransparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-primary"
+                            )}
                             aria-label="Toggle menu"
                         >
                             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -128,13 +144,17 @@ export default function Header() {
 
                         {/* Logo */}
                         <Link href="/" className="flex items-center" onClick={closeMobileMenu}>
-                            <span className="text-2xl lg:text-3xl font-bold tracking-tight">
-                                <span className="text-secondary">
-                                    REGAL
-                                </span>
+                            <span className={cn(
+                                "text-2xl lg:text-3xl font-bold tracking-tight transition-colors",
+                                isTransparent ? "text-white" : "text-secondary"
+                            )}>
+                                REGAL
                             </span>
                             {isAttireSection && (
-                                <span className="hidden sm:inline text-slate-400 text-lg ml-2 font-light">| Attire</span>
+                                <span className={cn(
+                                    "hidden sm:inline text-lg ml-2 font-light transition-colors",
+                                    isTransparent ? "text-white/60" : "text-slate-400"
+                                )}>| Attire</span>
                             )}
                         </Link>
 
@@ -152,7 +172,10 @@ export default function Header() {
                                         >
                                             <Link
                                                 href={`/attire/products?category=${category.slug}`}
-                                                className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-slate-700 hover:text-primary transition-colors"
+                                                className={cn(
+                                                    "flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors",
+                                                    isTransparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-primary"
+                                                )}
                                             >
                                                 {category.name}
                                                 {category.subcategories && (
@@ -182,7 +205,10 @@ export default function Header() {
                                     ))}
                                     <Link
                                         href="/attire/products?sale=true"
-                                        className="px-4 py-2 text-sm font-medium text-secondary hover:text-secondary/80 transition-colors"
+                                        className={cn(
+                                            "px-4 py-2 text-sm font-medium transition-colors",
+                                            isTransparent ? "text-white hover:text-white/80" : "text-secondary hover:text-secondary/80"
+                                        )}
                                     >
                                         Sale
                                     </Link>
@@ -196,7 +222,10 @@ export default function Header() {
                                         onMouseLeave={() => setIsServicesOpen(false)}
                                     >
                                         <button
-                                            className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-slate-700 hover:text-primary transition-colors"
+                                            className={cn(
+                                                "flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors",
+                                                isTransparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-primary"
+                                            )}
                                         >
                                             Services
                                             <ChevronDown size={14} className={`transition-transform ${isServicesOpen ? 'rotate-180' : ''}`} />
@@ -227,13 +256,19 @@ export default function Header() {
                                     </div>
                                     <Link
                                         href="/about"
-                                        className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-primary transition-colors"
+                                        className={cn(
+                                            "px-4 py-2 text-sm font-medium transition-colors",
+                                            isTransparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-primary"
+                                        )}
                                     >
                                         About Us
                                     </Link>
                                     <Link
                                         href="/contact"
-                                        className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-primary transition-colors"
+                                        className={cn(
+                                            "px-4 py-2 text-sm font-medium transition-colors",
+                                            isTransparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-primary"
+                                        )}
                                     >
                                         Contact Us
                                     </Link>
@@ -253,16 +288,22 @@ export default function Header() {
                                                 placeholder="Search products..."
                                                 value={localSearch}
                                                 onChange={(e) => setLocalSearch(e.target.value)}
-                                                className="w-64 lg:w-80 pl-10 pr-4 py-2 text-sm bg-slate-100 border border-transparent rounded-full focus:bg-white focus:border-slate-300 focus:outline-none transition-all"
+                                                className={cn(
+                                                    "w-64 lg:w-80 pl-10 pr-4 py-2 text-sm border border-transparent rounded-full focus:bg-white focus:border-slate-300 focus:outline-none transition-all",
+                                                    isTransparent ? "bg-white/10 text-white placeholder:text-white/60" : "bg-slate-100 text-slate-900"
+                                                )}
                                             />
-                                            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                            <Search size={18} className={cn("absolute left-3 top-1/2 -translate-y-1/2 transition-colors", isTransparent ? "text-white/60" : "text-slate-400")} />
                                         </form>
                                     </div>
 
                                     {/* Search (Mobile) */}
                                     <button
                                         onClick={() => setIsSearchOpen(true)}
-                                        className="md:hidden p-2 text-slate-700 hover:text-primary transition-colors"
+                                        className={cn(
+                                            "md:hidden p-2 transition-colors",
+                                            isTransparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-primary"
+                                        )}
                                         aria-label="Search"
                                     >
                                         <Search size={22} />
@@ -271,7 +312,10 @@ export default function Header() {
                                     {/* Wishlist */}
                                     <Link
                                         href="/attire/wishlist"
-                                        className="relative p-2 text-slate-700 hover:text-primary transition-colors"
+                                        className={cn(
+                                            "relative p-2 transition-colors",
+                                            isTransparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-primary"
+                                        )}
                                         aria-label="Wishlist"
                                     >
                                         <Heart size={22} />
@@ -289,7 +333,10 @@ export default function Header() {
                                 <div className="flex items-center gap-1">
                                     <Link
                                         href="/account"
-                                        className="p-2 text-slate-700 hover:text-primary transition-colors flex items-center gap-1"
+                                        className={cn(
+                                            "p-2 transition-colors flex items-center gap-1",
+                                            isTransparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-primary"
+                                        )}
                                         aria-label="Account"
                                     >
                                         <User size={22} />
@@ -297,7 +344,10 @@ export default function Header() {
                                     </Link>
                                     <button
                                         onClick={handleSignOut}
-                                        className="p-2 text-slate-500 hover:text-red-600 transition-colors"
+                                        className={cn(
+                                            "p-2 transition-colors",
+                                            isTransparent ? "text-white/70 hover:text-white" : "text-slate-500 hover:text-red-600"
+                                        )}
                                         title="Sign Out"
                                     >
                                         <LogOut size={20} />
@@ -306,7 +356,10 @@ export default function Header() {
                             ) : (
                                 <Link
                                     href="/login"
-                                    className="p-2 text-slate-700 hover:text-primary transition-colors"
+                                    className={cn(
+                                        "p-2 transition-colors",
+                                        isTransparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-primary"
+                                    )}
                                     aria-label="Account"
                                 >
                                     <User size={22} />
@@ -317,7 +370,10 @@ export default function Header() {
                             {isAttireSection && (
                                 <button
                                     onClick={toggleCart}
-                                    className="relative p-2 text-slate-700 hover:text-primary transition-colors"
+                                    className={cn(
+                                        "relative p-2 transition-colors",
+                                        isTransparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-primary"
+                                    )}
                                     aria-label="Cart"
                                 >
                                     <ShoppingBag size={22} />

@@ -68,13 +68,21 @@ export default function ContactPage() {
     return (
         <div className="flex flex-col min-h-screen">
             {/* Hero Section */}
-            <section className="bg-primary py-20 relative overflow-hidden">
-                <div className="absolute inset-0 hero-gradient opacity-90" />
+            <section className="bg-primary py-20 relative min-h-[70vh] overflow-hidden">
+                <div className="absolute inset-0 bg-primary">
+                    <div className="absolute inset-0 hero-gradient opacity-90" />
+                    <img
+                        src="https://www.coutts.com/content/dam/coutts/images/owned/the-coutts-experience/20250803_Coutts_Day_5_07_Coutts_24_042.jpg"
+                        alt="About Regal"
+                        className="w-full h-full object-cover mix-blend-overlay"
+                    />
+                </div>
                 <div className="container mx-auto px-4 relative z-10 text-center text-white">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Get in Touch</h1>
                     <p className="text-white/60 max-w-xl mx-auto text-lg font-light">
                         Have a question about our collections or need help planning your next event? We're here to help you every step of the way.
                     </p>
+
                 </div>
             </section>
 
