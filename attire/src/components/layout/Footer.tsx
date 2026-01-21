@@ -11,30 +11,23 @@ import { Instagram, Facebook, Twitter, Youtube, Mail } from 'lucide-react';
 const footerLinks = {
     services: [
         { label: 'Attire Store', href: '/attire' },
-        { label: 'Event Planning', href: '/events', comingSoon: true },
-        { label: 'Bridal Services', href: '/bridal', comingSoon: true },
-        { label: 'Catering', href: '/catering', comingSoon: true },
+        { label: 'Event Planning', href: '/events' },
+        { label: 'Bridal Services', href: '/bridal' },
+        { label: 'Catering', href: '/catering' },
     ],
     shop: [
         { label: 'Women', href: '/attire/products?category=women' },
-        { label: 'Men', href: '/attire/products?category=men' },
         { label: 'Kids', href: '/attire/products?category=kids' },
         { label: 'Accessories', href: '/attire/products?category=accessories' },
         { label: 'Sale', href: '/attire/products?sale=true' },
     ],
     help: [
         { label: 'Customer Service', href: '/help' },
-        { label: 'Track Order', href: '/track-order' },
-        { label: 'Shipping Info', href: '/shipping' },
-        { label: 'Returns & Exchanges', href: '/returns' },
+        { label: 'Track Order', href: '/account/orders' },
         { label: 'Size Guide', href: '/size-guide' },
-    ],
-    about: [
         { label: 'About Us', href: '/about' },
-        { label: 'Careers', href: '/careers' },
-        { label: 'Press', href: '/press' },
         { label: 'Contact', href: '/contact' },
-    ],
+    ]
 };
 
 const socialLinks = [
@@ -42,6 +35,7 @@ const socialLinks = [
     { icon: Facebook, href: 'https://facebook.com', label: 'Facebook' },
     { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
     { icon: Youtube, href: 'https://youtube.com', label: 'YouTube' },
+
 ];
 
 export default function Footer() {
@@ -80,9 +74,9 @@ export default function Footer() {
 
             {/* Main footer content */}
             <div className="container mx-auto px-4 py-12">
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     {/* Brand section */}
-                    <div className="col-span-2 md-col-span-1 mb-6 lg:mb-0">
+                    <div className="col-span-2 md:col-span-1 mb-6 lg:mb-0">
                         <Link href="/" className="inline-block mb-4">
                             <span className="text-2xl font-bold text-secondary">
                                 REGAL
@@ -115,14 +109,10 @@ export default function Footer() {
                             {footerLinks.services.map((link) => (
                                 <li key={link.label}>
                                     <Link
-                                        href={link.comingSoon ? '#' : link.href}
-                                        className={`text-sm transition-colors ${link.comingSoon
-                                            ? 'text-slate-500 cursor-not-allowed'
-                                            : 'text-slate-400 hover:text-white'
-                                            }`}
+                                        href={link.href}
+                                        className="text-slate-400 hover:text-white text-sm transition-colors"
                                     >
                                         {link.label}
-                                        {link.comingSoon && <span className="text-xs ml-1">(Soon)</span>}
                                     </Link>
                                 </li>
                             ))}
@@ -151,23 +141,6 @@ export default function Footer() {
                         <h4 className="font-semibold mb-4">Help</h4>
                         <ul className="space-y-2">
                             {footerLinks.help.map((link) => (
-                                <li key={link.label}>
-                                    <Link
-                                        href={link.href}
-                                        className="text-slate-400 hover:text-white text-sm transition-colors"
-                                    >
-                                        {link.label}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* About links */}
-                    <div>
-                        <h4 className="font-semibold mb-4">About</h4>
-                        <ul className="space-y-2">
-                            {footerLinks.about.map((link) => (
                                 <li key={link.label}>
                                     <Link
                                         href={link.href}

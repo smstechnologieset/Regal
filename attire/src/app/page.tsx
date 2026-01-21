@@ -121,9 +121,9 @@ export default function RegalLandingPage() {
                                     Explore Our Services
                                 </Button>
                             </Link>
-                            <Link href="/attire">
+                            <Link href="/about">
                                 <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white hover:text-primary">
-                                    Shop Attire
+                                    Learn More
                                 </Button>
                             </Link>
                         </div>
@@ -319,11 +319,11 @@ export default function RegalLandingPage() {
                         Join thousands of satisfied customers who trust Regal for their fashion and celebration needs.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link href="/attire">
+                        {/* <Link href="/attire">
                             <Button size="lg" variant="secondary">
                                 Shop Attire
                             </Button>
-                        </Link>
+                        </Link> */}
                         <Link href="/register">
                             <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white hover:text-primary">
                                 Create Account
