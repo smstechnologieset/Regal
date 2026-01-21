@@ -71,23 +71,83 @@ export default function AdminOrderDetailPage() {
     }, [orderId, addToast]);
 
     const updateStatus = async (newStatus: string) => {
-        if (!order) return;
+        if (!order || order.status === newStatus) return;
         setUpdating(true);
 
+        const activeStatuses = ['confirmed', 'in_progress', 'completed'];
+        const wasActive = activeStatuses.includes(order.status);
+        const isActive = activeStatuses.includes(newStatus);
+
         const supabase = getSupabaseClient();
-        const { error } = await supabase
-            .from('orders')
-            .update({ status: newStatus })
-            .eq('id', orderId);
 
-        if (!error) {
-            setOrder({ ...order, status: newStatus });
-            addToast(`Order status updated to ${newStatus}`, 'success');
-        } else {
-            addToast('Failed to update status', 'error');
+        try {
+            // 1. Handle Stock Adjustments
+            if (!wasActive && isActive) {
+                // Transitioning from Inactive to Active: Decrease Stock
+                for (const item of order.details || []) {
+                    const productId = item.productId || item.id;
+                    if (!productId) continue;
+
+                    const { data: product } = await supabase
+                        .from('products')
+                        .select('stock_count')
+                        .eq('id', productId)
+                        .single();
+
+                    if (product) {
+                        const newCount = Math.max(0, (product.stock_count || 0) - (item.quantity || 1));
+                        await supabase
+                            .from('products')
+                            .update({
+                                stock_count: newCount,
+                                in_stock: newCount > 0
+                            })
+                            .eq('id', productId);
+                    }
+                }
+            } else if (wasActive && !isActive) {
+                // Transitioning from Active to Inactive (Cancelled/Pending): Restore Stock
+                for (const item of order.details || []) {
+                    const productId = item.productId || item.id;
+                    if (!productId) continue;
+
+                    const { data: product } = await supabase
+                        .from('products')
+                        .select('stock_count')
+                        .eq('id', productId)
+                        .single();
+
+                    if (product) {
+                        const newCount = (product.stock_count || 0) + (item.quantity || 1);
+                        await supabase
+                            .from('products')
+                            .update({
+                                stock_count: newCount,
+                                in_stock: true
+                            })
+                            .eq('id', productId);
+                    }
+                }
+            }
+
+            // 2. Update Order Status
+            const { error } = await supabase
+                .from('orders')
+                .update({ status: newStatus })
+                .eq('id', orderId);
+
+            if (!error) {
+                setOrder({ ...order, status: newStatus });
+                addToast(`Order status updated to ${newStatus}`, 'success');
+            } else {
+                addToast('Failed to update status', 'error');
+            }
+        } catch (err: any) {
+            console.error('Error in updateStatus:', err);
+            addToast('An error occurred while updating the order', 'error');
+        } finally {
+            setUpdating(false);
         }
-
-        setUpdating(false);
     };
 
     const getServiceLabel = (type: string) => {
@@ -264,8 +324,8 @@ export default function AdminOrderDetailPage() {
                                     onClick={() => updateStatus(status)}
                                     disabled={updating || order.status === status}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all ${order.status === status
-                                            ? getStatusColor(status)
-                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                        ? getStatusColor(status)
+                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                         } disabled:opacity-50`}
                                 >
                                     {status.replace('_', ' ')}

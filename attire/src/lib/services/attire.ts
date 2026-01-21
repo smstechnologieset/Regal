@@ -12,7 +12,7 @@ async function withRetry<T>(
     signal?: AbortSignal
 ): Promise<{ data: T | null; error: any; count?: number | null }> {
     let lastError: any;
-    
+
     // If the external signal is already aborted, don't even start
     if (signal?.aborted) {
         return { data: null, error: new Error('Request aborted'), count: 0 };
@@ -21,28 +21,28 @@ async function withRetry<T>(
     for (let i = 0; i < retries; i++) {
         const attempt = i + 1;
         const timestamp = new Date().toLocaleTimeString();
-        
+
         // Create an internal timeout controller
         const timeoutController = new AbortController();
         const timeoutId = setTimeout(() => timeoutController.abort(), timeoutMs);
 
         try {
             console.log(`[${timestamp}] FETCH START: Attempt ${attempt}/${retries}`);
-            
+
             // Execute the function, passing it a signal that combines the external and timeout signals
             // (In recent Node/Browsers we can use AbortSignal.any, but for compatibility we'll manually check)
             const result = await fn(timeoutController.signal);
-            
+
             if (!result.error) {
                 console.log(`[${timestamp}] FETCH SUCCESS on attempt ${attempt}`);
                 return result;
             }
-            
+
             lastError = result.error;
             console.warn(`[${timestamp}] FETCH FAILURE: Attempt ${attempt} failed with:`, lastError.message || lastError);
-            
+
             if (lastError.code === 'PGRST116') return result;
-            
+
         } catch (err: any) {
             lastError = err;
             if (err.name === 'AbortError' || err.message?.includes('timed out')) {
@@ -53,16 +53,16 @@ async function withRetry<T>(
         } finally {
             clearTimeout(timeoutId);
         }
-        
+
         if (i < retries - 1 && !signal?.aborted) {
             const backoff = delay * Math.pow(2, i);
             console.log(`[${timestamp}] FETCH RETRY: Waiting ${backoff}ms before attempt ${attempt + 1}...`);
             await new Promise(resolve => setTimeout(resolve, backoff));
         }
-        
+
         if (signal?.aborted) break;
     }
-    
+
     return { data: null, error: lastError || new Error('Request failed after retries'), count: 0 };
 }
 
@@ -142,7 +142,7 @@ export async function getProducts(
         if (options.onSale) {
             finalData = finalData.filter((p: Product) => (p.originalPrice ?? 0) > p.price);
         } else {
-            finalData = finalData.filter((p: Product) => !( (p.originalPrice ?? 0) > p.price ));
+            finalData = finalData.filter((p: Product) => !((p.originalPrice ?? 0) > p.price));
         }
     }
 
@@ -167,7 +167,7 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
             .select('*')
             .eq('id', id)
             .single();
-        
+
         if (retrySignal) q = q.abortSignal(retrySignal);
         return q;
     }, 3, 500, 15000, signal);
@@ -208,7 +208,7 @@ export async function getCategories(signal?: AbortSignal): Promise<Category[]> {
             .from('categories')
             .select('*')
             .order('name', { ascending: true });
-        
+
         if (retrySignal) q = q.abortSignal(retrySignal);
         return q;
     }, 3, 500, 15000, signal);
@@ -236,7 +236,7 @@ export async function getFeaturedProducts(signal?: AbortSignal): Promise<{
     onSale: Product[];
 }> {
     console.log('Fetching featured products (sequential with cancellation support)...');
-    
+
     try {
         // Sequentialize to avoid hitting browser connection limits
         const newRes = await getProducts({ badges: ['new'] }, 'newest', 1, 8, signal);
@@ -270,7 +270,7 @@ export async function getRelatedProducts(productId: string, limit: number = 4, s
         .select('category')
         .eq('id', productId)
         .single();
-    
+
     if (signal) q1 = q1.abortSignal(signal);
     const { data: product } = await q1;
 
@@ -283,7 +283,7 @@ export async function getRelatedProducts(productId: string, limit: number = 4, s
         .eq('category', product.category)
         .neq('id', productId)
         .limit(limit);
-    
+
     if (signal) q2 = q2.abortSignal(signal);
     const { data: related } = await q2;
 
@@ -350,28 +350,8 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
         return { orderId: '', conversationId: '', success: false };
     }
 
-    // 3. Decrement stock for each item
-    for (const item of orderData.items as any[]) {
-        const { data: currentProduct } = await supabase
-            .from('products')
-            .select('stock_count')
-            .eq('id', item.productId)
-            .single();
-
-        if (currentProduct) {
-            const newCount = Math.max(0, currentProduct.stock_count - item.quantity);
-            await supabase
-                .from('products')
-                .update({ 
-                    stock_count: newCount,
-                    in_stock: newCount > 0
-                })
-                .eq('id', item.productId);
-        }
-    }
-
+    // 3. Create an associated conversation
     try {
-        // 4. Create an associated conversation
         const { data: conversation, error: convError } = await supabase
             .from('conversations')
             .insert({
