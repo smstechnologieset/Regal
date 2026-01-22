@@ -170,3 +170,31 @@ ${bookingData.notes || 'No additional notes provided.'}
         success: true,
     };
 }
+
+/**
+ * Fetch all bridal accessories from the database
+ */
+export async function getBridalAccessories(): Promise<import('@/types').BridalAccessory[]> {
+    const supabase = getSupabaseClient();
+
+    const { data, error } = await supabase
+        .from('bridal_accessories')
+        .select('*')
+        .order('name', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching bridal accessories:', error);
+        return [];
+    }
+
+    return (data || []).map((item: Record<string, unknown>) => ({
+        id: item.id as string,
+        name: item.name as string,
+        category: item.category as 'veil' | 'jewelry' | 'headpiece' | 'shoes' | 'clutch',
+        priceRent: item.price_rent as number,
+        priceBuy: item.price_buy as number,
+        images: (item.images as string[]) || [],
+        description: item.description as string,
+        isNew: item.is_new as boolean,
+    }));
+}

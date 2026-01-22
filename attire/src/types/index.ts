@@ -189,6 +189,17 @@ export interface BridalService {
   image: string;
 }
 
+export interface BridalAccessory {
+  id: string;
+  name: string;
+  category: 'veil' | 'jewelry' | 'headpiece' | 'shoes' | 'clutch';
+  priceRent: number;
+  priceBuy: number;
+  images: string[];
+  description: string;
+  isNew?: boolean;
+}
+
 export interface AppointmentSlot {
   id: string;
   date: string;
