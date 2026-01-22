@@ -32,7 +32,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Attire - Modern Fashion E-Commerce",
-  description: "Discover the latest trends in fashion. Shop clothing, accessories, and more with free shipping on orders over $50.",
+  description: "Discover the latest trends in fashion. Shop clothing, accessories, and more with free shipping on orders over ETB500.",
   keywords: "fashion, clothing, accessories, online shopping, women's fashion, men's fashion",
   openGraph: {
     title: "Attire - Modern Fashion E-Commerce",

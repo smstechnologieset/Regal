@@ -136,7 +136,7 @@ export default function FilterPanel({
                                         {category.name}
                                     </span>
                                 </label>
-                                
+
                                 {/* Subcategories */}
                                 {filters.category === category.slug && category.subcategories && category.subcategories.length > 0 && (
                                     <div className="ml-6 space-y-1 pt-1 pb-2 border-l border-slate-100 pl-4">
@@ -200,10 +200,10 @@ export default function FilterPanel({
                 >
                     <div className="space-y-3">
                         {[
-                            { label: 'Under $50', min: 0, max: 50 },
-                            { label: '$50 - $100', min: 50, max: 100 },
-                            { label: '$100 - $200', min: 100, max: 200 },
-                            { label: 'Over $200', min: 200, max: 999 },
+                            { label: 'Under ETB 50', min: 0, max: 50 },
+                            { label: 'ETB 50 - ETB 100', min: 50, max: 100 },
+                            { label: 'ETB 100 - ETB 200', min: 100, max: 200 },
+                            { label: 'Over ETB 200', min: 200, max: 999 },
                         ].map((range) => (
                             <label
                                 key={range.label}

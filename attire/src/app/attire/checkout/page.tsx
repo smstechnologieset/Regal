@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronLeft, Truck, CreditCard, Banknote, Lock } from 'lucide-react';
+import { ChevronLeft, Truck, CreditCard, Banknote, Lock, Tag, X } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useApp } from '@/context/AppContext';
 import { useAuth } from '@/context/AuthContext';
@@ -59,9 +59,18 @@ export default function CheckoutPage() {
     });
     const [errors, setErrors] = useState<Partial<ShippingForm>>({});
 
+    // Promo code state
+    const [promoCodeInput, setPromoCodeInput] = useState('');
+    const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+    const [appliedPromo, setAppliedPromo] = useState<{
+        code: string;
+        discountAmount: number;
+    } | null>(null);
+
     const subtotal = getCartTotal();
     const shipping = subtotal >= 50 ? 0 : 9.99;
-    const total = subtotal + shipping;
+    const discount = appliedPromo?.discountAmount || 0;
+    const total = Math.max(0, subtotal - discount + shipping);
 
     // Handle input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -107,6 +116,46 @@ export default function CheckoutPage() {
         return Object.keys(newErrors).length === 0;
     };
 
+    // Handle Promo Code application
+    const handleApplyPromoCode = async () => {
+        if (!promoCodeInput.trim()) return;
+
+        setIsApplyingPromo(true);
+        try {
+            const response = await fetch('/api/attire/promocodes/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code: promoCodeInput,
+                    subtotal
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setAppliedPromo({
+                    code: data.promo.code,
+                    discountAmount: data.promo.discount_amount
+                });
+                addToast(`Promo code "${data.promo.code}" applied!`, 'success');
+                setPromoCodeInput('');
+            } else {
+                addToast(data.error || 'Invalid promo code', 'error');
+            }
+        } catch (error) {
+            console.error('Failed to validate promo code:', error);
+            addToast('Failed to apply promo code', 'error');
+        } finally {
+            setIsApplyingPromo(false);
+        }
+    };
+
+    const handleRemovePromo = () => {
+        setAppliedPromo(null);
+        addToast('Promo code removed', 'info');
+    };
+
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -144,6 +193,8 @@ export default function CheckoutPage() {
                 shippingAddress: formData,
                 subtotal,
                 shipping,
+                discount,
+                promoCode: appliedPromo?.code || null,
                 total,
             });
 
@@ -401,7 +452,61 @@ export default function CheckoutPage() {
                                             {shipping === 0 ? 'FREE' : formatPrice(shipping)}
                                         </span>
                                     </div>
+
+                                    {appliedPromo && (
+                                        <div className="flex justify-between text-sm text-emerald-600 font-medium">
+                                            <div className="flex items-center gap-1">
+                                                <Tag size={12} />
+                                                <span>Discount ({appliedPromo.code})</span>
+                                            </div>
+                                            <span>-{formatPrice(appliedPromo.discountAmount)}</span>
+                                        </div>
+                                    )}
                                 </div>
+
+                                {/* Promo Code Input */}
+                                {!appliedPromo ? (
+                                    <div className="py-4 border-b border-slate-200">
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Promo code"
+                                                className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary uppercase font-medium"
+                                                value={promoCodeInput}
+                                                onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                                                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleApplyPromoCode())}
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={handleApplyPromoCode}
+                                                isLoading={isApplyingPromo}
+                                                disabled={!promoCodeInput.trim()}
+                                            >
+                                                Apply
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="py-4 border-b border-slate-200">
+                                        <div className="flex items-center justify-between px-3 py-2 bg-emerald-50 border border-emerald-100 rounded-lg">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center">
+                                                    <Tag size={12} />
+                                                </div>
+                                                <span className="text-sm font-bold text-emerald-700">{appliedPromo.code}</span>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={handleRemovePromo}
+                                                className="text-emerald-700 hover:text-emerald-900 transition-colors"
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="flex justify-between pt-4 mb-6">
                                     <span className="text-lg font-semibold text-primary">Total</span>

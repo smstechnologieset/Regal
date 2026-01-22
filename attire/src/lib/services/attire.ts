@@ -344,6 +344,8 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
             details: orderData.items,
             shipping_address: orderData.shippingAddress,
             service_type: 'attire',
+            promo_code: orderData.promoCode || null,
+            discount_amount: orderData.discount || 0,
         })
         .select()
         .single();
@@ -351,6 +353,34 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
     if (orderError || !order) {
         console.error('Error creating order:', orderError);
         return { orderId: '', conversationId: '', success: false };
+    }
+
+    // 3. Increment promo code usage count if used
+    if (orderData.promoCode) {
+        try {
+            const { error: promoUpdateError } = await supabase.rpc('increment_promo_usage', {
+                p_code: orderData.promoCode
+            });
+
+            if (promoUpdateError) {
+                // If RPC fails (e.g. not exists), try manual update
+                const { data: promo } = await supabase
+                    .from('promo_codes')
+                    .select('id, usage_count')
+                    .eq('code', orderData.promoCode)
+                    .single();
+
+                if (promo) {
+                    await supabase
+                        .from('promo_codes')
+                        .update({ usage_count: (promo.usage_count || 0) + 1 })
+                        .eq('id', promo.id);
+                }
+            }
+        } catch (err) {
+            console.error('Error updating promo usage:', err);
+            // Don't fail the whole order if just usage count update fails
+        }
     }
 
     // 3. Create an associated conversation

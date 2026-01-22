@@ -28,7 +28,7 @@ export default function LoadingWrapper({ children }: { children: React.ReactNode
             <div className="fixed inset-0 flex items-center justify-center bg-white z-[9999]">
                 <div className="flex flex-col items-center gap-4">
                     <Loader />
-                    <span className="text-secondary font-bold tracking-[0.2em] text-sm md:text-base animate-pulse">
+                    <span className="text-secondary font-bold tracking-[0.3em] text-sm md:text-base animate-pulse">
                         REGAL
                     </span>
                 </div>

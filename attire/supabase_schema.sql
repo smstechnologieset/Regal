@@ -338,9 +338,51 @@ CREATE TABLE IF NOT EXISTS public.orders (
   total DECIMAL(10, 2) DEFAULT 0,
   notes TEXT,
   shipping_address JSONB DEFAULT '{}',
+  promo_code TEXT,
+  discount_amount DECIMAL(10, 2) DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Promo Codes Table
+CREATE TABLE IF NOT EXISTS public.promo_codes (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  code TEXT NOT NULL UNIQUE,
+  discount_type TEXT NOT NULL CHECK (discount_type IN ('percentage', 'fixed')),
+  discount_value DECIMAL(10, 2) NOT NULL,
+  min_purchase DECIMAL(10, 2) DEFAULT 0,
+  usage_limit INTEGER, -- NULL for unlimited
+  usage_count INTEGER DEFAULT 0,
+  start_date TIMESTAMPTZ DEFAULT NOW(),
+  end_date TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS for promo_codes
+ALTER TABLE public.promo_codes ENABLE ROW LEVEL SECURITY;
+
+-- Policies for promo_codes
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Allow public read-only access to promo_codes') THEN
+        CREATE POLICY "Allow public read-only access to promo_codes" ON public.promo_codes FOR SELECT USING (true);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'Admins can manage promo_codes') THEN
+        CREATE POLICY "Admins can manage promo_codes" ON public.promo_codes FOR ALL USING (public.is_admin());
+    END IF;
+END $$;
+
+-- Function to increment promo usage
+CREATE OR REPLACE FUNCTION public.increment_promo_usage(p_code TEXT)
+RETURNS VOID AS $$
+BEGIN
+  UPDATE public.promo_codes
+  SET usage_count = usage_count + 1
+  WHERE code = p_code;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Enable Row Level Security
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
