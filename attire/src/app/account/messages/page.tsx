@@ -33,15 +33,37 @@ export default function MessagesPage() {
       if (!user) return;
 
       const supabase = getSupabaseClient();
-      const { data, error } = await supabase
+
+      // Fetch conversations
+      const { data: convData, error: convError } = await supabase
         .from("conversations")
         .select("*")
         .eq("user_id", user.id)
         .order("last_message_at", { ascending: false });
 
-      if (!error && data) {
-        setConversations(data);
+      if (convError || !convData) {
+        setLoading(false);
+        return;
       }
+
+      // For each conversation, count unread messages
+      const conversationsWithUnread = await Promise.all(
+        convData.map(async (conv: any) => {
+          const { count } = await supabase
+            .from("messages")
+            .select("*", { count: "exact", head: true })
+            .eq("conversation_id", conv.id)
+            .eq("read", false)
+            .neq("sender_id", user.id); // Only count messages not sent by user
+
+          return {
+            ...conv,
+            unread_count: count || 0,
+          };
+        })
+      );
+
+      setConversations(conversationsWithUnread);
       setLoading(false);
     }
 
@@ -101,50 +123,77 @@ export default function MessagesPage() {
           </div>
         ) : conversations.length > 0 ? (
           <div className="divide-y divide-slate-100">
-            {conversations.map((conv) => (
-              <Link
-                key={conv.id}
-                href={`/account/messages/${conv.id}`}
-                className="block p-5 hover:bg-slate-50 transition-colors"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        conv.status === "open" ? "bg-rose-100" : "bg-slate-100"
-                      }`}
-                    >
-                      <MessageSquare
-                        size={20}
-                        className={
-                          conv.status === "open"
-                            ? "text-secondary"
-                            : "text-slate-400"
-                        }
-                      />
+            {conversations.map((conv) => {
+              const hasUnread = (conv.unread_count || 0) > 0;
+              return (
+                <Link
+                  key={conv.id}
+                  href={`/account/messages/${conv.id}`}
+                  className={`block p-5 transition-all ${
+                    hasUnread
+                      ? "bg-green-50 hover:bg-green-100 border-l-4 border-green-500 shadow-sm"
+                      : "hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center relative ${
+                          hasUnread
+                            ? "bg-green-100 ring-2 ring-green-300"
+                            : conv.status === "open"
+                              ? "bg-rose-100"
+                              : "bg-slate-100"
+                        }`}
+                      >
+                        <MessageSquare
+                          size={20}
+                          className={
+                            hasUnread
+                              ? "text-green-600"
+                              : conv.status === "open"
+                                ? "text-secondary"
+                                : "text-slate-400"
+                          }
+                        />
+                        {hasUnread && (
+                          <span className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                            {conv.unread_count}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <p
+                          className={`font-medium ${
+                            hasUnread ? "text-green-900" : "text-primary"
+                          }`}
+                        >
+                          {conv.subject || "Support Request"}
+                          {hasUnread && (
+                            <span className="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
+                              New
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          {getServiceLabel(conv.service_type)} •{" "}
+                          {conv.status === "open" ? "Active" : "Closed"}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-primary">
-                        {conv.subject || "Support Request"}
-                      </p>
-                      <p className="text-sm text-slate-500">
-                        {getServiceLabel(conv.service_type)} •{" "}
-                        {conv.status === "open" ? "Active" : "Closed"}
-                      </p>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-sm text-slate-500 flex items-center gap-1">
+                          <Clock size={14} />
+                          {new Date(conv.last_message_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <ChevronRight className="text-slate-400" size={20} />
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-sm text-slate-500 flex items-center gap-1">
-                        <Clock size={14} />
-                        {new Date(conv.last_message_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <ChevronRight className="text-slate-400" size={20} />
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         ) : (
           <div className="p-12 text-center">
