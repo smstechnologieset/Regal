@@ -166,7 +166,7 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
             .from('products')
             .select('*')
             .eq('id', id)
-            .single();
+            .maybeSingle();
 
         if (retrySignal) q = q.abortSignal(retrySignal);
         return q;

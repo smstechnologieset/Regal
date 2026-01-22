@@ -109,25 +109,31 @@ export default function AdminOrderDetailPage() {
           const productId = item.productId || item.id;
           if (!productId) continue;
 
-          const { data: product } = await supabase
+          const { data: product, error: productError } = await supabase
             .from("products")
             .select("stock_count")
             .eq("id", productId)
-            .single();
+            .maybeSingle();
 
-          if (product) {
-            const newCount = Math.max(
-              0,
-              (product.stock_count || 0) - (item.quantity || 1)
+          // Skip if product doesn't exist (old/invalid product ID)
+          if (productError || !product) {
+            console.warn(
+              `Product ${productId} not found, skipping stock adjustment`
             );
-            await supabase
-              .from("products")
-              .update({
-                stock_count: newCount,
-                in_stock: newCount > 0,
-              })
-              .eq("id", productId);
+            continue;
           }
+
+          const newCount = Math.max(
+            0,
+            (product.stock_count || 0) - (item.quantity || 1)
+          );
+          await supabase
+            .from("products")
+            .update({
+              stock_count: newCount,
+              in_stock: newCount > 0,
+            })
+            .eq("id", productId);
         }
       } else if (wasActive && !isActive) {
         // Transitioning from Active to Inactive (Cancelled/Pending): Restore Stock
@@ -135,22 +141,28 @@ export default function AdminOrderDetailPage() {
           const productId = item.productId || item.id;
           if (!productId) continue;
 
-          const { data: product } = await supabase
+          const { data: product, error: productError } = await supabase
             .from("products")
             .select("stock_count")
             .eq("id", productId)
-            .single();
+            .maybeSingle();
 
-          if (product) {
-            const newCount = (product.stock_count || 0) + (item.quantity || 1);
-            await supabase
-              .from("products")
-              .update({
-                stock_count: newCount,
-                in_stock: true,
-              })
-              .eq("id", productId);
+          // Skip if product doesn't exist (old/invalid product ID)
+          if (productError || !product) {
+            console.warn(
+              `Product ${productId} not found, skipping stock adjustment`
+            );
+            continue;
           }
+
+          const newCount = (product.stock_count || 0) + (item.quantity || 1);
+          await supabase
+            .from("products")
+            .update({
+              stock_count: newCount,
+              in_stock: true,
+            })
+            .eq("id", productId);
         }
       }
 
