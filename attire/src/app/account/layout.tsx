@@ -91,7 +91,7 @@ export default function AccountLayout({
         .select("*", { count: "exact", head: true })
         .in(
           "conversation_id",
-          conversations.map((c) => c.id)
+          conversations.map((c: { id: string }) => c.id)
         )
         .eq("read", false)
         .neq("sender_id", user.id);
