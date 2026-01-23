@@ -136,6 +136,11 @@ export async function getProducts(
         createdAt: item.created_at as string,
         inStock: item.in_stock as boolean,
         stockCount: item.stock_count as number,
+        // Pre-order fields
+        estimatedRestockDate: item.estimated_restock_date as string | undefined,
+        allowPreorder: item.allow_preorder as boolean | undefined,
+        preorderCount: item.preorder_count as number | undefined,
+        estimatedDeliveryDays: item.estimated_delivery_days as number | undefined,
     }));
 
     if (options.onSale !== undefined) {
@@ -199,6 +204,11 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
         createdAt: p.created_at,
         inStock: p.in_stock,
         stockCount: p.stock_count,
+        // Pre-order fields
+        estimatedRestockDate: p.estimated_restock_date,
+        allowPreorder: p.allow_preorder,
+        preorderCount: p.preorder_count,
+        estimatedDeliveryDays: p.estimated_delivery_days,
     };
 }
 
@@ -315,8 +325,21 @@ export async function getRelatedProducts(productId: string, limit: number = 4, s
 export async function createOrder(orderData: Record<string, unknown>): Promise<{ orderId: string; conversationId: string; success: boolean }> {
     const supabase = getSupabaseClient();
 
-    // 1. Verify stock availability for all items first
-    for (const item of orderData.items as any[]) {
+    // 1. Verify stock availability for all items first (skip for pre-orders)
+    const items = orderData.items as any[];
+    let hasPreorders = false;
+    let allPreorders = true;
+
+    for (const item of items) {
+        // Check if this is a pre-order item
+        if (item.isPreorder) {
+            hasPreorders = true;
+            allPreorders = allPreorders && true;
+            continue; // Skip stock check for pre-orders
+        }
+
+        allPreorders = false;
+
         const { data: product, error: stockCheckError } = await supabase
             .from('products')
             .select('stock_count, in_stock, name')
@@ -324,7 +347,7 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
             .single();
 
         if (stockCheckError || !product) {
-            console.error(`Error checking stock for ${item.product.id}:`, stockCheckError);
+            console.error(`Error checking stock for ${item.productId}:`, stockCheckError);
             return { orderId: '', conversationId: '', success: false };
         }
 
@@ -333,6 +356,9 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
             return { orderId: '', conversationId: '', success: false };
         }
     }
+
+    // Determine pre-order status
+    const preorderStatus = hasPreorders ? (allPreorders ? 'all' : 'partial') : 'none';
 
     // 2. Create the order
     const { data: order, error: orderError } = await supabase
@@ -346,6 +372,8 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
             service_type: 'attire',
             promo_code: orderData.promoCode || null,
             discount_amount: orderData.discount || 0,
+            has_preorders: hasPreorders,
+            preorder_status: preorderStatus,
         })
         .select()
         .single();
@@ -355,7 +383,31 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
         return { orderId: '', conversationId: '', success: false };
     }
 
-    // 3. Increment promo code usage count if used
+    // 3. Create order_items records for each item
+    const orderItemsToInsert = items.map(item => ({
+        order_id: order.id,
+        product_id: item.productId,
+        quantity: item.quantity,
+        price: item.price,
+        selected_size: item.size,
+        selected_color: item.color,
+        is_preorder: item.isPreorder || false,
+        estimated_delivery_date: item.estimatedDeliveryDate || null,
+        preorder_status: item.isPreorder ? 'pending' : null,
+    }));
+
+    const { error: orderItemsError } = await supabase
+        .from('order_items')
+        .insert(orderItemsToInsert);
+
+    if (orderItemsError) {
+        console.error('Error creating order items:', orderItemsError);
+        // Rollback: delete the order
+        await supabase.from('orders').delete().eq('id', order.id);
+        return { orderId: '', conversationId: '', success: false };
+    }
+
+    // 4. Increment promo code usage count if used
     if (orderData.promoCode) {
         try {
             const { error: promoUpdateError } = await supabase.rpc('increment_promo_usage', {
@@ -383,8 +435,7 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
         }
     }
 
-    // 3. Create an associated conversation
-    const items = orderData.items as any[];
+    // 5. Create an associated conversation
     const firstItemName = items[0]?.productName || items[0]?.product?.name || items[0]?.name || 'Attire Order';
     const displaySubject = items.length > 1
         ? `${firstItemName} +${items.length - 1} more`
@@ -409,13 +460,19 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
             return { orderId: order.id, conversationId: '', success: true };
         }
 
-        // 3. Create initial message
+        // 6. Create initial message
+        const orderTypeMessage = hasPreorders 
+            ? (allPreorders 
+                ? 'New pre-order placed!' 
+                : 'New order placed with pre-order items!')
+            : 'New order placed!';
+
         const { error: msgError } = await supabase
             .from('messages')
             .insert({
                 conversation_id: conversation.id,
                 sender_id: orderData.userId,
-                content: `New order placed! Order ID: ${order.id}. I have a question about this order.`,
+                content: `${orderTypeMessage} Order ID: ${order.id}. I have a question about this order.`,
             });
 
         if (msgError) {

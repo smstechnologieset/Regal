@@ -31,6 +31,23 @@ interface Order {
   notes: string | null;
   created_at: string;
   updated_at: string;
+  has_preorders?: boolean;
+  preorder_status?: string;
+}
+
+interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  price: number;
+  selected_size?: string;
+  selected_color?: string;
+  is_preorder: boolean;
+  preorder_status?: string;
+  estimated_delivery_date?: string;
+  created_at: string;
 }
 
 const statusSteps = ["pending", "confirmed", "in_progress", "completed"];
@@ -42,22 +59,41 @@ export default function UserOrderDetailPage() {
   const { user } = useAuth();
   const { addToast } = useApp();
   const [order, setOrder] = useState<Order | null>(null);
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [contacting, setContacting] = useState(false);
+  const [cancellingItemId, setCancellingItemId] = useState<string | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [itemToCancel, setItemToCancel] = useState<OrderItem | null>(null);
 
   useEffect(() => {
     async function fetchOrder() {
       if (!orderId) return;
 
       const supabase = getSupabaseClient();
-      const { data, error } = await supabase
+
+      // Fetch order
+      const { data: orderData, error: orderError } = await supabase
         .from("orders")
         .select("*")
         .eq("id", orderId)
         .single();
 
-      if (!error && data) {
-        setOrder(data);
+      if (!orderError && orderData) {
+        setOrder(orderData);
+
+        // Fetch order items if this is an attire order
+        if (orderData.service_type === "attire") {
+          const { data: itemsData, error: itemsError } = await supabase
+            .from("order_items")
+            .select("*")
+            .eq("order_id", orderId)
+            .order("created_at", { ascending: true });
+
+          if (!itemsError && itemsData) {
+            setOrderItems(itemsData);
+          }
+        }
       }
       setLoading(false);
     }
@@ -135,6 +171,67 @@ export default function UserOrderDetailPage() {
     } finally {
       setContacting(false);
     }
+  };
+
+  const handleCancelPreOrder = (item: OrderItem) => {
+    setItemToCancel(item);
+    setShowCancelDialog(true);
+  };
+
+  const confirmCancelPreOrder = async () => {
+    if (!itemToCancel) return;
+
+    setCancellingItemId(itemToCancel.id);
+    setShowCancelDialog(false);
+
+    try {
+      const response = await fetch(
+        `/api/attire/orders/${orderId}/items/${itemToCancel.id}/cancel`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to cancel pre-order");
+      }
+
+      const result = await response.json();
+
+      // Update local state
+      setOrderItems((prev) =>
+        prev.map((item) =>
+          item.id === itemToCancel.id
+            ? { ...item, preorder_status: "cancelled" }
+            : item
+        )
+      );
+
+      // Update order if needed
+      if (result.order) {
+        setOrder((prev) => (prev ? { ...prev, ...result.order } : null));
+      }
+
+      addToast("Pre-order cancelled successfully", "success");
+    } catch (err: any) {
+      console.error("Error cancelling pre-order:", err);
+      addToast(err.message || "Failed to cancel pre-order", "error");
+    } finally {
+      setCancellingItemId(null);
+      setItemToCancel(null);
+    }
+  };
+
+  const formatDeliveryDate = (dateString?: string) => {
+    if (!dateString) return "TBD";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
   if (loading) {
@@ -236,6 +333,86 @@ export default function UserOrderDetailPage() {
         )}
       </div>
 
+      {/* Order Items (for Attire orders) */}
+      {order.service_type === "attire" && orderItems.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h2 className="font-semibold text-slate-900 mb-4">Order Items</h2>
+          <div className="space-y-4">
+            {orderItems.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-start gap-4 pb-4 border-b border-slate-100 last:border-0 last:pb-0"
+              >
+                <div className="flex-1">
+                  <h3 className="font-medium text-slate-900">
+                    {item.product_name}
+                  </h3>
+                  <div className="text-sm text-slate-600 mt-1 space-y-1">
+                    {item.selected_size && <p>Size: {item.selected_size}</p>}
+                    {item.selected_color && <p>Color: {item.selected_color}</p>}
+                    <p>Quantity: {item.quantity}</p>
+                    <p className="font-medium">${item.price.toFixed(2)} each</p>
+                  </div>
+
+                  {/* Pre-order badge and info */}
+                  {item.is_preorder && (
+                    <div className="mt-2">
+                      <div className="inline-flex items-center gap-2">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                          Pre-Order
+                        </span>
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            item.preorder_status === "pending"
+                              ? "bg-blue-100 text-blue-800"
+                              : item.preorder_status === "ready"
+                                ? "bg-green-100 text-green-800"
+                                : item.preorder_status === "fulfilled"
+                                  ? "bg-slate-100 text-slate-800"
+                                  : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {item.preorder_status === "pending"
+                            ? "Awaiting Stock"
+                            : item.preorder_status === "ready"
+                              ? "Ready to Ship"
+                              : item.preorder_status === "fulfilled"
+                                ? "Fulfilled"
+                                : "Cancelled"}
+                        </span>
+                      </div>
+                      {item.preorder_status === "pending" &&
+                        item.estimated_delivery_date && (
+                          <p className="text-sm text-slate-600 mt-1">
+                            Estimated delivery:{" "}
+                            {formatDeliveryDate(item.estimated_delivery_date)}
+                          </p>
+                        )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Cancel button for pending pre-orders */}
+                {item.is_preorder && item.preorder_status === "pending" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCancelPreOrder(item)}
+                    disabled={cancellingItemId === item.id}
+                  >
+                    {cancellingItemId === item.id ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      "Cancel Pre-Order"
+                    )}
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Order Details */}
       <div className="grid md:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
@@ -288,6 +465,40 @@ export default function UserOrderDetailPage() {
           </Button>
         </div>
       </div>
+
+      {/* Cancel Confirmation Dialog */}
+      {showCancelDialog && itemToCancel && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">
+              Cancel Pre-Order?
+            </h3>
+            <p className="text-slate-600 mb-4">
+              Are you sure you want to cancel the pre-order for{" "}
+              <span className="font-medium">{itemToCancel.product_name}</span>?
+              This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowCancelDialog(false);
+                  setItemToCancel(null);
+                }}
+              >
+                Keep Pre-Order
+              </Button>
+              <Button
+                variant="primary"
+                onClick={confirmCancelPreOrder}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Yes, Cancel Pre-Order
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -23,6 +23,11 @@ export interface Product {
   createdAt: string; // ISO date string
   inStock: boolean;
   stockCount?: number;
+  // Pre-order fields
+  estimatedRestockDate?: string; // ISO date string
+  allowPreorder?: boolean;
+  preorderCount?: number;
+  estimatedDeliveryDays?: number;
 }
 
 export interface ProductColor {
@@ -53,6 +58,7 @@ export interface CartItem {
   quantity: number;
   selectedSize: string;
   selectedColor: ProductColor;
+  isPreorder?: boolean;
 }
 
 export interface Cart {
@@ -98,6 +104,23 @@ export interface Order {
   total: number;
   status: OrderStatus;
   createdAt: string;
+  hasPreorders?: boolean;
+  preorderStatus?: PreOrderStatus;
+}
+
+// Order Item (database representation)
+export interface OrderItem {
+  id: string;
+  orderId: string;
+  productId: string;
+  quantity: number;
+  price: number;
+  selectedSize?: string;
+  selectedColor?: ProductColor;
+  isPreorder: boolean;
+  preorderStatus?: PreOrderItemStatus;
+  estimatedDeliveryDate?: string; // ISO date string
+  createdAt: string;
 }
 
 export interface ShippingAddress {
@@ -111,6 +134,18 @@ export interface ShippingAddress {
 }
 
 export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+
+export type PreOrderStatus = 'none' | 'partial' | 'all';
+
+export type PreOrderItemStatus = 'pending' | 'ready' | 'fulfilled' | 'cancelled';
+
+// Pre-order summary for display
+export interface PreOrderSummary {
+  totalPreOrderItems: number;
+  estimatedDeliveryDate?: string;
+  hasPreOrders: boolean;
+  preOrderStatus: PreOrderStatus;
+}
 
 // API response types (for future backend integration)
 export interface ApiResponse<T> {

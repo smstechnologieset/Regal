@@ -25,7 +25,12 @@ import { useAuth } from "@/context/AuthContext";
 import { submitOrder } from "@/lib/api";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import PreOrderNotice from "@/components/attire/PreOrderNotice";
 import { formatPrice, isValidEmail, isValidPhone } from "@/lib/utils";
+import {
+  hasPreOrderItems,
+  getEstimatedDeliveryDate,
+} from "@/lib/utils/preorderHelpers";
 
 type PaymentMethod = "cod" | "card";
 
@@ -194,6 +199,10 @@ export default function CheckoutPage() {
           size: item.selectedSize,
           color: item.selectedColor.name,
           price: item.product.price,
+          isPreorder: item.isPreorder || false,
+          estimatedDeliveryDate: item.isPreorder
+            ? getEstimatedDeliveryDate(item.product)?.toISOString()
+            : null,
         })),
         shippingAddress: formData,
         subtotal,
@@ -447,6 +456,13 @@ export default function CheckoutPage() {
                     </div>
                   ))}
                 </div>
+
+                {/* Pre-Order Notice */}
+                {hasPreOrderItems(items) && (
+                  <div className="mb-4">
+                    <PreOrderNotice items={items} />
+                  </div>
+                )}
 
                 <div className="space-y-3 py-4 border-y border-slate-200">
                   <div className="flex justify-between text-sm">
