@@ -31,8 +31,8 @@ export default function BridalAccessoriesPage() {
     filter === "all"
       ? accessories
       : accessories.filter(
-          (item) => item.category.toLowerCase() === filter.toLowerCase()
-        );
+        (item) => item.category.toLowerCase() === filter.toLowerCase()
+      );
 
   return (
     <div className="min-h-screen bg-slate-50 py-12">
@@ -63,11 +63,10 @@ export default function BridalAccessoriesPage() {
             <button
               key={cat}
               onClick={() => setFilter(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all capitalize ${
-                filter === cat
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all capitalize ${filter === cat
                   ? "bg-primary text-white"
                   : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-              }`}
+                }`}
             >
               {cat}
             </button>
@@ -102,14 +101,14 @@ export default function BridalAccessoriesPage() {
                   <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                     <div className="flex gap-2">
                       <Link
-                        href={`/bridal/appointments?accessory=${item.id}`}
+                        href={`/bridal/rent-buy?accessory=${item.id}`}
                         className="flex-1"
                       >
                         <Button
                           size="sm"
                           className="w-full bg-white text-primary hover:bg-slate-100"
                         >
-                          Book Appointment
+                          Rent Or Buy
                         </Button>
                       </Link>
                     </div>

@@ -207,13 +207,46 @@ export async function getBridalGownById(id: string): Promise<BridalGown | null> 
 }
 
 /**
- * Rent or Buy a bridal gown (creates order + conversation)
+ * Fetch a single bridal accessory by ID
  */
-export async function rentBuyBridalGown(orderData: {
+export async function getBridalAccessoryById(id: string): Promise<import('@/types').BridalAccessory | null> {
+    const supabase = getSupabaseClient();
+
+    const { data, error } = await supabase
+        .from('bridal_accessories')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error || !data) {
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error fetching bridal accessory:', error);
+        }
+        return null;
+    }
+
+    const item = data as any;
+    return {
+        id: item.id,
+        name: item.name,
+        category: item.category,
+        priceRent: item.price_rent,
+        priceBuy: item.price_buy,
+        images: item.images || [],
+        description: item.description,
+        isNew: item.is_new,
+    };
+}
+
+/**
+ * Submit a bridal transaction (Rent or Buy for Gown or Accessory)
+ */
+export async function submitBridalTransaction(orderData: {
     userId: string;
-    gownId: string;
-    gownName: string;
-    type: 'rent' | 'buy';
+    itemId: string;
+    itemName: string;
+    itemType: 'gown' | 'accessory';
+    transactionType: 'rent' | 'buy';
     price: number;
     appointmentDate?: string;
     appointmentTime?: string;
@@ -225,7 +258,7 @@ export async function rentBuyBridalGown(orderData: {
     const supabase = getSupabaseClient();
 
     // 1. If renting, check for double booking
-    if (orderData.type === 'rent' && orderData.appointmentDate && orderData.appointmentTime) {
+    if (orderData.transactionType === 'rent' && orderData.appointmentDate && orderData.appointmentTime) {
         try {
             const checkRes = await fetch(`${window.location.origin}/api/bridal/appointments/booked-slots?date=${orderData.appointmentDate}`);
             const { bookedSlots } = await checkRes.json();
@@ -248,9 +281,10 @@ export async function rentBuyBridalGown(orderData: {
             status: 'pending',
             total: orderData.price,
             details: {
-                gownId: orderData.gownId,
-                gownName: orderData.gownName,
-                type: orderData.type, // 'rent' or 'buy'
+                itemId: orderData.itemId,
+                itemName: orderData.itemName,
+                itemType: orderData.itemType,
+                type: orderData.transactionType, // 'rent' or 'buy'
                 date: orderData.appointmentDate || null,
                 time: orderData.appointmentTime || null,
                 notes: orderData.notes,
@@ -263,7 +297,7 @@ export async function rentBuyBridalGown(orderData: {
         .single();
 
     if (orderError || !order) {
-        console.error('Error creating bridal gown order:', orderError);
+        console.error('Error creating bridal order:', orderError);
         return { orderId: '', conversationId: '', success: false };
     }
 
@@ -274,7 +308,7 @@ export async function rentBuyBridalGown(orderData: {
             user_id: orderData.userId,
             service_type: 'bridal',
             order_id: order.id,
-            subject: `Gown ${orderData.type.toUpperCase()}: ${orderData.gownName}`,
+            subject: `${orderData.itemType === 'gown' ? 'Gown' : 'Accessory'} ${orderData.transactionType.toUpperCase()}: ${orderData.itemName}`,
             status: 'open',
         })
         .select()
@@ -285,15 +319,18 @@ export async function rentBuyBridalGown(orderData: {
     }
 
     // 4. Send initial detailed message
-    const messageContent = `
-**New Bridal Gown ${orderData.type === 'rent' ? 'Rental Request' : 'Purchase Request'}**
+    const displayItemType = orderData.itemType === 'gown' ? 'Gown' : 'Accessory';
+    const displayOrderType = orderData.transactionType === 'rent' ? 'Rental Request' : 'Purchase Request';
 
-👗 **Gown:** ${orderData.gownName}
-💰 **Internal Total:** $${orderData.price}
-${orderData.type === 'rent' ? `
-📅 **Rental Fitting Date:** ${orderData.appointmentDate}
-🕒 **Fitting Time:** ${orderData.appointmentTime}
-` : '✨ **Action:** Direct Purchase (No fitting required)'}
+    const messageContent = `
+**New Bridal ${displayItemType} ${displayOrderType}**
+
+✨ **Item:** ${orderData.itemName}
+💰 **Total:** $${orderData.price}
+${orderData.transactionType === 'rent' ? `
+📅 **Fitting/Pickup Date:** ${orderData.appointmentDate}
+🕒 **Time:** ${orderData.appointmentTime}
+` : '📦 **Action:** Direct Purchase'}
 
 **Special Notes:**
 ${orderData.notes || 'None'}
