@@ -89,7 +89,7 @@ export default function BridalGalleryPage() {
                                     <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                                         <div className="flex gap-2">
                                             <Link href={`/bridal/rent-buy?package=${gown.id}`} className="flex-1">
-                                                <Button size="sm" className="w-full bg-primary text-white hover:bg-slate-100">
+                                                <Button size="sm" className="w-full bg-primary text-white hover:bg-slate-50 hover:text-primary">
                                                     Rent Or Buy
                                                 </Button>
                                             </Link>

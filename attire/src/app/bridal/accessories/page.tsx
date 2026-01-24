@@ -64,8 +64,8 @@ export default function BridalAccessoriesPage() {
               key={cat}
               onClick={() => setFilter(cat)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all capitalize ${filter === cat
-                  ? "bg-primary text-white"
-                  : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+                ? "bg-primary text-white"
+                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
                 }`}
             >
               {cat}
@@ -106,7 +106,7 @@ export default function BridalAccessoriesPage() {
                       >
                         <Button
                           size="sm"
-                          className="w-full bg-white text-primary hover:bg-slate-100"
+                          className="w-full bg-primary text-white hover:bg-slate-50 hover:text-primary"
                         >
                           Rent Or Buy
                         </Button>
