@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Loader from "@/components/ui/Loader";
+import { useApp } from '@/context/AppContext';
 
 /**
  * LoadingWrapper Component
@@ -11,19 +12,22 @@ import Loader from "@/components/ui/Loader";
  * Includes a small delay to ensure the loader is visible for a premium feel.
  */
 export default function LoadingWrapper({ children }: { children: React.ReactNode }) {
-    const [loading, setLoading] = useState(true);
+    const [timerDone, setTimerDone] = useState(false);
+    const { isAppBootstrapReady } = useApp();
 
     useEffect(() => {
-        // Add a small artificial delay to ensure the loader is visible 
-        // and the transition isn't just a flicker.
+        // Essential visual delay (1.6s)
         const timer = setTimeout(() => {
-            setLoading(false);
+            setTimerDone(true);
         }, 1600);
 
         return () => clearTimeout(timer);
     }, []);
 
-    if (loading) {
+    // App is "loading" if the visual timer hasn't finished OR the core data isn't ready
+    const isLoading = !timerDone || !isAppBootstrapReady;
+
+    if (isLoading) {
         return (
             <div className="fixed inset-0 flex items-center justify-center bg-white z-[9999]">
                 <div className="flex flex-col items-center gap-4">

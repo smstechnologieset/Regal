@@ -16,6 +16,7 @@ import React, {
 } from "react";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import { useAuth } from "./AuthContext";
+import { useApp } from "./AppContext";
 
 export interface Notification {
   id: string;
@@ -48,6 +49,7 @@ export function NotificationProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const { isAppBootstrapReady } = useApp();
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,12 +81,13 @@ export function NotificationProvider({
 
   // Initial fetch
   useEffect(() => {
+    if (!isAppBootstrapReady) return;
     fetchNotifications();
-  }, [fetchNotifications]);
+  }, [fetchNotifications, isAppBootstrapReady]);
 
   // Subscribe to real-time notifications
   useEffect(() => {
-    if (!user) return;
+    if (!user || !isAppBootstrapReady) return;
 
     const channel = supabase
       .channel("notifications")

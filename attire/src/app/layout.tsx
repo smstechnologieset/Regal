@@ -54,9 +54,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} font-sans min-h-screen flex flex-col`}
       >
-        <AuthProvider>
-          <SocketProvider>
-            <AppProvider>
+        <AppProvider>
+          <AuthProvider>
+            <SocketProvider>
               <NotificationProvider>
                 <WishlistProvider>
                   <CartProvider>
@@ -71,9 +71,9 @@ export default function RootLayout({
                   </CartProvider>
                 </WishlistProvider>
               </NotificationProvider>
-            </AppProvider>
-          </SocketProvider>
-        </AuthProvider>
+            </SocketProvider>
+          </AuthProvider>
+        </AppProvider>
       </body>
     </html>
   );

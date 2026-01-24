@@ -10,6 +10,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { useApp } from './AppContext';
 import { initSocket, disconnectSocket, getSocket } from '@/lib/socket';
 
 interface Message {
@@ -48,13 +49,16 @@ interface SocketContextType {
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
+    const { isAppBootstrapReady } = useApp();
     const { session } = useAuth();
     const [socket, setSocket] = useState<Socket | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Initialize socket connection when session is available
+    // Initialize socket connection when session is available and app is ready
     useEffect(() => {
+        if (!isAppBootstrapReady) return;
+
         console.log('SocketProvider: session effect triggered');
         if (!session?.access_token) {
             console.log('SocketProvider: disconnecting (no token)');
@@ -164,7 +168,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
                 sock.off('new_message', callback);
             };
         }
-        return () => {};
+        return () => { };
     }, []);
 
     const onTypingUpdate = useCallback((callback: (data: { conversationId: string; users: TypingUser[] }) => void) => {
@@ -175,7 +179,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
                 sock.off('user_typing', callback);
             };
         }
-        return () => {};
+        return () => { };
     }, []);
 
     const onMessagesRead = useCallback((callback: (data: { conversationId: string; readBy: string }) => void) => {
@@ -186,7 +190,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
                 sock.off('messages_read', callback);
             };
         }
-        return () => {};
+        return () => { };
     }, []);
 
     const value: SocketContextType = React.useMemo(() => ({

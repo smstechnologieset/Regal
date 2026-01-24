@@ -8,59 +8,77 @@ async function withRetry<T>(
     fn: (signal?: AbortSignal) => Promise<{ data: T | null; error: any; count?: number | null }>,
     retries = 3,
     delay = 500,
-    timeoutMs = 15000, // Reduced to 15s - if it takes longer, better to retry or fail early than hog slots
+    timeoutMs = 15000,
     signal?: AbortSignal
 ): Promise<{ data: T | null; error: any; count?: number | null }> {
     let lastError: any;
 
-    // If the external signal is already aborted, don't even start
     if (signal?.aborted) {
+        console.log('[withRetry] External signal already aborted. Skipping fetch.');
         return { data: null, error: new Error('Request aborted'), count: 0 };
     }
 
     for (let i = 0; i < retries; i++) {
+        if (signal?.aborted) break;
+
         const attempt = i + 1;
         const timestamp = new Date().toLocaleTimeString();
+        const localController = new AbortController();
 
-        // Create an internal timeout controller
-        const timeoutController = new AbortController();
-        const timeoutId = setTimeout(() => timeoutController.abort(), timeoutMs);
+        const onExternalAbort = () => {
+            console.log(`[withRetry] Attempt ${attempt} EXTERNAL ABORT triggered`);
+            localController.abort('external');
+        };
+        if (signal) signal.addEventListener('abort', onExternalAbort, { once: true });
 
         try {
-            console.log(`[${timestamp}] FETCH START: Attempt ${attempt}/${retries}`);
+            console.log(`[${timestamp}] [withRetry] Attempt ${attempt}/${retries} - STARTING...`);
 
-            // Execute the function, passing it a signal that combines the external and timeout signals
-            // (In recent Node/Browsers we can use AbortSignal.any, but for compatibility we'll manually check)
-            const result = await fn(timeoutController.signal);
+            // Use Promise.race to guarantee the timeout happens even if fn() ignores the signal
+            const resultPromise = fn(localController.signal);
+
+            const timeoutPromise = new Promise<never>((_, reject) => {
+                setTimeout(() => {
+                    console.warn(`[withRetry] Attempt ${attempt} TIMEOUT REJECTION triggered at ${timeoutMs}ms`);
+                    localController.abort('timeout');
+                    reject(new Error('timeout'));
+                }, timeoutMs);
+            });
+
+            const result = await Promise.race([resultPromise, timeoutPromise]) as { data: T | null; error: any; count?: number | null };
 
             if (!result.error) {
-                console.log(`[${timestamp}] FETCH SUCCESS on attempt ${attempt}`);
+                console.log(`[${timestamp}] [withRetry] Attempt ${attempt} SUCCESS`);
                 return result;
             }
 
             lastError = result.error;
-            console.warn(`[${timestamp}] FETCH FAILURE: Attempt ${attempt} failed with:`, lastError.message || lastError);
-
+            console.warn(`[withRetry] Attempt ${attempt} DATA ERROR:`, lastError.code || lastError.message);
             if (lastError.code === 'PGRST116') return result;
 
         } catch (err: any) {
             lastError = err;
-            if (err.name === 'AbortError' || err.message?.includes('timed out')) {
-                console.warn(`[${timestamp}] FETCH TIMEOUT/ABORT on attempt ${attempt}`);
+            const isTimeout = err.message === 'timeout' || localController.signal.reason === 'timeout';
+            const isAbort = err.name === 'AbortError' || signal?.aborted || localController.signal.aborted;
+
+            if (isTimeout) {
+                console.warn(`[${timestamp}] [withRetry] Attempt ${attempt} TIMED OUT`);
+            } else if (isAbort) {
+                console.warn(`[${timestamp}] [withRetry] Attempt ${attempt} ABORTED`);
+                if (signal?.aborted) break;
             } else {
-                console.error(`[${timestamp}] FETCH CRITICAL: Error on attempt ${attempt}:`, err.message || err);
+                console.error(`[${timestamp}] [withRetry] Attempt ${attempt} EXCEPTION:`, err.message || err);
             }
         } finally {
-            clearTimeout(timeoutId);
+            if (signal) signal.removeEventListener('abort', onExternalAbort);
+            console.log(`[withRetry] Attempt ${attempt} done.`);
         }
 
         if (i < retries - 1 && !signal?.aborted) {
             const backoff = delay * Math.pow(2, i);
-            console.log(`[${timestamp}] FETCH RETRY: Waiting ${backoff}ms before attempt ${attempt + 1}...`);
-            await new Promise(resolve => setTimeout(resolve, backoff));
+            console.log(`[withRetry] Waiting ${backoff}ms...`);
+            await new Promise(r => setTimeout(r, backoff));
         }
-
-        if (signal?.aborted) break;
     }
 
     return { data: null, error: lastError || new Error('Request failed after retries'), count: 0 };
@@ -216,6 +234,7 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
  * Fetch all attire categories
  */
 export async function getCategories(signal?: AbortSignal): Promise<Category[]> {
+    console.log('[attireService] getCategories: Querying Supabase...');
     const { data, error } = await withRetry((retrySignal) => {
         let q = getSupabaseClient()
             .from('categories')
@@ -248,13 +267,24 @@ export async function getFeaturedProducts(signal?: AbortSignal): Promise<{
     bestsellers: Product[];
     onSale: Product[];
 }> {
-    console.log('Fetching featured products (sequential with cancellation support)...');
+    console.log('[attireService] getFeaturedProducts: STARTING parallel fetch...');
 
     try {
-        // Sequentialize to avoid hitting browser connection limits
-        const newRes = await getProducts({ badges: ['new'] }, 'newest', 1, 8, signal);
-        const bestRes = await getProducts({ badges: ['bestseller'] }, 'popularity', 1, 8, signal);
-        const saleRes = await getProducts({ onSale: true }, 'newest', 1, 8, signal);
+        // Fetch in parallel but with a microscopic stagger to avoid connection limits
+        const results = await Promise.all([
+            getProducts({ badges: ['new'] }, 'newest', 1, 8, signal),
+            (async () => {
+                await new Promise(r => setTimeout(r, 20));
+                return getProducts({ badges: ['bestseller'] }, 'popularity', 1, 8, signal);
+            })(),
+            (async () => {
+                await new Promise(r => setTimeout(r, 40));
+                return getProducts({ onSale: true }, 'newest', 1, 8, signal);
+            })()
+        ]);
+
+        const [newRes, bestRes, saleRes] = results;
+        console.log('[attireService] getFeaturedProducts: SUCCESS');
 
         return {
             newArrivals: newRes.data || [],
@@ -461,9 +491,9 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
         }
 
         // 6. Create initial message
-        const orderTypeMessage = hasPreorders 
-            ? (allPreorders 
-                ? 'New pre-order placed!' 
+        const orderTypeMessage = hasPreorders
+            ? (allPreorders
+                ? 'New pre-order placed!'
                 : 'New order placed with pre-order items!')
             : 'New order placed!';
 

@@ -45,6 +45,9 @@ interface AppContextType {
     addToast: (message: string, type?: ToastType) => void;
     removeToast: (id: string) => void;
     showApiError: (error: any, defaultMessage?: string) => Promise<void>;
+
+    // Boot state
+    isAppBootstrapReady: boolean;
 }
 
 // Toast types
@@ -62,8 +65,10 @@ const defaultFilters: FilterOptions = {};
 // Create context
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Provider component
 export function AppProvider({ children }: { children: React.ReactNode }) {
+    // Bootstrap state
+    const [isAppBootstrapReady, setIsAppBootstrapReady] = useState(false);
+
     // Categories state
     const [categories, setCategories] = useState<Category[]>([]);
     const [categoriesLoading, setCategoriesLoading] = useState(true);
@@ -145,31 +150,58 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const fetchCategories = useCallback(async (signal?: AbortSignal) => {
         setCategoriesLoading(true);
         try {
-            const data = await getCategories(signal);
-            
-            if (signal?.aborted) return;
-
-            if (data.length === 0) {
-                // ...
+            console.log('[AppProvider] Checking network connectivity via ping...');
+            try {
+                const ping = await fetch('/api/notifications?limit=1', { signal });
+                console.log('[AppProvider] Network ping status:', ping.status);
+            } catch (e) {
+                console.warn('[AppProvider] Network ping failed (may be expected if middleware blocks):', e);
             }
+
+            console.log('[AppProvider] fetchCategories STARTING...');
+            const data = await getCategories(signal);
+
+            if (signal?.aborted) {
+                console.log('[AppProvider] fetchCategories ABORTED by signal.');
+                return;
+            }
+
+            console.log('[AppProvider] fetchCategories SUCCESS, count:', data.length);
             setCategories(data);
         } catch (error) {
-            if (error instanceof Error && error.name === 'AbortError') return;
-            console.error('AppProvider: Error fetching categories:', error);
+            if (error instanceof Error && error.name === 'AbortError') {
+                console.log('[AppProvider] fetchCategories detected AbortError.');
+                return;
+            }
+            console.error('[AppProvider] fetchCategories CRITICAL ERROR:', error);
             showApiError(error, 'Failed to load menu categories');
         } finally {
-            if (!signal?.aborted) {
+            if (!signal || !signal.aborted) {
+                console.log('[AppProvider] fetchCategories FINALLY (setting loading to false)');
                 setCategoriesLoading(false);
+                // Core data is loaded, allow the rest of the app to start
+                if (!isAppBootstrapReady) {
+                    console.log('[AppProvider] Bootstrap Complete (data loaded).');
+                    setIsAppBootstrapReady(true);
+                }
             }
         }
-    }, [showApiError]);
+    }, [isAppBootstrapReady, showApiError]);
 
     useEffect(() => {
         const controller = new AbortController();
         fetchCategories(controller.signal);
-        
+
+        // Ultimate safety: if for some reason we're still "loading" after 30s, force it off
+        const safetyTimer = setTimeout(() => {
+            console.warn('[AppProvider] STUCK PROTECTION: Safety timer reached. Forcing bootstrap ready.');
+            setCategoriesLoading(false);
+            setIsAppBootstrapReady(true);
+        }, 30000);
+
         return () => {
             controller.abort();
+            clearTimeout(safetyTimer);
         };
     }, [fetchCategories]);
 
@@ -192,6 +224,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         categories,
         categoriesLoading,
         refreshCategories: fetchCategories,
+        isAppBootstrapReady,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

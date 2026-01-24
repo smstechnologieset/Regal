@@ -62,37 +62,44 @@ export default function AttireHomePage() {
 
   // Fetch featured products and categories
   useEffect(() => {
+    let isMounted = true;
     const controller = new AbortController();
-    console.log('AttireHomePage: Mount Effect Triggered');
+    console.log(`[AttireHomePage] Mount (Desktop: ${window.innerWidth >= 1024})`);
 
     const fetchData = async () => {
-      console.log('AttireHomePage: Starting fetchData...');
+      if (categoriesLoading) {
+        console.log('[AttireHomePage] Waiting for app categories to settle...');
+        return;
+      }
+      console.log('[AttireHomePage] Starting fetchData...');
       try {
         const productsData = await getFeaturedProducts(controller.signal);
 
-        if (!controller.signal.aborted) {
-          console.log('AttireHomePage: fetchData Success', !!productsData);
+        if (isMounted && !controller.signal.aborted) {
+          console.log('[AttireHomePage] Fetch Success');
           setFeaturedProducts(productsData);
           setLoading(false);
-          console.log('AttireHomePage: fetchData Complete (loading state set to false)');
+        } else if (!isMounted) {
+          console.log('[AttireHomePage] Fetch finished but component was already unmounted');
         }
       } catch (error: any) {
-        if (error.name === 'AbortError') {
-          console.log('AttireHomePage: fetchData aborted');
+        if (!isMounted || error.name === 'AbortError') {
+          console.log('[AttireHomePage] Fetch aborted/unmounted');
           return;
         }
-        console.error('AttireHomePage: fetchData Error:', error);
-        setLoading(false);
+        console.error('[AttireHomePage] Fetch Error:', error);
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchData();
 
     return () => {
-      console.log('AttireHomePage: Unmounting (aborting fetch)...');
+      console.log('[AttireHomePage] Unmount (cleaning up...)');
+      isMounted = false;
       controller.abort();
     };
-  }, []);
+  }, [categoriesLoading]);
 
   // Auto-rotate hero slides
   useEffect(() => {

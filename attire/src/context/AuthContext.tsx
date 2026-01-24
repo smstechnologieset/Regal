@@ -21,6 +21,7 @@ import {
   AuthChangeEvent,
 } from "@supabase/supabase-js";
 import { getSupabaseClient } from "@/lib/supabase/client";
+import { useApp } from "./AppContext";
 
 export interface Profile {
   id: string;
@@ -67,27 +68,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Fetch user profile
   const fetchProfile = useCallback(
     async (userId: string) => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
+      console.log(`[AuthContext] fetchProfile: Starting for user ${userId}...`);
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", userId)
+          .single();
 
-      if (error) {
-        // PGRST116 means no rows were found, which is expected for new users for a split second
-        if (error.code === "PGRST116") {
+        if (error) {
+          // PGRST116 means no rows were found, which is expected for new users for a split second
+          if (error.code === "PGRST116") {
+            console.log(`[AuthContext] fetchProfile: No profile found for user ${userId}`);
+            return null;
+          }
+
+          console.error("[AuthContext] fetchProfile: Database error:", error);
           return null;
         }
-
-        console.error("Database error fetching profile:", {
-          code: error.code,
-          message: error.message,
-          userId,
-          error, // Logging the whole error object too
-        });
+        console.log(`[AuthContext] fetchProfile: SUCCESS for user ${userId}`);
+        return data as Profile;
+      } catch (err) {
+        console.error(`[AuthContext] fetchProfile: UNEXPECTED ERROR for user ${userId}:`, err);
         return null;
       }
-      return data as Profile;
     },
     [supabase]
   );
@@ -100,10 +104,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, fetchProfile]);
 
+  const { isAppBootstrapReady } = useApp();
+
   // Initialize auth state
   useEffect(() => {
+    if (!isAppBootstrapReady) return;
+
     const initializeAuth = async () => {
       try {
+        console.log("[AuthProvider] Boot ready. Initializing session...");
         const {
           data: { session: currentSession },
         } = await supabase.auth.getSession();
@@ -128,6 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, newSession: Session | null) => {
+        console.log(`[AuthProvider] Auth Change Event: ${event}`);
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
@@ -168,7 +178,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase, fetchProfile]);
+  }, [supabase, fetchProfile, isAppBootstrapReady]);
 
   // Sign in with email/password
   const signIn = async (email: string, password: string) => {
