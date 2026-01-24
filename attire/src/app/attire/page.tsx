@@ -42,7 +42,7 @@ const heroSlides = [
 
 // Features/USPs
 const features = [
-  { icon: Truck, title: 'Free Shipping', desc: 'On orders over $50' },
+  { icon: Truck, title: 'Free Shipping', desc: 'On orders over ETB 500' },
   { icon: RefreshCw, title: 'Easy Returns', desc: '30-day return policy' },
   { icon: Shield, title: 'Secure Payment', desc: '100% secure checkout' },
   { icon: Clock, title: '24/7 Support', desc: 'Here to help anytime' },

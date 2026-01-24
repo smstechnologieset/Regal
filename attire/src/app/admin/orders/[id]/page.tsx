@@ -19,6 +19,7 @@ import {
   MessageSquare,
   ShoppingBag,
   Truck,
+  Clock,
 } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import { useApp } from "@/context/AppContext";
@@ -103,9 +104,9 @@ export default function AdminOrderDetailPage() {
 
     try {
       // 1. Handle Stock Adjustments
-      if (!wasActive && isActive) {
+      if (!wasActive && isActive && Array.isArray(order.details)) {
         // Transitioning from Inactive to Active: Decrease Stock
-        for (const item of order.details || []) {
+        for (const item of (order.details as any[])) {
           const productId = item.productId || item.id;
           if (!productId) continue;
 
@@ -135,9 +136,9 @@ export default function AdminOrderDetailPage() {
             })
             .eq("id", productId);
         }
-      } else if (wasActive && !isActive) {
+      } else if (wasActive && !isActive && Array.isArray(order.details)) {
         // Transitioning from Active to Inactive (Cancelled/Pending): Restore Stock
-        for (const item of order.details || []) {
+        for (const item of (order.details as any[])) {
           const productId = item.productId || item.id;
           if (!productId) continue;
 
@@ -213,15 +214,16 @@ export default function AdminOrderDetailPage() {
 
       // 2. If no conversation exists, create a new one
       const items = Array.isArray(order.details) ? order.details : [];
-      const firstItemName =
-        items[0]?.productName ||
-        items[0]?.product?.name ||
-        items[0]?.name ||
-        "Attire Order";
-      const displaySubject =
-        items.length > 1
-          ? `${firstItemName} +${items.length - 1} more`
-          : firstItemName;
+      const isBridal = order.service_type === 'bridal';
+      const bridalDetails = !Array.isArray(order.details) ? order.details : null;
+
+      const firstItemName = isBridal && bridalDetails?.gownName
+        ? bridalDetails.gownName
+        : (items[0]?.productName || items[0]?.product?.name || items[0]?.name || "Order Request");
+
+      const displaySubject = items.length > 1
+        ? `${firstItemName} +${items.length - 1} more`
+        : firstItemName;
 
       const { data: newConv, error: createError } = await supabase
         .from("conversations")
@@ -373,7 +375,6 @@ export default function AdminOrderDetailPage() {
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-16 bg-slate-100 rounded overflow-hidden flex-shrink-0">
-                        {/* Image would go here if available */}
                         <div className="w-full h-full flex items-center justify-center text-slate-400">
                           <ShoppingBag size={20} />
                         </div>
@@ -401,9 +402,64 @@ export default function AdminOrderDetailPage() {
                     </div>
                   </div>
                 ))
+              ) : order.service_type === 'bridal' ? (
+                <div className="space-y-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex gap-4">
+                      <div className="w-16 h-20 bg-rose-50 rounded-lg flex items-center justify-center text-rose-300">
+                        <ShoppingBag size={32} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-bold text-lg text-slate-900">
+                            {order.details?.gownName || "Bridal Gown"}
+                          </p>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${order.details?.type === 'buy' ? 'bg-primary text-white' : 'bg-secondary text-white'
+                            }`}>
+                            {order.details?.type || 'Request'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-500">
+                          Designer: {order.details?.designer || 'Custom'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xl font-bold text-slate-900">
+                        ${order.total?.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {order.details?.type === 'rent' && (
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-slate-400 uppercase font-bold mb-1">Fitting Date</p>
+                        <div className="flex items-center gap-2 text-slate-700">
+                          <Calendar size={16} />
+                          <span className="font-medium">{order.details?.date || 'To be scheduled'}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-400 uppercase font-bold mb-1">Fitting Time</p>
+                        <div className="flex items-center gap-2 text-slate-700">
+                          <Clock size={16} />
+                          <span className="font-medium">{order.details?.time || 'N/A'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {order.details?.notes && (
+                    <div className="pt-4 border-t border-slate-100">
+                      <p className="text-xs text-slate-400 uppercase font-bold mb-1">Notes from Customer</p>
+                      <p className="text-sm text-slate-600 italic">"{order.details.notes}"</p>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <p className="text-slate-500 text-sm">
-                  No items found in this order.
+                  Service details: {JSON.stringify(order.details)}
                 </p>
               )}
             </div>
@@ -457,11 +513,10 @@ export default function AdminOrderDetailPage() {
                   key={status}
                   onClick={() => updateStatus(status)}
                   disabled={updating || order.status === status}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all ${
-                    order.status === status
-                      ? getStatusColor(status)
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  } disabled:opacity-50`}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-all ${order.status === status
+                    ? getStatusColor(status)
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    } disabled:opacity-50`}
                 >
                   {status.replace("_", " ")}
                 </button>

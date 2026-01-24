@@ -430,7 +430,8 @@ CREATE TABLE IF NOT EXISTS public.conversations (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable Row Level Security
+
+-- 
 ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
 
 -- Policies for conversations

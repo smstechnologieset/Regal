@@ -172,6 +172,150 @@ ${bookingData.notes || 'No additional notes provided.'}
 }
 
 /**
+ * Fetch a single bridal gown by ID
+ */
+export async function getBridalGownById(id: string): Promise<BridalGown | null> {
+    const supabase = getSupabaseClient();
+
+    const { data, error } = await supabase
+        .from('bridal_gowns')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+    if (error || !data) {
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error fetching bridal gown:', error);
+        }
+        return null;
+    }
+
+    const gown = data as any;
+    return {
+        id: gown.id,
+        name: gown.name,
+        designer: gown.designer,
+        style: gown.style,
+        silhouette: gown.silhouette,
+        priceRent: gown.price_rent,
+        priceBuy: gown.price_buy,
+        sizes: gown.sizes || [],
+        images: gown.images || [],
+        description: gown.description,
+        isNew: gown.is_new,
+    };
+}
+
+/**
+ * Rent or Buy a bridal gown (creates order + conversation)
+ */
+export async function rentBuyBridalGown(orderData: {
+    userId: string;
+    gownId: string;
+    gownName: string;
+    type: 'rent' | 'buy';
+    price: number;
+    appointmentDate?: string;
+    appointmentTime?: string;
+    notes: string;
+    contactName: string;
+    contactEmail: string;
+    contactPhone: string;
+}): Promise<{ orderId: string; conversationId: string; success: boolean }> {
+    const supabase = getSupabaseClient();
+
+    // 1. If renting, check for double booking
+    if (orderData.type === 'rent' && orderData.appointmentDate && orderData.appointmentTime) {
+        try {
+            const checkRes = await fetch(`${window.location.origin}/api/bridal/appointments/booked-slots?date=${orderData.appointmentDate}`);
+            const { bookedSlots } = await checkRes.json();
+
+            if (bookedSlots && bookedSlots.includes(orderData.appointmentTime)) {
+                return { orderId: '', conversationId: '', success: false };
+            }
+        } catch (apiError) {
+            console.error('Error checking availability:', apiError);
+            return { orderId: '', conversationId: '', success: false };
+        }
+    }
+
+    // 2. Create the order
+    const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+            user_id: orderData.userId,
+            service_type: 'bridal',
+            status: 'pending',
+            total: orderData.price,
+            details: {
+                gownId: orderData.gownId,
+                gownName: orderData.gownName,
+                type: orderData.type, // 'rent' or 'buy'
+                date: orderData.appointmentDate || null,
+                time: orderData.appointmentTime || null,
+                notes: orderData.notes,
+                contactName: orderData.contactName,
+                contactEmail: orderData.contactEmail,
+                contactPhone: orderData.contactPhone,
+            },
+        })
+        .select()
+        .single();
+
+    if (orderError || !order) {
+        console.error('Error creating bridal gown order:', orderError);
+        return { orderId: '', conversationId: '', success: false };
+    }
+
+    // 3. Create a conversation
+    const { data: conversation, error: convError } = await supabase
+        .from('conversations')
+        .insert({
+            user_id: orderData.userId,
+            service_type: 'bridal',
+            order_id: order.id,
+            subject: `Gown ${orderData.type.toUpperCase()}: ${orderData.gownName}`,
+            status: 'open',
+        })
+        .select()
+        .single();
+
+    if (convError || !conversation) {
+        return { orderId: order.id, conversationId: '', success: true };
+    }
+
+    // 4. Send initial detailed message
+    const messageContent = `
+**New Bridal Gown ${orderData.type === 'rent' ? 'Rental Request' : 'Purchase Request'}**
+
+👗 **Gown:** ${orderData.gownName}
+💰 **Internal Total:** $${orderData.price}
+${orderData.type === 'rent' ? `
+📅 **Rental Fitting Date:** ${orderData.appointmentDate}
+🕒 **Fitting Time:** ${orderData.appointmentTime}
+` : '✨ **Action:** Direct Purchase (No fitting required)'}
+
+**Special Notes:**
+${orderData.notes || 'None'}
+
+---
+*Customer: ${orderData.contactName} (${orderData.contactEmail})*
+    `.trim();
+
+    await supabase.from('messages').insert({
+        conversation_id: conversation.id,
+        sender_id: orderData.userId,
+        content: messageContent,
+    });
+
+    return {
+        orderId: order.id,
+        conversationId: conversation.id,
+        success: true,
+    };
+}
+
+/**
  * Fetch all bridal accessories from the database
  */
 export async function getBridalAccessories(): Promise<import('@/types').BridalAccessory[]> {
