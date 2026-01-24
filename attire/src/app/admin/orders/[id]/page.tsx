@@ -432,20 +432,11 @@ export default function AdminOrderDetailPage() {
                   </div>
 
                   {order.details?.type === 'rent' && (
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 grid sm:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-xs text-slate-400 uppercase font-bold mb-1">Fitting Date</p>
-                        <div className="flex items-center gap-2 text-slate-700">
-                          <Calendar size={16} />
-                          <span className="font-medium">{order.details?.date || 'To be scheduled'}</span>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-xs text-slate-400 uppercase font-bold mb-1">Fitting Time</p>
-                        <div className="flex items-center gap-2 text-slate-700">
-                          <Clock size={16} />
-                          <span className="font-medium">{order.details?.time || 'N/A'}</span>
-                        </div>
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                      <p className="text-xs text-slate-400 uppercase font-bold mb-1">Rental Date</p>
+                      <div className="flex items-center gap-2 text-slate-700">
+                        <Calendar size={16} />
+                        <span className="font-medium">{order.details?.date || 'To be scheduled'}</span>
                       </div>
                     </div>
                   )}

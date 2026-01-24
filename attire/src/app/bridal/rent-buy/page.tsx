@@ -27,7 +27,6 @@ function RentBuyForm() {
     const [loadingItem, setLoadingItem] = useState(true);
     const [selectionType, setSelectionType] = useState<'rent' | 'buy'>('rent');
     const [date, setDate] = useState('');
-    const [time, setTime] = useState('');
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -36,8 +35,8 @@ function RentBuyForm() {
     });
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
-    const [bookedSlots, setBookedSlots] = useState<string[]>([]);
-    const [fetchingSlots, setFetchingSlots] = useState(false);
+    const [isDateBooked, setIsDateBooked] = useState(false);
+    const [fetchingAvailability, setFetchingAvailability] = useState(false);
 
     // Fetch details
     useEffect(() => {
@@ -78,31 +77,30 @@ function RentBuyForm() {
         fetchDetails();
     }, [gownId, accessoryId, router, addToast]);
 
-    // Fetch booked slots when date changes (only if renting)
+    // Check availability when date changes (only if renting)
     useEffect(() => {
-        async function fetchBookedSlots() {
+        async function checkAvailability() {
             if (!date || selectionType !== 'rent') {
-                setBookedSlots([]);
+                setIsDateBooked(false);
                 return;
             }
 
-            setFetchingSlots(true);
+            setFetchingAvailability(true);
             try {
-                const res = await fetch(`/api/bridal/appointments/booked-slots?date=${date}`);
+                const id = gownId || accessoryId;
+                const res = await fetch(`/api/bridal/appointments/booked-slots?date=${date}&itemId=${id}`);
                 const data = await res.json();
-                if (data.bookedSlots) {
-                    setBookedSlots(data.bookedSlots);
-                }
+                setIsDateBooked(data.isBooked);
             } catch (error) {
-                console.error('Error fetching booked slots:', error);
+                console.error('Error fetching availability:', error);
             } finally {
-                setFetchingSlots(false);
+                setFetchingAvailability(false);
             }
         }
-        fetchBookedSlots();
-    }, [date, selectionType]);
+        checkAvailability();
+    }, [date, selectionType, gownId, accessoryId]);
 
-    const timeSlots = ['10:00 AM', '11:00 AM', '01:00 PM', '02:00 PM', '04:00 PM'];
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -116,8 +114,13 @@ function RentBuyForm() {
 
         if (!item) return;
 
-        if (selectionType === 'rent' && (!date || !time)) {
-            addToast('Please select a date and time', 'error');
+        if (selectionType === 'rent' && !date) {
+            addToast('Please select a date', 'error');
+            return;
+        }
+
+        if (selectionType === 'rent' && isDateBooked) {
+            addToast('This date is already booked for this item', 'error');
             return;
         }
 
@@ -132,7 +135,6 @@ function RentBuyForm() {
                 transactionType: selectionType,
                 price: selectionType === 'rent' ? (item.priceRent || 0) : (item.priceBuy || 0),
                 appointmentDate: selectionType === 'rent' ? date : undefined,
-                appointmentTime: selectionType === 'rent' ? time : undefined,
                 contactName: formData.name,
                 contactEmail: formData.email,
                 contactPhone: formData.phone,
@@ -143,7 +145,7 @@ function RentBuyForm() {
                 setSuccess(true);
                 addToast(`${selectionType === 'rent' ? 'Rental request' : 'Purchase request'} submitted!`, 'success');
             } else {
-                addToast('Failed to submit request. Slot might have been booked.', 'error');
+                addToast('Failed to submit request. This date might have been taken.', 'error');
             }
         } catch (error) {
             console.error('Submission failed:', error);
@@ -169,7 +171,7 @@ function RentBuyForm() {
                     <p className="text-slate-600 mb-8">
                         Thank you, {formData.name}. Your {selectionType} request for <strong>{item.name}</strong> has been received.
                         {selectionType === 'rent' ? (
-                            <span> We look forward to seeing you on {new Date(date).toLocaleDateString()} at {time}.</span>
+                            <span> We have reserved this item for you on <strong>{new Date(date).toLocaleDateString()}</strong>.</span>
                         ) : (
                             <span> Our team will contact you shortly to finalize your purchase and delivery.</span>
                         )}
@@ -294,44 +296,34 @@ function RentBuyForm() {
                                 {selectionType === 'rent' && (
                                     <div className="space-y-4 animate-fade-in">
                                         <h3 className="font-bold text-primary flex items-center gap-2">
-                                            <Clock size={20} className="text-secondary" />
-                                            Schedule {itemType === 'gown' ? 'Your Fitting' : 'Pickup'}
+                                            <Calendar size={20} className="text-secondary" />
+                                            When do you need it?
                                         </h3>
-                                        <div className="grid sm:grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-2">Preferred Date</label>
+                                        <div className="max-w-sm">
+                                            <label className="block text-sm font-medium text-slate-700 mb-2">Select Rental Date</label>
+                                            <div className="relative">
                                                 <input
                                                     type="date"
                                                     value={date}
                                                     onChange={(e) => setDate(e.target.value)}
-                                                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-secondary outline-none"
+                                                    className={`w-full px-4 py-3 border rounded-xl outline-none transition-all ${isDateBooked
+                                                            ? 'border-red-300 bg-red-50 text-red-900 focus:ring-2 focus:ring-red-200'
+                                                            : 'border-slate-200 focus:ring-2 focus:ring-secondary/20 focus:border-secondary'
+                                                        }`}
                                                     required={selectionType === 'rent'}
                                                     min={new Date().toISOString().split('T')[0]}
                                                 />
+                                                {fetchingAvailability && (
+                                                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-secondary"></div>
+                                                    </div>
+                                                )}
                                             </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-slate-700 mb-2">Preferred Time</label>
-                                                <div className="relative">
-                                                    <select
-                                                        value={time}
-                                                        onChange={(e) => setTime(e.target.value)}
-                                                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-secondary outline-none appearance-none disabled:bg-slate-50"
-                                                        required={selectionType === 'rent'}
-                                                        disabled={!date || fetchingSlots}
-                                                    >
-                                                        <option value="">{fetchingSlots ? 'Checking slots...' : 'Select Time'}</option>
-                                                        {timeSlots.map(t => {
-                                                            const isBooked = bookedSlots.includes(t);
-                                                            return (
-                                                                <option key={t} value={t} disabled={isBooked}>
-                                                                    {t} {isBooked ? '(Booked)' : ''}
-                                                                </option>
-                                                            );
-                                                        })}
-                                                    </select>
-                                                    <Clock size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                                                </div>
-                                            </div>
+                                            {isDateBooked && (
+                                                <p className="mt-2 text-xs text-red-600 font-medium flex items-center gap-1">
+                                                    This date is already reserved. Please select another.
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                 )}

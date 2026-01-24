@@ -249,7 +249,6 @@ export async function submitBridalTransaction(orderData: {
     transactionType: 'rent' | 'buy';
     price: number;
     appointmentDate?: string;
-    appointmentTime?: string;
     notes: string;
     contactName: string;
     contactEmail: string;
@@ -257,13 +256,13 @@ export async function submitBridalTransaction(orderData: {
 }): Promise<{ orderId: string; conversationId: string; success: boolean }> {
     const supabase = getSupabaseClient();
 
-    // 1. If renting, check for double booking
-    if (orderData.transactionType === 'rent' && orderData.appointmentDate && orderData.appointmentTime) {
+    // 1. If renting, check for daily booking availability
+    if (orderData.transactionType === 'rent' && orderData.appointmentDate) {
         try {
-            const checkRes = await fetch(`${window.location.origin}/api/bridal/appointments/booked-slots?date=${orderData.appointmentDate}`);
-            const { bookedSlots } = await checkRes.json();
+            const checkRes = await fetch(`${window.location.origin}/api/bridal/appointments/booked-slots?date=${orderData.appointmentDate}&itemId=${orderData.itemId}`);
+            const { isBooked } = await checkRes.json();
 
-            if (bookedSlots && bookedSlots.includes(orderData.appointmentTime)) {
+            if (isBooked) {
                 return { orderId: '', conversationId: '', success: false };
             }
         } catch (apiError) {
@@ -286,7 +285,6 @@ export async function submitBridalTransaction(orderData: {
                 itemType: orderData.itemType,
                 type: orderData.transactionType, // 'rent' or 'buy'
                 date: orderData.appointmentDate || null,
-                time: orderData.appointmentTime || null,
                 notes: orderData.notes,
                 contactName: orderData.contactName,
                 contactEmail: orderData.contactEmail,
@@ -328,8 +326,7 @@ export async function submitBridalTransaction(orderData: {
 ✨ **Item:** ${orderData.itemName}
 💰 **Total:** $${orderData.price}
 ${orderData.transactionType === 'rent' ? `
-📅 **Fitting/Pickup Date:** ${orderData.appointmentDate}
-🕒 **Time:** ${orderData.appointmentTime}
+📅 **Rental Date:** ${orderData.appointmentDate}
 ` : '📦 **Action:** Direct Purchase'}
 
 **Special Notes:**
