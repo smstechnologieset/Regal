@@ -150,14 +150,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const fetchCategories = useCallback(async (signal?: AbortSignal) => {
         setCategoriesLoading(true);
         try {
-            console.log('[AppProvider] Checking network connectivity via ping...');
-            try {
-                const ping = await fetch('/api/notifications?limit=1', { signal });
-                console.log('[AppProvider] Network ping status:', ping.status);
-            } catch (e) {
-                console.warn('[AppProvider] Network ping failed (may be expected if middleware blocks):', e);
-            }
-
             console.log('[AppProvider] fetchCategories STARTING...');
             const data = await getCategories(signal);
 
@@ -192,12 +184,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const controller = new AbortController();
         fetchCategories(controller.signal);
 
-        // Ultimate safety: if for some reason we're still "loading" after 30s, force it off
+        // Safety: if for some reason we're still "loading" after 10s, force it off
         const safetyTimer = setTimeout(() => {
             console.warn('[AppProvider] STUCK PROTECTION: Safety timer reached. Forcing bootstrap ready.');
             setCategoriesLoading(false);
             setIsAppBootstrapReady(true);
-        }, 30000);
+        }, 10000);
 
         return () => {
             controller.abort();

@@ -156,13 +156,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             return null;
           };
 
-          if (
-            event === "SIGNED_IN" ||
-            event === "USER_UPDATED" ||
-            event === "INITIAL_SESSION"
-          ) {
+          if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
             const profileData = await fetchWithRetry(newSession.user.id);
             setProfile(profileData);
+          } else if (event === "USER_UPDATED") {
+            // USER_UPDATED usually means password/email change, profile is likely same
+            // Don't block the event handler, just refresh in background if we don't have one
+            if (!profile) {
+              fetchProfile(newSession.user.id).then(setProfile);
+            }
           } else {
             const profileData = await fetchProfile(newSession.user.id);
             setProfile(profileData);

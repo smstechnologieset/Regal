@@ -18,6 +18,9 @@ import {
   LogOut,
   LayoutDashboard,
   ChevronRight,
+  Menu,
+  X,
+  Home
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { getSupabaseClient } from "@/lib/supabase/client";
@@ -40,6 +43,7 @@ export default function AccountLayout({
 
   const [isLoggingOut, setIsLoggingOut] = React.useState(false);
   const [unreadMessageCount, setUnreadMessageCount] = React.useState(0);
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -53,6 +57,11 @@ export default function AccountLayout({
       window.location.href = "/";
     }
   };
+
+  // Close sidebar on navigation
+  React.useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   // Redirect if not logged in
   React.useEffect(() => {
@@ -138,11 +147,39 @@ export default function AccountLayout({
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Mobile Header */}
+      <header className="lg:hidden sticky top-0 left-0 right-0 h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 z-40">
+        <button onClick={() => setSidebarOpen(true)} className="p-2 text-slate-600">
+          <Menu size={24} />
+        </button>
+        <span className="font-bold text-secondary tracking-tight">REGAL ACCOUNT</span>
+        <div className="w-10"></div>
+      </header>
+
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar Overlay */}
+          {sidebarOpen && (
+            <div
+              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
+
           {/* Sidebar */}
-          <aside className="w-full lg:w-72 flex-shrink-0">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden sticky top-24">
+          <aside className={`
+            fixed top-0 left-0 h-full w-72 bg-white z-50 transform transition-transform duration-300 lg:relative lg:translate-x-0 lg:z-0 lg:h-auto lg:bg-transparent lg:w-72 flex-shrink-0
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          `}>
+            <div className="bg-white lg:rounded-2xl shadow-xl lg:shadow-sm border-r lg:border border-slate-200 overflow-hidden sticky top-0 lg:top-24 h-full lg:h-auto">
+              {/* Sidebar Header (Mobile Only) */}
+              <div className="lg:hidden p-6 border-b border-slate-100 flex items-center justify-between">
+                <span className="font-bold text-secondary">MENU</span>
+                <button onClick={() => setSidebarOpen(false)} className="text-slate-400">
+                  <X size={20} />
+                </button>
+              </div>
+
               {/* User Info */}
               <div className="p-6 border-b border-slate-100">
                 <div className="flex items-center gap-4">
@@ -183,26 +220,37 @@ export default function AccountLayout({
                       <li key={item.name}>
                         <Link
                           href={item.href}
-                          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                            isActive
-                              ? "bg-rose-50 text-rose-700"
-                              : "text-slate-600 hover:bg-slate-50 hover:text-primary"
-                          }`}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
+                            ? "bg-rose-50 text-rose-700 font-medium"
+                            : "text-slate-600 hover:bg-slate-50 hover:text-primary"
+                            }`}
                         >
                           <item.icon size={20} />
-                          {item.name}
+                          <span className="flex-1">{item.name}</span>
+                          {item.name === "Messages" && unreadMessageCount > 0 && (
+                            <span className="bg-secondary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                              {unreadMessageCount}
+                            </span>
+                          )}
                         </Link>
                       </li>
                     );
                   })}
                 </ul>
 
-                {/* Sign Out */}
-                <div className="mt-4 pt-4 border-t border-slate-100">
+                {/* Bottom Actions */}
+                <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col gap-1">
+                  <Link
+                    href="/"
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors"
+                  >
+                    <Home size={20} />
+                    Back to Home
+                  </Link>
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full text-left"
                   >
                     <LogOut size={20} />
                     Sign Out

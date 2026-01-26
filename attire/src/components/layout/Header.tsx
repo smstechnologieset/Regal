@@ -386,24 +386,26 @@ export default function Header() {
                     <Search size={22} />
                   </button>
 
-                  {/* Wishlist */}
-                  <Link
-                    href="/attire/wishlist"
-                    className={cn(
-                      "relative p-2 transition-colors",
-                      isTransparent
-                        ? "text-white hover:text-white/80"
-                        : "text-slate-700 hover:text-primary"
-                    )}
-                    aria-label="Wishlist"
-                  >
-                    <Heart size={22} />
-                    {wishlistCount > 0 && (
-                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-secondary text-white text-[10px] font-medium rounded-full flex items-center justify-center">
-                        {wishlistCount}
-                      </span>
-                    )}
-                  </Link>
+                  {/* Wishlist - Only if logged in */}
+                  {user && (
+                    <Link
+                      href="/attire/wishlist"
+                      className={cn(
+                        "relative p-2 transition-colors",
+                        isTransparent
+                          ? "text-white hover:text-white/80"
+                          : "text-slate-700 hover:text-primary"
+                      )}
+                      aria-label="Wishlist"
+                    >
+                      <Heart size={22} />
+                      {wishlistCount > 0 && (
+                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-secondary text-white text-[10px] font-medium rounded-full flex items-center justify-center">
+                          {wishlistCount}
+                        </span>
+                      )}
+                    </Link>
+                  )}
                 </>
               )}
 
@@ -456,8 +458,8 @@ export default function Header() {
                 </Link>
               )}
 
-              {/* Cart - Only in Attire section */}
-              {isAttireSection && (
+              {/* Cart - Only in Attire section AND if logged in */}
+              {isAttireSection && user && (
                 <button
                   onClick={toggleCart}
                   className={cn(

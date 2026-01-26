@@ -7,7 +7,7 @@
  * Only accessible to users with admin role.
  */
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -199,14 +199,39 @@ export default function AdminLayout({
 }) {
     const pathname = usePathname();
     const router = useRouter();
-    const { profile, signOut } = useAuth();
+    const { profile, signOut, isLoading, isAdmin } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    // Protection: Redirect non-admins
+    useEffect(() => {
+        if (!isLoading && !isAdmin) {
+            console.log('[AdminLayout] Non-admin detected. Redirecting to /account');
+            router.push('/account');
+        }
+    }, [isAdmin, isLoading, router]);
 
     const handleSignOut = async () => {
         await signOut();
         // Use window.location.href for a full refresh to ensure all cookies and state are cleared
         window.location.href = '/';
     };
+
+    // Show loading state while checking auth
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-100">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                    <span className="text-slate-500 font-medium">Verifying admin access...</span>
+                </div>
+            </div>
+        );
+    }
+
+    // Do not show admin content if not admin
+    if (!isAdmin) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen bg-slate-100">

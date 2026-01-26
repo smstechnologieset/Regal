@@ -223,7 +223,7 @@ function LoginContent() {
           </div>
 
           {/* Social Login */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-3">
             <button
               type="button"
               onClick={handleGoogleSignIn}
@@ -252,21 +252,33 @@ function LoginContent() {
                   />
                 </svg>
               )}
-              Google
+              Continue with Google
             </button>
           </div>
         </div>
 
-        {/* Sign Up Link */}
-        <p className="text-center mt-6 text-slate-600">
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/register"
-            className="text-secondary hover:text-secondary/80 font-medium"
-          >
-            Sign up
-          </Link>
-        </p>
+        {/* Sign Up & Legal Link */}
+        <div className="text-center mt-6 space-y-4">
+          <p className="text-slate-600">
+            Don&apos;t have an account?{" "}
+            <Link
+              href="/register"
+              className="text-secondary hover:text-secondary/80 font-medium"
+            >
+              Sign up
+            </Link>
+          </p>
+          <p className="text-xs text-slate-400">
+            By signing in, you agree to our{" "}
+            <Link href="/terms" className="hover:text-primary underline px-1">
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="hover:text-primary underline px-1">
+              Privacy Policy
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

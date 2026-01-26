@@ -18,9 +18,34 @@ export default function ForgotPasswordPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [cooldown, setCooldown] = useState(0);
+    const hasRequestedRef = React.useRef(false);
+
+    // Initialize cooldown from sessionStorage on mount
+    React.useEffect(() => {
+        const lastReset = sessionStorage.getItem('regal_pwd_reset_last');
+        if (lastReset) {
+            const diff = Math.floor((Date.now() - parseInt(lastReset)) / 1000);
+            if (diff < 60) {
+                setCooldown(60 - diff);
+            }
+        }
+    }, []);
+
+    // Handle cooldown timer
+    React.useEffect(() => {
+        if (cooldown > 0) {
+            const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [cooldown]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (isLoading || cooldown > 0 || hasRequestedRef.current) {
+            return;
+        }
 
         if (!email) {
             setError('Email is required');
@@ -31,16 +56,33 @@ export default function ForgotPasswordPage() {
         setError('');
 
         const supabase = getSupabaseClient();
+
+        // Mark as requested to prevent double-submit in Strict Mode
+        hasRequestedRef.current = true;
+
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
             redirectTo: `${window.location.origin}/reset-password`,
         });
 
         if (resetError) {
-            setError(resetError.message);
+            hasRequestedRef.current = false; // Allow retry on error (except 429)
+
+            // Check for Supabase rate limit error (usually contains "rate limit" or is 429)
+            if (resetError.message.toLowerCase().includes('rate limit') || (resetError as any).status === 429) {
+                const now = Date.now();
+                sessionStorage.setItem('regal_pwd_reset_last', now.toString());
+                setError(`Too many requests. Please wait ${60} seconds before trying again.`);
+                setCooldown(60);
+            } else {
+                setError(resetError.message);
+            }
             setIsLoading(false);
             return;
         }
 
+        // On success, set persistent cooldown
+        sessionStorage.setItem('regal_pwd_reset_last', Date.now().toString());
+        setCooldown(60);
         setSuccess(true);
         setIsLoading(false);
     };
@@ -92,7 +134,9 @@ export default function ForgotPasswordPage() {
                             value={email}
                             onChange={(e) => {
                                 setEmail(e.target.value);
-                                setError('');
+                                if (error && !error.includes('Too many requests')) {
+                                    setError('');
+                                }
                             }}
                             error={error}
                             placeholder="you@example.com"
@@ -104,8 +148,9 @@ export default function ForgotPasswordPage() {
                             fullWidth
                             size="lg"
                             isLoading={isLoading}
+                            disabled={cooldown > 0}
                         >
-                            Send Reset Link
+                            {cooldown > 0 ? `Wait ${cooldown}s` : 'Send Reset Link'}
                         </Button>
                     </form>
                 </div>
