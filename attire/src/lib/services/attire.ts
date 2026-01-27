@@ -78,15 +78,15 @@ export async function getProducts(
         }
 
         return {
-            products: finalData,
-            totalCount: total,
+            data: finalData,
+            total,
             page,
             pageSize,
             totalPages,
         };
     } catch (error) {
         console.error('Error fetching products:', error);
-        return { products: [], totalCount: 0, page, pageSize, totalPages: 0 };
+        return { data: [], total: 0, page, pageSize, totalPages: 0 };
     }
 }
 
@@ -193,9 +193,9 @@ export async function getFeaturedProducts(signal?: AbortSignal): Promise<{
         console.log('[attireService] getFeaturedProducts: SUCCESS');
 
         return {
-            newArrivals: newRes.products || [],
-            bestsellers: bestRes.products || [],
-            onSale: saleRes.products || [],
+            newArrivals: newRes.data || [],
+            bestsellers: bestRes.data || [],
+            onSale: saleRes.data || [],
         };
     } catch (error) {
         console.error('Error in getFeaturedProducts:', error);

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Search, Sparkles, Calendar, PenTool, ArrowRight } from 'lucide-react';
 import { EVENT_TYPES } from '@/lib/constants';
-import { getEventPackages } from '@/lib/services/events';
+import { getEventPackages } from '@/lib/services/event-service';
 import { EventPackage } from '@/types';
 import EventPackageCard from '@/components/events/EventPackageCard';
 import Button from '@/components/ui/Button';

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Check, Calendar, Users, Clock, Mail } from 'lucide-react';
-import { getEventPackageById } from '@/lib/services/events';
+import { getEventPackageById } from '@/lib/services/event-service';
 import { EventPackage } from '@/types';
 import Button from '@/components/ui/Button';
 import { formatPrice } from '@/lib/utils';

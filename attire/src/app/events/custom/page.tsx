@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { EVENT_TYPES, COMMON_FEATURES } from '@/lib/constants';
-import { getEventPackages, submitEventRequest, checkEventAvailability } from '@/lib/services/events';
+import { getEventPackages, submitEventRequest, checkEventAvailability } from '@/lib/services/event-service';
 import { EventPackage } from '@/types';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -65,7 +65,7 @@ function CustomEventForm() {
             const data = await getEventPackages();
             setPackages(data);
             if (packageId) {
-                const pkg = data.find(p => p.id === packageId);
+                const pkg = data.find((p: EventPackage) => p.id === packageId);
                 if (pkg) {
                     setSelectedPackage(pkg);
                     setFormData(prev => ({
