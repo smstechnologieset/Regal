@@ -12,7 +12,7 @@ export default function ContactPage() {
         {
             icon: Phone,
             title: 'Call Us',
-            details: '+1 (555) 123-4567',
+            details: '+251 912 345 678',
             sub: 'Mon-Fri from 9am to 6pm'
         },
         {

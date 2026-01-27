@@ -159,7 +159,7 @@ export default function EventDetailPage({ params }: EventDetailPageProps) {
                             <div className="space-y-3">
                                 <Link href={`/events/custom?package=${pkg.id}`}>
                                     <Button fullWidth size="lg">
-                                        Request Proposal
+                                        Customize Proposal
                                     </Button>
                                 </Link>
                                 <Button fullWidth variant="outline" size="lg">

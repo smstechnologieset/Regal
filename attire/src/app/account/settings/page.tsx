@@ -97,7 +97,7 @@ export default function SettingsPage() {
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
-                            placeholder="+1 234 567 8900"
+                            placeholder="+251 912 345 678"
                             leftIcon={<Phone size={18} />}
                         />
                     </div>
@@ -146,8 +146,8 @@ export default function SettingsPage() {
                             <p className="text-sm text-slate-500">Your account role</p>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${profile?.role === 'admin'
-                                ? 'bg-purple-100 text-purple-700'
-                                : 'bg-slate-100 text-slate-700'
+                            ? 'bg-purple-100 text-purple-700'
+                            : 'bg-slate-100 text-slate-700'
                             }`}>
                             {profile?.role === 'admin' ? 'Administrator' : 'Member'}
                         </span>

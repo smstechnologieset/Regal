@@ -1,88 +1,6 @@
 import { getSupabaseClient } from '@/lib/supabase/client';
+import { withRetry } from '@/lib/supabase/utils';
 import { Product, Category, FilterOptions, SortOption, PaginatedResponse, ProductColor, ProductBadge } from '@/types';
-
-/**
- * Utility to retry a Supabase query with exponential backoff
- */
-async function withRetry<T>(
-    fn: (signal?: AbortSignal) => Promise<{ data: T | null; error: any; count?: number | null }>,
-    retries = 3,
-    delay = 500,
-    timeoutMs = 15000,
-    signal?: AbortSignal
-): Promise<{ data: T | null; error: any; count?: number | null }> {
-    let lastError: any;
-
-    if (signal?.aborted) {
-        console.log('[withRetry] External signal already aborted. Skipping fetch.');
-        return { data: null, error: new Error('Request aborted'), count: 0 };
-    }
-
-    for (let i = 0; i < retries; i++) {
-        if (signal?.aborted) break;
-
-        const attempt = i + 1;
-        const timestamp = new Date().toLocaleTimeString();
-        const localController = new AbortController();
-
-        const onExternalAbort = () => {
-            console.log(`[withRetry] Attempt ${attempt} EXTERNAL ABORT triggered`);
-            localController.abort('external');
-        };
-        if (signal) signal.addEventListener('abort', onExternalAbort, { once: true });
-
-        try {
-            console.log(`[${timestamp}] [withRetry] Attempt ${attempt}/${retries} - STARTING...`);
-
-            // Use Promise.race to guarantee the timeout happens even if fn() ignores the signal
-            const resultPromise = fn(localController.signal);
-
-            const timeoutPromise = new Promise<never>((_, reject) => {
-                setTimeout(() => {
-                    console.warn(`[withRetry] Attempt ${attempt} TIMEOUT REJECTION triggered at ${timeoutMs}ms`);
-                    localController.abort('timeout');
-                    reject(new Error('timeout'));
-                }, timeoutMs);
-            });
-
-            const result = await Promise.race([resultPromise, timeoutPromise]) as { data: T | null; error: any; count?: number | null };
-
-            if (!result.error) {
-                console.log(`[${timestamp}] [withRetry] Attempt ${attempt} SUCCESS`);
-                return result;
-            }
-
-            lastError = result.error;
-            console.warn(`[withRetry] Attempt ${attempt} DATA ERROR:`, lastError.code || lastError.message);
-            if (lastError.code === 'PGRST116') return result;
-
-        } catch (err: any) {
-            lastError = err;
-            const isTimeout = err.message === 'timeout' || localController.signal.reason === 'timeout';
-            const isAbort = err.name === 'AbortError' || signal?.aborted || localController.signal.aborted;
-
-            if (isTimeout) {
-                console.warn(`[${timestamp}] [withRetry] Attempt ${attempt} TIMED OUT`);
-            } else if (isAbort) {
-                console.warn(`[${timestamp}] [withRetry] Attempt ${attempt} ABORTED`);
-                if (signal?.aborted) break;
-            } else {
-                console.error(`[${timestamp}] [withRetry] Attempt ${attempt} EXCEPTION:`, err.message || err);
-            }
-        } finally {
-            if (signal) signal.removeEventListener('abort', onExternalAbort);
-            console.log(`[withRetry] Attempt ${attempt} done.`);
-        }
-
-        if (i < retries - 1 && !signal?.aborted) {
-            const backoff = delay * Math.pow(2, i);
-            console.log(`[withRetry] Waiting ${backoff}ms...`);
-            await new Promise(r => setTimeout(r, backoff));
-        }
-    }
-
-    return { data: null, error: lastError || new Error('Request failed after retries'), count: 0 };
-}
 
 /**
  * Fetch products from the database with filtering, sorting, and pagination.
@@ -95,87 +13,81 @@ export async function getProducts(
     signal?: AbortSignal
 ): Promise<PaginatedResponse<Product>> {
     console.log(`Fetching products: page=${page}, size=${pageSize}, sort=${sort}`);
-    const { data, error, count } = await withRetry((retrySignal) => {
-        let q = getSupabaseClient()
-            .from('products')
-            .select('*', { count: 'exact' });
+    try {
+        const { data, count } = await withRetry(async (retrySignal) => {
+            let q = getSupabaseClient()
+                .from('products')
+                .select('*', { count: 'exact' });
 
-        if (retrySignal) q = q.abortSignal(retrySignal);
+            if (retrySignal) q = q.abortSignal(retrySignal);
 
-        if (options.category) q = q.eq('category', options.category);
-        if (options.subcategory) q = q.eq('subcategory', options.subcategory);
-        if (options.sizes && options.sizes.length > 0) q = q.contains('sizes', options.sizes);
-        if (options.priceRange) q = q.gte('price', options.priceRange.min).lte('price', options.priceRange.max);
-        if (options.inStock !== undefined) q = q.eq('in_stock', options.inStock);
-        if (options.badges && options.badges.length > 0) q = q.contains('badges', options.badges);
+            if (options.category) q = q.eq('category', options.category);
+            if (options.subcategory) q = q.eq('subcategory', options.subcategory);
+            if (options.sizes && options.sizes.length > 0) q = q.contains('sizes', options.sizes);
+            if (options.priceRange) q = q.gte('price', options.priceRange.min).lte('price', options.priceRange.max);
+            if (options.inStock !== undefined) q = q.eq('in_stock', options.inStock);
+            if (options.badges && options.badges.length > 0) q = q.contains('badges', options.badges);
 
-        switch (sort) {
-            case 'newest': q = q.order('created_at', { ascending: false }); break;
-            case 'price-asc': q = q.order('price', { ascending: true }); break;
-            case 'price-desc': q = q.order('price', { ascending: false }); break;
-            case 'popularity': q = q.order('popularity', { ascending: false }); break;
+            switch (sort) {
+                case 'newest': q = q.order('created_at', { ascending: false }); break;
+                case 'price-asc': q = q.order('price', { ascending: true }); break;
+                case 'price-desc': q = q.order('price', { ascending: false }); break;
+                case 'popularity': q = q.order('popularity', { ascending: false }); break;
+            }
+
+            const from = (page - 1) * pageSize;
+            const to = from + pageSize - 1;
+            q = q.range(from, to);
+
+            const result = await q;
+            if (result.error) throw result.error;
+            return result;
+        }, 3, 500, 15000, signal);
+
+        const total = count || 0;
+        const totalPages = Math.ceil(total / pageSize);
+
+        let finalData = ((data as any[]) || []).map((item: any) => ({
+            id: item.id as string,
+            name: item.name as string,
+            description: item.description as string,
+            price: item.price as number,
+            originalPrice: item.original_price as number,
+            category: item.category as string,
+            subcategory: item.subcategory as string,
+            sizes: (item.sizes as string[]) || [],
+            colors: (item.colors as ProductColor[]) || [],
+            images: (item.images as string[]) || [],
+            badges: (item.badges as ProductBadge[]) || [],
+            rating: item.rating as number,
+            reviewCount: item.review_count as number,
+            popularity: item.popularity as number,
+            createdAt: item.created_at as string,
+            inStock: item.in_stock as boolean,
+            stockCount: item.stock_count as number,
+            estimatedRestockDate: item.estimated_restock_date as string | undefined,
+            allowPreorder: item.allow_preorder as boolean | undefined,
+            preorderCount: item.preorder_count as number | undefined,
+            estimatedDeliveryDays: item.estimated_delivery_days as number | undefined,
+        }));
+
+        if (options.onSale !== undefined) {
+            finalData = finalData.filter((p: Product) =>
+                options.onSale ? (p.originalPrice ?? 0) > p.price : !((p.originalPrice ?? 0) > p.price)
+            );
         }
 
-        const from = (page - 1) * pageSize;
-        const to = from + pageSize - 1;
-        return q.range(from, to);
-    });
-
-    if (error) {
-        console.error('Error fetching products:', error);
         return {
-            data: [],
-            total: 0,
+            products: finalData,
+            totalCount: total,
             page,
             pageSize,
-            totalPages: 0,
+            totalPages,
         };
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        return { products: [], totalCount: 0, page, pageSize, totalPages: 0 };
     }
-
-    const total = count || 0;
-    const totalPages = Math.ceil(total / pageSize);
-
-    // Filter by onSale if requested (client-side filter on the current page of results)
-    let finalData = ((data as any[]) || []).map((item: any) => ({
-        id: item.id as string,
-        name: item.name as string,
-        description: item.description as string,
-        price: item.price as number,
-        originalPrice: item.original_price as number,
-        category: item.category as string,
-        subcategory: item.subcategory as string,
-        sizes: (item.sizes as string[]) || [],
-        colors: (item.colors as ProductColor[]) || [],
-        images: (item.images as string[]) || [],
-        badges: (item.badges as ProductBadge[]) || [],
-        rating: item.rating as number,
-        reviewCount: item.review_count as number,
-        popularity: item.popularity as number,
-        createdAt: item.created_at as string,
-        inStock: item.in_stock as boolean,
-        stockCount: item.stock_count as number,
-        // Pre-order fields
-        estimatedRestockDate: item.estimated_restock_date as string | undefined,
-        allowPreorder: item.allow_preorder as boolean | undefined,
-        preorderCount: item.preorder_count as number | undefined,
-        estimatedDeliveryDays: item.estimated_delivery_days as number | undefined,
-    }));
-
-    if (options.onSale !== undefined) {
-        if (options.onSale) {
-            finalData = finalData.filter((p: Product) => (p.originalPrice ?? 0) > p.price);
-        } else {
-            finalData = finalData.filter((p: Product) => !((p.originalPrice ?? 0) > p.price));
-        }
-    }
-
-    return {
-        data: finalData,
-        total,
-        page,
-        pageSize,
-        totalPages,
-    };
 }
 
 /**
@@ -183,51 +95,47 @@ export async function getProducts(
  */
 export async function getProductById(id: string, signal?: AbortSignal): Promise<Product | null> {
     const supabase = getSupabaseClient();
+    try {
+        const data = await withRetry(async (retrySignal) => {
+            let q = supabase.from('products').select('*').eq('id', id).maybeSingle();
+            if (retrySignal) q = q.abortSignal(retrySignal);
+            const result = await q;
+            if (result.error) throw result.error;
+            return result.data;
+        }, 3, 500, 15000, signal);
 
-    const { data, error } = await withRetry((retrySignal) => {
-        let q = supabase
-            .from('products')
-            .select('*')
-            .eq('id', id)
-            .maybeSingle();
+        if (!data) return null;
 
-        if (retrySignal) q = q.abortSignal(retrySignal);
-        return q;
-    }, 3, 500, 15000, signal);
-
-    if (error || !data) {
-        // Only log actual errors, not "not found" (PGRST116)
-        if (error && error.code !== 'PGRST116') {
+        const p = data as any;
+        return {
+            id: p.id,
+            name: p.name,
+            description: p.description,
+            price: p.price,
+            originalPrice: p.original_price,
+            category: p.category,
+            subcategory: p.subcategory,
+            sizes: p.sizes || [],
+            colors: p.colors || [],
+            images: p.images || [],
+            badges: p.badges || [],
+            rating: p.rating,
+            reviewCount: p.review_count,
+            popularity: p.popularity,
+            createdAt: p.created_at,
+            inStock: p.in_stock,
+            stockCount: p.stock_count,
+            estimatedRestockDate: p.estimated_restock_date,
+            allowPreorder: p.allow_preorder,
+            preorderCount: p.preorder_count,
+            estimatedDeliveryDays: p.estimated_delivery_days,
+        };
+    } catch (error: any) {
+        if (error?.code !== 'PGRST116') {
             console.error('Error fetching product:', error);
         }
         return null;
     }
-
-    const p = data as any;
-    return {
-        id: p.id,
-        name: p.name,
-        description: p.description,
-        price: p.price,
-        originalPrice: p.original_price,
-        category: p.category,
-        subcategory: p.subcategory,
-        sizes: p.sizes || [],
-        colors: p.colors || [],
-        images: p.images || [],
-        badges: p.badges || [],
-        rating: p.rating,
-        reviewCount: p.review_count,
-        popularity: p.popularity,
-        createdAt: p.created_at,
-        inStock: p.in_stock,
-        stockCount: p.stock_count,
-        // Pre-order fields
-        estimatedRestockDate: p.estimated_restock_date,
-        allowPreorder: p.allow_preorder,
-        preorderCount: p.preorder_count,
-        estimatedDeliveryDays: p.estimated_delivery_days,
-    };
 }
 
 /**
@@ -235,28 +143,27 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
  */
 export async function getCategories(signal?: AbortSignal): Promise<Category[]> {
     console.log('[attireService] getCategories: Querying Supabase...');
-    const { data, error } = await withRetry((retrySignal) => {
-        let q = getSupabaseClient()
-            .from('categories')
-            .select('*')
-            .order('name', { ascending: true });
+    try {
+        const data = await withRetry(async (retrySignal) => {
+            const supabase = getSupabaseClient();
+            let q = supabase.from('categories').select('*').order('name', { ascending: true });
+            if (retrySignal) q = q.abortSignal(retrySignal);
+            const result = await q;
+            if (result.error) throw result.error;
+            return result.data;
+        }, 3, 500, 15000, signal);
 
-        if (retrySignal) q = q.abortSignal(retrySignal);
-        return q;
-    }, 3, 500, 15000, signal);
-
-    if (error) {
+        return (data || []).map((cat: any) => ({
+            id: cat.id as string,
+            name: cat.name as string,
+            slug: cat.slug as string,
+            image: cat.image as string,
+            subcategories: (cat.subcategories as any[]) || [],
+        }));
+    } catch (error) {
         console.error('Error fetching categories:', error);
         return [];
     }
-
-    return ((data as any[]) || []).map((cat: any) => ({
-        id: cat.id as string,
-        name: cat.name as string,
-        slug: cat.slug as string,
-        image: cat.image as string,
-        subcategories: (cat.subcategories as any[]) || [],
-    }));
 }
 
 /**
@@ -270,7 +177,6 @@ export async function getFeaturedProducts(signal?: AbortSignal): Promise<{
     console.log('[attireService] getFeaturedProducts: STARTING parallel fetch...');
 
     try {
-        // Fetch in parallel but with a microscopic stagger to avoid connection limits
         const results = await Promise.all([
             getProducts({ badges: ['new'] }, 'newest', 1, 8, signal),
             (async () => {
@@ -287,17 +193,13 @@ export async function getFeaturedProducts(signal?: AbortSignal): Promise<{
         console.log('[attireService] getFeaturedProducts: SUCCESS');
 
         return {
-            newArrivals: newRes.data || [],
-            bestsellers: bestRes.data || [],
-            onSale: saleRes.data || [],
+            newArrivals: newRes.products || [],
+            bestsellers: bestRes.products || [],
+            onSale: saleRes.products || [],
         };
     } catch (error) {
         console.error('Error in getFeaturedProducts:', error);
-        return {
-            newArrivals: [],
-            bestsellers: [],
-            onSale: [],
-        };
+        return { newArrivals: [], bestsellers: [], onSale: [] };
     }
 }
 
@@ -306,47 +208,40 @@ export async function getFeaturedProducts(signal?: AbortSignal): Promise<{
  */
 export async function getRelatedProducts(productId: string, limit: number = 4, signal?: AbortSignal): Promise<Product[]> {
     const supabase = getSupabaseClient();
+    try {
+        let q1 = supabase.from('products').select('category').eq('id', productId).single();
+        if (signal) q1 = q1.abortSignal(signal);
+        const { data: product } = await q1;
 
-    // First get the current product's category
-    let q1 = supabase
-        .from('products')
-        .select('category')
-        .eq('id', productId)
-        .single();
+        if (!product) return [];
 
-    if (signal) q1 = q1.abortSignal(signal);
-    const { data: product } = await q1;
+        let q2 = supabase.from('products').select('*').eq('category', product.category).neq('id', productId).limit(limit);
+        if (signal) q2 = q2.abortSignal(signal);
+        const { data: related } = await q2;
 
-    if (!product) return [];
-
-    // Then find other products in the same category
-    let q2 = supabase
-        .from('products')
-        .select('*')
-        .eq('category', product.category)
-        .neq('id', productId)
-        .limit(limit);
-
-    if (signal) q2 = q2.abortSignal(signal);
-    const { data: related } = await q2;
-
-    return (related || []).map((item: Record<string, unknown>) => ({
-        id: item.id as string,
-        name: item.name as string,
-        description: item.description as string,
-        price: item.price as number,
-        originalPrice: item.original_price as number,
-        category: item.category as string,
-        sizes: item.sizes || [],
-        colors: item.colors || [],
-        images: item.images || [],
-        badges: item.badges || [],
-        rating: item.rating,
-        reviewCount: item.review_count,
-        popularity: item.popularity,
-        createdAt: item.created_at,
-        inStock: item.in_stock,
-    }));
+        return (related || []).map((item: any) => ({
+            id: item.id as string,
+            name: item.name as string,
+            description: item.description as string,
+            price: item.price as number,
+            originalPrice: item.original_price as number,
+            category: item.category as string,
+            subcategory: item.subcategory as string,
+            sizes: (item.sizes as string[]) || [],
+            colors: (item.colors as ProductColor[]) || [],
+            images: (item.images as string[]) || [],
+            badges: (item.badges as ProductBadge[]) || [],
+            rating: item.rating as number,
+            reviewCount: item.review_count as number,
+            popularity: item.popularity as number,
+            createdAt: item.created_at as string,
+            inStock: item.in_stock as boolean,
+            stockCount: item.stock_count as number,
+        }));
+    } catch (error) {
+        console.error('Error in getRelatedProducts:', error);
+        return [];
+    }
 }
 
 /**
@@ -354,46 +249,27 @@ export async function getRelatedProducts(productId: string, limit: number = 4, s
  */
 export async function createOrder(orderData: Record<string, unknown>): Promise<{ orderId: string; conversationId: string; success: boolean }> {
     const supabase = getSupabaseClient();
-
-    // 1. Verify stock availability for all items first (skip for pre-orders)
     const items = orderData.items as any[];
     let hasPreorders = false;
     let allPreorders = true;
 
-    for (const item of items) {
-        // Check if this is a pre-order item
-        if (item.isPreorder) {
-            hasPreorders = true;
-            allPreorders = allPreorders && true;
-            continue; // Skip stock check for pre-orders
+    try {
+        for (const item of items) {
+            if (item.isPreorder) {
+                hasPreorders = true;
+                continue;
+            }
+            allPreorders = false;
+
+            const { data: product } = await supabase.from('products').select('stock_count, in_stock, name').eq('id', item.productId).single();
+            if (!product || !product.in_stock || product.stock_count < item.quantity) {
+                console.error(`Insufficient stock for ${item.productId}`);
+                return { orderId: '', conversationId: '', success: false };
+            }
         }
 
-        allPreorders = false;
-
-        const { data: product, error: stockCheckError } = await supabase
-            .from('products')
-            .select('stock_count, in_stock, name')
-            .eq('id', item.productId)
-            .single();
-
-        if (stockCheckError || !product) {
-            console.error(`Error checking stock for ${item.productId}:`, stockCheckError);
-            return { orderId: '', conversationId: '', success: false };
-        }
-
-        if (!product.in_stock || product.stock_count < item.quantity) {
-            console.error(`Insufficient stock for ${product.name}. Requested: ${item.quantity}, Available: ${product.stock_count}`);
-            return { orderId: '', conversationId: '', success: false };
-        }
-    }
-
-    // Determine pre-order status
-    const preorderStatus = hasPreorders ? (allPreorders ? 'all' : 'partial') : 'none';
-
-    // 2. Create the order
-    const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
+        const preorderStatus = hasPreorders ? (allPreorders ? 'all' : 'partial') : 'none';
+        const { data: order, error: orderError } = await supabase.from('orders').insert({
             user_id: orderData.userId,
             total: orderData.total,
             status: 'pending',
@@ -404,116 +280,54 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
             discount_amount: orderData.discount || 0,
             has_preorders: hasPreorders,
             preorder_status: preorderStatus,
-        })
-        .select()
-        .single();
+        }).select().single();
 
-    if (orderError || !order) {
-        console.error('Error creating order:', orderError);
-        return { orderId: '', conversationId: '', success: false };
-    }
+        if (orderError || !order) throw orderError;
 
-    // 3. Create order_items records for each item
-    const orderItemsToInsert = items.map(item => ({
-        order_id: order.id,
-        product_id: item.productId,
-        quantity: item.quantity,
-        price: item.price,
-        selected_size: item.size,
-        selected_color: item.color,
-        is_preorder: item.isPreorder || false,
-        estimated_delivery_date: item.estimatedDeliveryDate || null,
-        preorder_status: item.isPreorder ? 'pending' : null,
-    }));
+        const orderItemsToInsert = items.map(item => ({
+            order_id: order.id,
+            product_id: item.productId,
+            quantity: item.quantity,
+            price: item.price,
+            selected_size: item.size,
+            selected_color: item.color,
+            is_preorder: item.isPreorder || false,
+            estimated_delivery_date: item.estimatedDeliveryDate || null,
+            preorder_status: item.isPreorder ? 'pending' : null,
+        }));
 
-    const { error: orderItemsError } = await supabase
-        .from('order_items')
-        .insert(orderItemsToInsert);
-
-    if (orderItemsError) {
-        console.error('Error creating order items:', orderItemsError);
-        // Rollback: delete the order
-        await supabase.from('orders').delete().eq('id', order.id);
-        return { orderId: '', conversationId: '', success: false };
-    }
-
-    // 4. Increment promo code usage count if used
-    if (orderData.promoCode) {
-        try {
-            const { error: promoUpdateError } = await supabase.rpc('increment_promo_usage', {
-                p_code: orderData.promoCode
-            });
-
-            if (promoUpdateError) {
-                // If RPC fails (e.g. not exists), try manual update
-                const { data: promo } = await supabase
-                    .from('promo_codes')
-                    .select('id, usage_count')
-                    .eq('code', orderData.promoCode)
-                    .single();
-
-                if (promo) {
-                    await supabase
-                        .from('promo_codes')
-                        .update({ usage_count: (promo.usage_count || 0) + 1 })
-                        .eq('id', promo.id);
-                }
-            }
-        } catch (err) {
-            console.error('Error updating promo usage:', err);
-            // Don't fail the whole order if just usage count update fails
-        }
-    }
-
-    // 5. Create an associated conversation
-    const firstItemName = items[0]?.productName || items[0]?.product?.name || items[0]?.name || 'Attire Order';
-    const displaySubject = items.length > 1
-        ? `${firstItemName} +${items.length - 1} more`
-        : firstItemName;
-
-    try {
-        const { data: conversation, error: convError } = await supabase
-            .from('conversations')
-            .insert({
-                user_id: orderData.userId,
-                order_id: order.id,
-                service_type: 'attire',
-                subject: displaySubject,
-                status: 'open',
-            })
-            .select()
-            .single();
-
-        if (convError || !conversation) {
-            console.error('Error creating conversation:', convError);
-            // We still have the order, so return success but without conversation
-            return { orderId: order.id, conversationId: '', success: true };
+        const { error: itemsError } = await supabase.from('order_items').insert(orderItemsToInsert);
+        if (itemsError) {
+            await supabase.from('orders').delete().eq('id', order.id);
+            throw itemsError;
         }
 
-        // 6. Create initial message
-        const orderTypeMessage = hasPreorders
-            ? (allPreorders
-                ? 'New pre-order placed!'
-                : 'New order placed with pre-order items!')
-            : 'New order placed!';
+        if (orderData.promoCode) {
+            await supabase.rpc('increment_promo_usage', { p_code: orderData.promoCode }).catch(console.error);
+        }
 
-        const { error: msgError } = await supabase
-            .from('messages')
-            .insert({
+        const firstItemName = items[0]?.productName || items[0]?.product?.name || items[0]?.name || 'Attire Order';
+        const displaySubject = items.length > 1 ? `${firstItemName} +${items.length - 1} more` : firstItemName;
+        const { data: conversation } = await supabase.from('conversations').insert({
+            user_id: orderData.userId,
+            order_id: order.id,
+            service_type: 'attire',
+            subject: displaySubject,
+            status: 'open',
+        }).select().single();
+
+        if (conversation) {
+            const orderTypeMsg = hasPreorders ? (allPreorders ? 'New pre-order' : 'New order with pre-orders') : 'New order';
+            await supabase.from('messages').insert({
                 conversation_id: conversation.id,
                 sender_id: orderData.userId,
-                content: `${orderTypeMessage} Order ID: ${order.id}. I have a question about this order.`,
+                content: `${orderTypeMsg} ID: ${order.id}. I have a question.`,
             });
-
-        if (msgError) {
-            console.error('Error creating initial message:', msgError);
         }
 
-        return { orderId: order.id, conversationId: conversation.id, success: true };
-    } catch (err) {
-        console.error('Unexpected error in order flow:', err);
-        // If conversation or message creation fails, we still consider the order placed successfully
-        // but return without conversation ID.
-        return { orderId: order.id, conversationId: '', success: true };
+        return { orderId: order.id, conversationId: conversation?.id || '', success: true };
+    } catch (error) {
+        console.error('Order creation failed:', error);
+        return { orderId: '', conversationId: '', success: false };
     }
 }

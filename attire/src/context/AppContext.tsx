@@ -68,6 +68,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: React.ReactNode }) {
     // Bootstrap state
     const [isAppBootstrapReady, setIsAppBootstrapReady] = useState(false);
+    const isBootstrapRef = React.useRef(false);
 
     // Categories state
     const [categories, setCategories] = useState<Category[]>([]);
@@ -172,24 +173,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                 console.log('[AppProvider] fetchCategories FINALLY (setting loading to false)');
                 setCategoriesLoading(false);
                 // Core data is loaded, allow the rest of the app to start
-                if (!isAppBootstrapReady) {
+                if (isBootstrapRef.current === false) {
                     console.log('[AppProvider] Bootstrap Complete (data loaded).');
+                    isBootstrapRef.current = true;
                     setIsAppBootstrapReady(true);
                 }
             }
         }
-    }, [isAppBootstrapReady, showApiError]);
+    }, [showApiError]);
 
     useEffect(() => {
         const controller = new AbortController();
         fetchCategories(controller.signal);
 
-        // Safety: if for some reason we're still "loading" after 10s, force it off
+        // Safety: if for some reason we're still "loading" after 30s, force it off
         const safetyTimer = setTimeout(() => {
             console.warn('[AppProvider] STUCK PROTECTION: Safety timer reached. Forcing bootstrap ready.');
             setCategoriesLoading(false);
+            isBootstrapRef.current = true;
             setIsAppBootstrapReady(true);
-        }, 10000);
+        }, 30000);
 
         return () => {
             controller.abort();

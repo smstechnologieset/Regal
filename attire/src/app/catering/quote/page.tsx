@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle, Utensils } from 'lucide-react';
 import { getCateringPackages, submitCateringQuote } from '@/lib/services/catering';
+import { checkEventAvailability } from '@/lib/services/events';
 import { CateringPackage } from '@/types';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -22,6 +23,8 @@ function CateringQuoteForm() {
     const [selectedPkg, setSelectedPkg] = useState(preselectedPkgId || '');
     const [guests, setGuests] = useState('');
     const [date, setDate] = useState('');
+    const [dateError, setDateError] = useState('');
+    const [checkingDate, setCheckingDate] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -44,6 +47,27 @@ function CateringQuoteForm() {
         }
         fetchPackages();
     }, []);
+
+    // Check availability
+    useEffect(() => {
+        if (!date) {
+            setDateError('');
+            return;
+        }
+
+        async function verifyDate() {
+            setCheckingDate(true);
+            setDateError('');
+            const { available, error } = await checkEventAvailability(date);
+            if (!available) {
+                setDateError(error || 'This date is already fully booked.');
+            }
+            setCheckingDate(false);
+        }
+
+        const timer = setTimeout(verifyDate, 500);
+        return () => clearTimeout(timer);
+    }, [date]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -69,13 +93,14 @@ function CateringQuoteForm() {
                 notes: formData.notes,
                 contactName: formData.name,
                 contactEmail: formData.email,
+                contactPhone: formData.phone,
             });
 
             if (result.success) {
                 setSuccess(true);
                 addToast('Quote request sent!', 'success');
             } else {
-                addToast('Failed to submit quote request. Please try again.', 'error');
+                addToast(result.error || 'Failed to submit quote request. Please try again.', 'error');
             }
         } catch (error) {
             console.error('Quote submission failed:', error);
@@ -157,14 +182,21 @@ function CateringQuoteForm() {
                                 min={10}
                             />
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Event Date</label>
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="block text-sm font-medium text-slate-700">Event Date</label>
+                                    {checkingDate && <span className="text-[10px] text-slate-400 animate-pulse">Checking availability...</span>}
+                                </div>
                                 <input
                                     type="date"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
-                                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none"
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${dateError
+                                        ? 'border-red-300 focus:ring-red-500'
+                                        : 'border-slate-300 focus:ring-amber-500'
+                                        }`}
                                     required
                                 />
+                                {dateError && <p className="text-xs text-red-600 font-medium mt-1">{dateError}</p>}
                             </div>
                         </div>
 
@@ -186,13 +218,23 @@ function CateringQuoteForm() {
                             />
                         </div>
 
-                        <Input
-                            label="Venue Location"
-                            value={formData.venue}
-                            onChange={(e) => setFormData(prev => ({ ...prev, venue: e.target.value }))}
-                            placeholder="Address or Venue Name"
-                            required
-                        />
+                        <div className="grid sm:grid-cols-2 gap-4">
+                            <Input
+                                label="Phone Number"
+                                type="tel"
+                                value={formData.phone}
+                                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                                placeholder="+251 912 345 678"
+                                required
+                            />
+                            <Input
+                                label="Venue Location"
+                                value={formData.venue}
+                                onChange={(e) => setFormData(prev => ({ ...prev, venue: e.target.value }))}
+                                placeholder="Address or Venue Name"
+                                required
+                            />
+                        </div>
 
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-slate-700">Dietary Restrictions</label>
@@ -215,7 +257,14 @@ function CateringQuoteForm() {
                             />
                         </div>
 
-                        <Button type="submit" fullWidth size="lg" isLoading={loading} className="bg-amber-600 hover:bg-amber-700 text-white">
+                        <Button
+                            type="submit"
+                            fullWidth
+                            size="lg"
+                            isLoading={loading}
+                            disabled={!!dateError || checkingDate}
+                            className="bg-amber-600 hover:bg-amber-700 text-white"
+                        >
                             Request Quote
                         </Button>
                     </div>

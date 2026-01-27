@@ -1,69 +1,67 @@
-/**
- * Bridal Service API
- * 
- * Handles all bridal-related data fetching and service management.
- * Uses the standard public Supabase client for client-side and server-side compatibility.
- */
-
 import { getSupabaseClient } from '@/lib/supabase/client';
+import { withRetry } from '@/lib/supabase/utils';
 import { BridalGown, BridalService } from '@/types';
 
-/**
- * Fetch all bridal gowns from the database
- */
-export async function getBridalGowns(): Promise<BridalGown[]> {
-    const supabase = getSupabaseClient();
+export async function getBridalGowns(signal?: AbortSignal): Promise<BridalGown[]> {
+    try {
+        const data = await withRetry(async (retrySignal) => {
+            const supabase = getSupabaseClient();
+            const { data, error } = await supabase
+                .from('bridal_gowns')
+                .select('*')
+                .abortSignal(retrySignal || (signal as any));
 
-    const { data, error } = await supabase
-        .from('bridal_gowns')
-        .select('*');
+            if (error) throw error;
+            return data;
+        }, 3, 500, 15000, signal);
 
-    if (error) {
-        console.error('Error fetching bridal gowns:', error);
+        // Transform database format to TypeScript interface format
+        return (data || []).map((gown: Record<string, unknown>) => ({
+            id: gown.id as string,
+            name: gown.name as string,
+            designer: gown.designer as string,
+            style: gown.style as string,
+            silhouette: gown.silhouette as string,
+            priceRent: gown.price_rent as number,
+            priceBuy: gown.price_buy as number,
+            sizes: (gown.sizes as string[]) || [],
+            images: (gown.images as string[]) || [],
+            description: gown.description as string,
+            isNew: gown.is_new as boolean,
+        }));
+    } catch (error) {
+        console.error('Error fetching bridal gowns after retries:', error);
         return [];
     }
-
-    // Transform database format to TypeScript interface format
-    return (data || []).map((gown: Record<string, unknown>) => ({
-        id: gown.id as string,
-        name: gown.name as string,
-        designer: gown.designer as string,
-        style: gown.style as string,
-        silhouette: gown.silhouette as string,
-        priceRent: gown.price_rent as number,
-        priceBuy: gown.price_buy as number,
-        sizes: (gown.sizes as string[]) || [],
-        images: (gown.images as string[]) || [],
-        description: gown.description as string,
-        isNew: gown.is_new as boolean,
-    }));
 }
 
-/**
- * Fetch all bridal services from the database
- */
-export async function getBridalServices(): Promise<BridalService[]> {
-    const supabase = getSupabaseClient();
+export async function getBridalServices(signal?: AbortSignal): Promise<BridalService[]> {
+    try {
+        const data = await withRetry(async (retrySignal) => {
+            const supabase = getSupabaseClient();
+            const { data, error } = await supabase
+                .from('bridal_services')
+                .select('*')
+                .order('price_start', { ascending: true })
+                .abortSignal(retrySignal || (signal as any));
 
-    const { data, error } = await supabase
-        .from('bridal_services')
-        .select('*')
-        .order('price_start', { ascending: true });
+            if (error) throw error;
+            return data;
+        }, 3, 500, 15000, signal);
 
-    if (error) {
-        console.error('Error fetching bridal services:', error);
+        return (data || []).map((service: Record<string, unknown>) => ({
+            id: service.id as string,
+            title: service.title as string,
+            description: service.description as string,
+            priceStart: service.price_start as number,
+            duration: service.duration as string,
+            type: service.type as 'makeup' | 'hair' | 'full-styling' | 'fitting',
+            image: service.image as string,
+        }));
+    } catch (error) {
+        console.error('Error fetching bridal services after retries:', error);
         return [];
     }
-
-    return (data || []).map((service: Record<string, unknown>) => ({
-        id: service.id as string,
-        title: service.title as string,
-        description: service.description as string,
-        priceStart: service.price_start as number,
-        duration: service.duration as string,
-        type: service.type as 'makeup' | 'hair' | 'full-styling' | 'fitting',
-        image: service.image as string,
-    }));
 }
 
 /**
@@ -349,30 +347,32 @@ ${orderData.notes || 'None'}
     };
 }
 
-/**
- * Fetch all bridal accessories from the database
- */
-export async function getBridalAccessories(): Promise<import('@/types').BridalAccessory[]> {
-    const supabase = getSupabaseClient();
+export async function getBridalAccessories(signal?: AbortSignal): Promise<import('@/types').BridalAccessory[]> {
+    try {
+        const data = await withRetry(async (retrySignal) => {
+            const supabase = getSupabaseClient();
+            const { data, error } = await supabase
+                .from('bridal_accessories')
+                .select('*')
+                .order('name', { ascending: true })
+                .abortSignal(retrySignal || (signal as any));
 
-    const { data, error } = await supabase
-        .from('bridal_accessories')
-        .select('*')
-        .order('name', { ascending: true });
+            if (error) throw error;
+            return data;
+        }, 3, 500, 15000, signal);
 
-    if (error) {
-        console.error('Error fetching bridal accessories:', error);
+        return (data || []).map((item: Record<string, unknown>) => ({
+            id: item.id as string,
+            name: item.name as string,
+            category: item.category as 'veil' | 'jewelry' | 'headpiece' | 'shoes' | 'clutch',
+            priceRent: item.price_rent as number,
+            priceBuy: item.price_buy as number,
+            images: (item.images as string[]) || [],
+            description: item.description as string,
+            isNew: item.is_new as boolean,
+        }));
+    } catch (error) {
+        console.error('Error fetching bridal accessories after retries:', error);
         return [];
     }
-
-    return (data || []).map((item: Record<string, unknown>) => ({
-        id: item.id as string,
-        name: item.name as string,
-        category: item.category as 'veil' | 'jewelry' | 'headpiece' | 'shoes' | 'clutch',
-        priceRent: item.price_rent as number,
-        priceBuy: item.price_buy as number,
-        images: (item.images as string[]) || [],
-        description: item.description as string,
-        isNew: item.is_new as boolean,
-    }));
 }

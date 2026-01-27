@@ -94,14 +94,14 @@ export default function AdminDashboard() {
   const statCards = [
     {
       label: "Total Revenue",
-      value: `$${stats.totalRevenue.toLocaleString()}`,
+      value: `ETB ${stats.totalRevenue.toLocaleString()}`,
       icon: DollarSign,
       color: "bg-emerald-500",
       change: "+12.5%",
     },
     {
       label: "Monthly Revenue",
-      value: `$${stats.monthlyRevenue.toLocaleString()}`,
+      value: `ETB ${stats.monthlyRevenue.toLocaleString()}`,
       icon: TrendingUp,
       color: "bg-blue-500",
       change: "+8.2%",

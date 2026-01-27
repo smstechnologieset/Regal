@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { EVENT_TYPES, COMMON_FEATURES } from '@/lib/constants';
-import { getEventPackages, submitEventRequest } from '@/lib/services/events';
+import { getEventPackages, submitEventRequest, checkEventAvailability } from '@/lib/services/events';
 import { EventPackage } from '@/types';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -24,6 +24,8 @@ function CustomEventForm() {
 
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [checkingDate, setCheckingDate] = useState(false);
+    const [dateError, setDateError] = useState('');
     const [formData, setFormData] = useState({
         eventType: '',
         guestCount: '' as string | number,
@@ -35,6 +37,27 @@ function CustomEventForm() {
         email: '',
         phone: '',
     });
+
+    // Check date availability when it changes
+    useEffect(() => {
+        if (!formData.date) {
+            setDateError('');
+            return;
+        }
+
+        async function verifyDate() {
+            setCheckingDate(true);
+            setDateError('');
+            const { available, error } = await checkEventAvailability(formData.date);
+            if (!available) {
+                setDateError(error || 'This date is already fully booked.');
+            }
+            setCheckingDate(false);
+        }
+
+        const timer = setTimeout(verifyDate, 500); // Debounce check
+        return () => clearTimeout(timer);
+    }, [formData.date]);
 
     // Fetch packages and set selected if packageId exists
     useEffect(() => {
@@ -104,9 +127,9 @@ function CustomEventForm() {
 
             if (result.success) {
                 addToast('Request submitted successfully!', 'success');
-                router.push(`/dashboard/orders`);
+                router.push(`/account/orders`);
             } else {
-                addToast('Failed to submit request. Please try again.', 'error');
+                addToast(result.error || 'Failed to submit request. Please try again.', 'error');
             }
         } catch (error) {
             console.error('Event request failed:', error);
@@ -195,14 +218,21 @@ function CustomEventForm() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="block text-sm font-medium text-slate-700">Preferred Date (Optional)</label>
+                            <div className="flex justify-between items-center">
+                                <label className="block text-sm font-medium text-slate-700">Preferred Date (Optional)</label>
+                                {checkingDate && <span className="text-[10px] text-slate-400 animate-pulse">Checking availability...</span>}
+                            </div>
                             <input
                                 type="date"
                                 name="date"
                                 value={formData.date}
                                 onChange={handleInputChange}
-                                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all"
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${dateError
+                                    ? 'border-red-300 focus:ring-red-500'
+                                    : 'border-slate-300 focus:ring-rose-500'
+                                    }`}
                             />
+                            {dateError && <p className="text-xs text-red-600 font-medium">{dateError}</p>}
                         </div>
                     </div>
                 )}
@@ -277,7 +307,7 @@ function CustomEventForm() {
                                 value={formData.phone}
                                 onChange={handleInputChange}
                                 required
-                                placeholder="+1 (555) 000-0000"
+                                placeholder="+251 912 345 678"
                             />
                         </div>
 
@@ -305,6 +335,7 @@ function CustomEventForm() {
                         type="submit"
                         className="flex-1"
                         isLoading={loading}
+                        disabled={!!dateError || checkingDate}
                     >
                         {step === 3 ? 'Submit Request' : 'Continue'}
                     </Button>

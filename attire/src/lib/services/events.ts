@@ -1,41 +1,37 @@
-/**
- * Events Service API
- * 
- * Handles all event-related data fetching and order submissions.
- * Uses the standard public Supabase client for client-side and server-side compatibility.
- */
-
 import { getSupabaseClient } from '@/lib/supabase/client';
+import { withRetry } from '@/lib/supabase/utils';
 import { EventPackage } from '@/types';
 
-/**
- * Fetch all event packages from the database
- */
-export async function getEventPackages(): Promise<EventPackage[]> {
-    const supabase = getSupabaseClient();
+export async function getEventPackages(signal?: AbortSignal): Promise<EventPackage[]> {
+    try {
+        const data = await withRetry(async (retrySignal) => {
+            const supabase = getSupabaseClient();
+            const { data, error } = await supabase
+                .from('event_packages')
+                .select('*')
+                .order('price_start', { ascending: true })
+                .abortSignal(retrySignal || (signal as any));
 
-    const { data, error } = await supabase
-        .from('event_packages')
-        .select('*')
-        .order('price_start', { ascending: true });
+            if (error) throw error;
+            return data;
+        }, 3, 500, 15000, signal);
 
-    if (error) {
-        console.error('Error fetching event packages:', error);
+        // Transform database format to TypeScript interface format
+        return (data || []).map((pkg: Record<string, unknown>) => ({
+            id: pkg.id as string,
+            title: pkg.title as string,
+            description: pkg.description as string,
+            type: pkg.type as 'wedding' | 'birthday' | 'corporate' | 'graduation' | 'social',
+            priceStart: pkg.price_start as number,
+            features: (pkg.features as string[]) || [],
+            image: pkg.image as string,
+            capacity: pkg.capacity as string,
+            popular: pkg.popular as boolean,
+        }));
+    } catch (error) {
+        console.error('Error fetching event packages after retries:', error);
         return [];
     }
-
-    // Transform database format to TypeScript interface format
-    return (data || []).map((pkg: Record<string, unknown>) => ({
-        id: pkg.id as string,
-        title: pkg.title as string,
-        description: pkg.description as string,
-        type: pkg.type as 'wedding' | 'birthday' | 'corporate' | 'graduation' | 'social',
-        priceStart: pkg.price_start as number,
-        features: (pkg.features as string[]) || [],
-        image: pkg.image as string,
-        capacity: pkg.capacity as string,
-        popular: pkg.popular as boolean,
-    }));
 }
 
 /**
@@ -99,6 +95,37 @@ export async function getEventPackageById(id: string): Promise<EventPackage | nu
 }
 
 /**
+ * Check if a date is already booked for an event
+ */
+export async function checkEventAvailability(date: string): Promise<{ available: boolean; error?: string }> {
+    if (!date) return { available: true };
+
+    const supabase = getSupabaseClient();
+
+    try {
+        // Search for any existing event or catering order on that date that isn't cancelled
+        // Note: details is JSONB, so we use the ->> operator to extract the date string
+        const { data, error } = await supabase
+            .from('orders')
+            .select('id')
+            .in('service_type', ['events', 'catering'])
+            .neq('status', 'cancelled')
+            .or(`details->>date.eq.${date},details->>eventDate.eq.${date}`)
+            .limit(1);
+
+        if (error) {
+            console.error('Error checking availability:', error);
+            return { available: false, error: 'Database check failed' };
+        }
+
+        return { available: data.length === 0 };
+    } catch (err) {
+        console.error('Availability check exception:', err);
+        return { available: false, error: 'Request check failed' };
+    }
+}
+
+/**
  * Submit an event request (creates order + conversation)
  */
 export async function submitEventRequest(requestData: {
@@ -113,8 +140,21 @@ export async function submitEventRequest(requestData: {
     contactName: string;
     contactEmail: string;
     contactPhone: string;
-}): Promise<{ orderId: string; conversationId: string; success: boolean }> {
+}): Promise<{ orderId: string; conversationId: string; success: boolean; error?: string }> {
     const supabase = getSupabaseClient();
+
+    // 1. Check availability FIRST if date is provided
+    if (requestData.date) {
+        const { available, error: availError } = await checkEventAvailability(requestData.date);
+        if (!available) {
+            return {
+                orderId: '',
+                conversationId: '',
+                success: false,
+                error: availError || 'This date is already fully booked. Please select another date.'
+            };
+        }
+    }
 
     // Calculate estimated total based on budget or package
     const total = requestData.budget || 0;
