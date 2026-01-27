@@ -23,6 +23,8 @@ import ToastContainer from "@/components/ui/Toast";
 import ScrollToTop from "@/components/layout/ScrollToTop";
 import LoadingWrapper from "@/components/layout/LoadingWrapper";
 
+import AIAssistant from "@/components/chat/AIAssistant";
+
 // Load Inter font with next/font for optimal performance
 const inter = Inter({
   subsets: ["latin"],
@@ -67,6 +69,7 @@ export default function RootLayout({
                       <CartDrawer />
                       <ToastContainer />
                       <ScrollToTop />
+                      <AIAssistant />
                     </LoadingWrapper>
                   </CartProvider>
                 </WishlistProvider>
@@ -78,3 +81,4 @@ export default function RootLayout({
     </html>
   );
 }
+
