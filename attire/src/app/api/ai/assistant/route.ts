@@ -10,7 +10,7 @@ REGAL provides fashion (Attire), Event Planning, Catering, and Bridal services.
 RULES:
 - Short responses (1-2 sentences).
 - Only REGAL topics.
-- Direct links: [Label](/path).
+- Direct links: Label.
 
 LINKS:
 - Home: /
@@ -18,6 +18,17 @@ LINKS:
 - Events: /events
 - Catering: /catering/menu
 - Bridal: /bridal/gowns
+- Account: /account
+- Contact: /contact
+- About: /about
+- Forgot Password: /forgot-password
+- Login: /login
+- Register: /register
+- Privacy Policy: /privacy-policy
+- Terms of Service: /terms-of-service
+- FAQ: /faq
+- Gowns: /bridal/gowns
+
 `;
 
 export async function POST(req: NextRequest) {
