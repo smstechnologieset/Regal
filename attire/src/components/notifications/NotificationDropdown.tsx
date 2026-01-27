@@ -72,7 +72,7 @@ export default function NotificationDropdown({
   };
 
   return (
-    <div className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-lg border border-slate-200 z-50 max-h-[600px] overflow-hidden flex flex-col">
+    <div className="fixed left-4 right-4 top-30 md:absolute md:right-0 md:left-auto md:top-auto md:w-96 md:mt-2 bg-white rounded-xl shadow-lg border border-slate-200 z-50 max-h-[600px] overflow-hidden flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-slate-100 flex items-center justify-between">
         <h3 className="font-semibold text-primary">Notifications</h3>
@@ -114,9 +114,8 @@ export default function NotificationDropdown({
                 <button
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`w-full p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors text-left ${
-                    !notification.read ? "bg-blue-50" : ""
-                  }`}
+                  className={`w-full p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors text-left ${!notification.read ? "bg-blue-50" : ""
+                    }`}
                 >
                   <div className="flex gap-3">
                     <div className="flex-shrink-0 mt-0.5">
