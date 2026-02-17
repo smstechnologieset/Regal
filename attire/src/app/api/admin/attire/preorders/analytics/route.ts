@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/admin/attire/preorders/analytics
@@ -15,12 +12,23 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = await createClient();
 
     // Verify admin access
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Check if user is admin
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile || profile.role !== 'admin') {
+      return NextResponse.json({ error: "Forbidden - Admin access required" }, { status: 403 });
     }
 
     // 1. Get total active pre-orders (pending + ready)
@@ -42,10 +50,9 @@ export async function GET(request: NextRequest) {
       .from("order_items")
       .select(`
         product_id,
-        product_name,
         quantity,
         preorder_status,
-        products!inner(name, stock, estimated_restock_date)
+        products!inner(name, stock_count, estimated_restock_date)
       `)
       .eq("is_preorder", true)
       .in("preorder_status", ["pending", "ready"]);
@@ -66,7 +73,7 @@ export async function GET(request: NextRequest) {
     productPreorders?.forEach((item: any) => {
       const productId = item.product_id;
       const existing = productMap.get(productId);
-      
+
       if (existing) {
         existing.totalQuantity += item.quantity;
         if (item.preorder_status === "pending") {
@@ -77,12 +84,12 @@ export async function GET(request: NextRequest) {
       } else {
         productMap.set(productId, {
           productId,
-          productName: item.product_name || item.products?.name || "Unknown",
+          productName: item.products?.name || "Unknown",
           totalQuantity: item.quantity,
           pendingCount: item.preorder_status === "pending" ? item.quantity : 0,
           readyCount: item.preorder_status === "ready" ? item.quantity : 0,
           estimatedRestockDate: item.products?.estimated_restock_date,
-          currentStock: item.products?.stock || 0,
+          currentStock: item.products?.stock_count || 0,
         });
       }
     });
@@ -182,7 +189,13 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    console.error("Error fetching pre-order analytics:", error);
+    console.error("[PreOrder Analytics] Error details:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+      stack: error.stack
+    });
     return NextResponse.json(
       { error: error.message || "Failed to fetch analytics" },
       { status: 500 }

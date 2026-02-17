@@ -40,6 +40,11 @@ export default function AIAssistant() {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    // Remove markdown links from text since we show them as buttons
+    const stripMarkdownLinks = (text: string) => {
+        return text.replace(/\[([^\]]+)\]\([^)]+\)/g, '');
+    };
+
     useEffect(() => {
         if (isOpen) {
             scrollToBottom();
@@ -147,10 +152,10 @@ export default function AIAssistant() {
                                 </div>
                                 <div className="space-y-2">
                                     <div className={`rounded-2xl p-3 shadow-sm ${msg.role === 'user'
-                                            ? 'bg-secondary text-white rounded-tr-none'
-                                            : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
+                                        ? 'bg-secondary text-white rounded-tr-none'
+                                        : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
                                         }`}>
-                                        <p className="text-sm leading-relaxed">{msg.content}</p>
+                                        <p className="text-sm leading-relaxed">{stripMarkdownLinks(msg.content).trim()}</p>
                                     </div>
 
                                     {/* Links/Quick Actions */}

@@ -40,13 +40,13 @@ export default function PreOrderAnalytics() {
 
       const response = await fetch("/api/admin/attire/preorders/analytics");
       if (!response.ok) {
-        throw new Error("Failed to fetch analytics");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch analytics");
       }
 
       const data = await response.json();
       setAnalytics(data.analytics);
     } catch (err: any) {
-      console.error("Error fetching analytics:", err);
       setError(err.message || "Failed to load analytics");
     } finally {
       setLoading(false);
@@ -76,9 +76,18 @@ export default function PreOrderAnalytics() {
   if (error) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <div className="flex items-center gap-3 text-red-600">
-          <AlertCircle size={20} />
-          <p>{error}</p>
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <AlertCircle className="text-red-500 mb-3" size={48} />
+          <h3 className="font-semibold text-slate-900 mb-2">
+            Unable to Load Analytics
+          </h3>
+          <p className="text-slate-600 mb-4 max-w-md">{error}</p>
+          <button
+            onClick={fetchAnalytics}
+            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );

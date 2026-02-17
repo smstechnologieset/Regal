@@ -34,13 +34,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Attire - Modern Fashion E-Commerce",
+  title: "Regal - All your needs At one place",
   description:
     "Discover the latest trends in fashion. Shop clothing, accessories, and more with free shipping on orders over ETB500.",
   keywords:
     "fashion, clothing, accessories, online shopping, women's fashion, men's fashion",
   openGraph: {
-    title: "Attire - Modern Fashion E-Commerce",
+    title: "Regal - All your needs At one place",
     description: "Discover the latest trends in fashion.",
     type: "website",
   },
