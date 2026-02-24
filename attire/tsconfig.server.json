@@ -15,6 +15,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["server.ts"],
+  "include": ["server.ts", "telegram_bot.ts"],
   "exclude": ["node_modules"]
 }

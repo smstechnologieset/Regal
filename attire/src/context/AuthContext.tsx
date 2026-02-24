@@ -43,6 +43,10 @@ interface AuthContextType {
     password: string
   ) => Promise<{ error: AuthError | null }>;
   signInWithGoogle: () => Promise<{ error: AuthError | null }>;
+  signInWithTelegram: (
+    email: string,
+    pass: string
+  ) => Promise<{ error: AuthError | null }>;
   signUp: (
     email: string,
     password: string,
@@ -206,6 +210,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error };
   };
 
+  // Sign in with Telegram Credentials
+  const signInWithTelegram = async (email: string, pass: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password: pass,
+    });
+    return { error };
+  };
+
   // Sign up with email/password
   const signUp = async (email: string, password: string, fullName: string) => {
     const { data, error } = await supabase.auth.signUp({
@@ -274,6 +287,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAdmin: profile?.role === "admin",
     signIn,
     signInWithGoogle,
+    signInWithTelegram,
     signUp,
     signOut,
     updateProfile,

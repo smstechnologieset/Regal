@@ -23,6 +23,7 @@ function LoginContent() {
   const {
     signIn,
     signInWithGoogle,
+    signInWithTelegram,
     user,
     isAdmin,
     isLoading: authLoading,
@@ -36,6 +37,11 @@ function LoginContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isTelegramLoading, setIsTelegramLoading] = useState(false);
+  const [isTelegramStep, setIsTelegramStep] = useState(false);
+  const [telegramCode, setTelegramCode] = useState("");
+  const [sessionId, setSessionId] = useState("");
+  
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -119,6 +125,48 @@ function LoginContent() {
 
     // If successful, user will be redirected to Google
     // No need to set loading false as page will redirect
+  };
+
+  const handleTelegramStart = () => {
+    const sid = Math.random().toString(36).substring(7);
+    setSessionId(sid);
+    setIsTelegramStep(true);
+    
+    // Redirect to bot (In production this would be regal_platform_bot)
+    // For now we use the user's bot placeholder
+    window.open(`https://t.me/RegalPlatformBot?start=${sid}`, "_blank");
+  };
+
+  const handleTelegramVerify = async () => {
+    setIsTelegramLoading(true);
+    setErrors({});
+
+    try {
+      const res = await fetch("/api/auth/telegram/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, code: telegramCode }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Verification failed");
+      }
+
+      // Automatically sign in with the returned credentials
+      const { error } = await signInWithTelegram(data.email, data.password);
+
+      if (error) {
+        throw error;
+      }
+
+      addToast("Successfully logged in with Telegram!", "success");
+    } catch (err: any) {
+      setErrors({ general: err.message });
+    } finally {
+      setIsTelegramLoading(false);
+    }
   };
 
   // Don't render if already logged in
@@ -227,7 +275,7 @@ function LoginContent() {
             <button
               type="button"
               onClick={handleGoogleSignIn}
-              disabled={isGoogleLoading}
+              disabled={isGoogleLoading || isTelegramStep}
               className="flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isGoogleLoading ? (
@@ -254,6 +302,51 @@ function LoginContent() {
               )}
               Continue with Google
             </button>
+
+            {/* Telegram Option */}
+            {!isTelegramStep ? (
+              <button
+                type="button"
+                onClick={handleTelegramStart}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#24A1DE] border border-transparent rounded-lg text-sm font-medium text-white hover:bg-[#24A1DE]/90 transition-colors"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M11.944 0C5.324 0 0 5.324 0 11.944c0 6.62 5.324 11.944 11.944 11.944 6.621 0 11.944-5.324 11.944-11.944C23.888 5.324 18.565 0 11.944 0zm5.204 15.654l-1.383 6.444c-.1.45-.367.557-.745.344l-5.11-3.763-2.466 2.373c-.274.274-.503.504-.633.504l.363-5.148 9.38-8.47c.408-.363-.088-.564-.633-.195l-11.593 7.29-4.992-1.56c-1.085-.34-.112-1.085.226-1.222l19.504-7.514c.904-.326 1.696.216 1.442 1.45z"/>
+                </svg>
+                Continue with Telegram
+              </button>
+            ) : (
+              <div className="space-y-4 pt-2 border-t border-slate-100">
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-primary">Verification Code</p>
+                  <p className="text-xs text-slate-500">Please enter the 6-digit code from Regal Bot</p>
+                </div>
+                <div className="flex gap-2 justify-center">
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={telegramCode}
+                    onChange={(e) => setTelegramCode(e.target.value.replace(/\D/g, ""))}
+                    className="w-full max-w-[200px] text-center text-2xl tracking-[0.5em] font-bold py-2 border-2 border-primary/20 rounded-lg focus:border-primary focus:ring-0 outline-none"
+                    placeholder="000000"
+                  />
+                </div>
+                <Button 
+                  fullWidth 
+                  onClick={handleTelegramVerify} 
+                  isLoading={isTelegramLoading}
+                  disabled={telegramCode.length !== 6}
+                >
+                  Verify & Log In
+                </Button>
+                <button 
+                  onClick={() => setIsTelegramStep(false)}
+                  className="w-full text-xs text-slate-400 hover:text-slate-600"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
