@@ -19,7 +19,7 @@ LINKS (use these in markdown format):
 - Shopping: /attire
 - Events: /events
 - Catering Menu: /catering/menu
-- Bridal Gowns: /bridal/gowns
+- Bridal Gowns: /bridal/gallery
 - My Account: /account
 - Contact Us: /contact
 - About: /about
@@ -35,7 +35,7 @@ User: "Catering packages?"
 You: "Our catering packages offer customizable options for events. [View Catering Menu](/catering/menu)"
 
 User: "Wedding dresses?"
-You: "We have beautiful bridal gowns for your special day. [Browse Gowns](/bridal/gowns)"
+You: "We have beautiful bridal gowns for your special day. [Browse Gowns](/bridal/gallery)"
 `;
 
 export async function POST(req: NextRequest) {

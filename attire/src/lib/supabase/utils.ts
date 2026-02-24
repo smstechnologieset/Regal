@@ -9,7 +9,7 @@ export async function withRetry<T>(
     fn: (signal?: AbortSignal) => Promise<T>,
     retries = 3,
     delay = 500,
-    timeoutMs = 15000,
+    timeoutMs = 30000,
     signal?: AbortSignal
 ): Promise<T> {
     let lastError: any;
@@ -23,18 +23,20 @@ export async function withRetry<T>(
 
         const attempt = i + 1;
         const localController = new AbortController();
+        let timeoutId: NodeJS.Timeout | undefined;
 
         const onExternalAbort = () => {
             localController.abort('external');
         };
+
         if (signal) signal.addEventListener('abort', onExternalAbort, { once: true });
 
         try {
-            // Use Promise.race to guarantee the timeout happens even if fn() ignores the signal
             const resultPromise = fn(localController.signal);
 
             const timeoutPromise = new Promise<never>((_, reject) => {
-                setTimeout(() => {
+                timeoutId = setTimeout(() => {
+                    console.error(`[withRetry] Timeout reached after ${timeoutMs}ms for attempt ${attempt}`);
                     localController.abort('timeout');
                     reject(new Error('timeout'));
                 }, timeoutMs);
@@ -42,26 +44,30 @@ export async function withRetry<T>(
 
             const result = await Promise.race([resultPromise, timeoutPromise]);
 
-            // Success! Remove listener and return
+            // Success! Clear timeout and remove listener
+            if (timeoutId) clearTimeout(timeoutId);
             if (signal) signal.removeEventListener('abort', onExternalAbort);
             return result;
 
         } catch (err: any) {
+            // Error occurred! Clear timeout and remove listener
+            if (timeoutId) clearTimeout(timeoutId);
+            if (signal) signal.removeEventListener('abort', onExternalAbort);
+
             lastError = err;
             const isTimeout = err.message === 'timeout' || localController.signal.reason === 'timeout';
             const isAbort = err.name === 'AbortError' || signal?.aborted || localController.signal.aborted;
 
             if (isAbort && signal?.aborted) {
-                if (signal) signal.removeEventListener('abort', onExternalAbort);
+                console.log(`[withRetry] Request aborted externally during attempt ${attempt}`);
                 break;
             }
 
-            // If it's a "standard" error (not timeout/abort), we might want to log it
-            if (!isTimeout && !isAbort) {
+            if (isTimeout) {
+                console.warn(`[withRetry] Attempt ${attempt} timed out.`);
+            } else if (!isAbort) {
                 console.warn(`[withRetry] Attempt ${attempt} error:`, err.message || err);
             }
-        } finally {
-            if (signal) signal.removeEventListener('abort', onExternalAbort);
         }
 
         if (i < retries - 1 && !signal?.aborted) {

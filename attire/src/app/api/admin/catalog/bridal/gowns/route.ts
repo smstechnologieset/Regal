@@ -3,8 +3,8 @@ export const runtime = "nodejs";
 /**
  * Admin Bridal Catalog API (Gowns)
  * 
- * GET /api/admin/catalog/bridal/gowns - List all bridal gowns
- * POST /api/admin/catalog/bridal/gowns - Create new gown
+ * GET /api/admin/catalog/bridal/gallery - List all bridal gowns
+ * POST /api/admin/catalog/bridal/gallery - Create new gown
  */
 
 import { NextRequest, NextResponse } from 'next/server';

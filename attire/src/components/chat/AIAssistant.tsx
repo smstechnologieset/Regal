@@ -27,7 +27,7 @@ export default function AIAssistant() {
             links: [
                 { label: 'Book an Event', url: '/events/custom' },
                 { label: 'Catering Menu', url: '/catering/menu' },
-                { label: 'Bridal Gowns', url: '/bridal/gowns' }
+                { label: 'Bridal Gowns', url: '/bridal/gallery' }
             ]
         }
     ]);

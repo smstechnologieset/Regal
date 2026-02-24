@@ -42,7 +42,7 @@ export async function getProducts(
             const result = await q;
             if (result.error) throw result.error;
             return result;
-        }, 3, 500, 15000, signal);
+        }, 3, 500, 30000, signal);
 
         const total = count || 0;
         const totalPages = Math.ceil(total / pageSize);
@@ -102,7 +102,7 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
             const result = await q;
             if (result.error) throw result.error;
             return result.data;
-        }, 3, 500, 15000, signal);
+        }, 3, 500, 30000, signal);
 
         if (!data) return null;
 
@@ -151,7 +151,7 @@ export async function getCategories(signal?: AbortSignal): Promise<Category[]> {
             const result = await q;
             if (result.error) throw result.error;
             return result.data;
-        }, 3, 500, 15000, signal);
+        }, 3, 500, 30000, signal);
 
         return (data || []).map((cat: any) => ({
             id: cat.id as string,

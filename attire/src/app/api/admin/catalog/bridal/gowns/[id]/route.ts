@@ -3,8 +3,8 @@ export const runtime = "nodejs";
 /**
  * Admin Bridal Catalog API (Single Gown)
  * 
- * PATCH /api/admin/catalog/bridal/gowns/[id] - Update bridal gown
- * DELETE /api/admin/catalog/bridal/gowns/[id] - Delete bridal gown
+ * PATCH /api/admin/catalog/bridal/gallery/[id] - Update bridal gown
+ * DELETE /api/admin/catalog/bridal/gallery/[id] - Delete bridal gown
  */
 
 import { NextRequest, NextResponse } from 'next/server';
