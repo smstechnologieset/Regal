@@ -53,3 +53,13 @@ export const BRIDAL_SILHOUETTES = [
     'Empire',
     'Mini',
 ];
+
+export const GIFT_CATEGORIES = [
+    { value: 'birthday', label: 'Birthday' },
+    { value: 'graduation', label: 'Graduation' },
+    { value: 'partner', label: 'Partner/Anniversary' },
+    { value: 'corporate', label: 'Corporate' },
+    { value: 'wedding', label: 'Wedding Gift' },
+    { value: 'other', label: 'Other' }
+];
+

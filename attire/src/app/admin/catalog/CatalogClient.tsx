@@ -7,8 +7,10 @@ import EventManager from '@/components/admin/catalog/EventManager';
 import BridalManager from '@/components/admin/catalog/BridalManager';
 import CateringManager from '@/components/admin/catalog/CateringManager';
 import PromoCodeManager from '@/components/admin/catalog/PromoCodeManager';
+import GiftPackagesManager from '@/components/admin/catalog/GiftPackagesManager';
+import { Gift } from 'lucide-react';
 
-type Category = 'attire' | 'events' | 'bridal' | 'catering' | 'promocodes';
+type Category = 'attire' | 'events' | 'bridal' | 'catering' | 'gifts' | 'promocodes';
 
 export default function CatalogClient() {
     const [activeTab, setActiveTab] = useState<Category>('attire');
@@ -18,6 +20,7 @@ export default function CatalogClient() {
         { id: 'events', name: 'Events', icon: Calendar, color: 'text-amber-600', bg: 'bg-amber-50' },
         { id: 'bridal', name: 'Bridal', icon: Heart, color: 'text-pink-600', bg: 'bg-pink-50' },
         { id: 'catering', name: 'Catering', icon: UtensilsCrossed, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+        { id: 'gifts', name: 'Gift Packages', icon: Gift, color: 'text-purple-600', bg: 'bg-purple-50' },
         { id: 'promocodes', name: 'Promo Codes', icon: Tag, color: 'text-blue-600', bg: 'bg-blue-50' },
     ];
 
@@ -27,6 +30,7 @@ export default function CatalogClient() {
             case 'events': return <EventManager />;
             case 'bridal': return <BridalManager />;
             case 'catering': return <CateringManager />;
+            case 'gifts': return <GiftPackagesManager />;
             case 'promocodes': return <PromoCodeManager />;
             default: return <AttireManager />;
         }

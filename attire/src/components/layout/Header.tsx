@@ -23,6 +23,7 @@ import {
   Heart as HeartIcon,
   UtensilsCrossed,
   LogOut,
+  Gift,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
@@ -56,6 +57,12 @@ const services = [
     href: "/catering",
     icon: UtensilsCrossed,
     description: "Catering",
+  },
+  {
+    name: "Gifts",
+    href: "/gifts",
+    icon: Gift,
+    description: "Curated Gift Packages",
   },
 ];
 

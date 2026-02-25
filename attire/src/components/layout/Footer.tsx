@@ -14,6 +14,7 @@ const footerLinks = {
         { label: 'Event Planning', href: '/events' },
         { label: 'Bridal Services', href: '/bridal' },
         { label: 'Catering', href: '/catering' },
+        { label: 'Gift Packages', href: '/gifts' },
     ],
     shop: [
         { label: 'Women', href: '/attire/products?category=women' },
