@@ -238,7 +238,7 @@ ${quoteData.dietaryRequirements || 'None specified'}
 **Additional Notes:**
 ${quoteData.notes || 'No additional notes.'}
 
-💰 **Estimated Total:** $${estimatedTotal.toLocaleString()}
+💰 **Estimated Total:** ETB ${estimatedTotal.toLocaleString()}
 
 ---
 *Contact: ${quoteData.contactName} | ${quoteData.contactEmail} | ${quoteData.contactPhone}*

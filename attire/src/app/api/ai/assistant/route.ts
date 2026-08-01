@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { enforceRateLimit } from '@/lib/rate-limit';
+
+export const runtime = 'nodejs';
 
 const HF_API_URL = 'https://router.huggingface.co/v1/chat/completions';
 const HF_TOKEN = process.env.HUGGINGFACE_API_KEY;
@@ -39,6 +42,10 @@ You: "We have beautiful bridal gowns for your special day. [Browse Gowns](/brida
 `;
 
 export async function POST(req: NextRequest) {
+    // Rate limit: this endpoint proxies a paid LLM, so cap per-IP usage.
+    const limited = enforceRateLimit(req, 'ai-assistant', 15, 60_000);
+    if (limited) return limited;
+
     if (!HF_TOKEN) {
         console.error('[AI Assistant] HF_TOKEN is missing');
         return NextResponse.json({ error: 'AI Service configuration missing' }, { status: 500 });
@@ -47,10 +54,27 @@ export async function POST(req: NextRequest) {
     try {
         const { message, history } = await req.json();
 
+        if (typeof message !== 'string' || !message.trim()) {
+            return NextResponse.json({ error: 'A message is required' }, { status: 400 });
+        }
+
+        // Sanitize history: only accept user/assistant turns with string content.
+        // This prevents callers from injecting a fake `system` role to override
+        // the guardrails below.
+        const safeHistory = (Array.isArray(history) ? history : [])
+            .filter(
+                (m: any) =>
+                    m &&
+                    (m.role === 'user' || m.role === 'assistant') &&
+                    typeof m.content === 'string'
+            )
+            .slice(-4)
+            .map((m: any) => ({ role: m.role, content: m.content.slice(0, 2000) }));
+
         const messages = [
             { role: 'system', content: SYSTEM_PROMPT },
-            ...(history || []).slice(-4),
-            { role: 'user', content: message }
+            ...safeHistory,
+            { role: 'user', content: message.slice(0, 2000) }
         ];
 
         console.log('[AI Assistant] Calling HF Router endpoint...');

@@ -11,7 +11,6 @@ import {
   Loader2,
   Sparkles,
   Scissors,
-  Upload,
 } from "lucide-react";
 import ImageUpload from "./ImageUpload";
 import { BRIDAL_SILHOUETTES } from "@/lib/constants";
@@ -67,6 +66,7 @@ export default function BridalManager() {
   >(null);
   const [submitting, setSubmitting] = useState(false);
   const [sizeInput, setSizeInput] = useState("");
+  const [search, setSearch] = useState("");
 
   // Form states
   const [gownForm, setGownForm] = useState({
@@ -336,6 +336,8 @@ export default function BridalManager() {
           />
           <input
             type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder={`Search ${activeTab}...`}
             className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500"
           />
@@ -360,7 +362,9 @@ export default function BridalManager() {
         </div>
       ) : activeTab === "accessories" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {accessories.map((accessory) => (
+          {accessories
+            .filter((accessory) => !search.trim() || accessory.name.toLowerCase().includes(search.toLowerCase()))
+            .map((accessory) => (
             <div
               key={accessory.id}
               className="bg-white rounded-xl border border-slate-200 overflow-hidden group shadow-sm hover:shadow-md transition-all"
@@ -408,10 +412,10 @@ export default function BridalManager() {
                 </p>
                 <div className="flex gap-2 text-xs font-medium text-pink-600">
                   {accessory.price_rent && (
-                    <span>Rent: ${accessory.price_rent}</span>
+                    <span>Rent: ETB {accessory.price_rent}</span>
                   )}
                   {accessory.price_buy && (
-                    <span>Buy: ${accessory.price_buy}</span>
+                    <span>Buy: ETB {accessory.price_buy}</span>
                   )}
                 </div>
               </div>
@@ -420,7 +424,9 @@ export default function BridalManager() {
         </div>
       ) : activeTab === "gowns" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {gowns.map((gown) => (
+          {gowns
+            .filter((gown) => !search.trim() || gown.name.toLowerCase().includes(search.toLowerCase()) || (gown.designer || '').toLowerCase().includes(search.toLowerCase()))
+            .map((gown) => (
             <div
               key={gown.id}
               className="bg-white rounded-xl border border-slate-200 overflow-hidden group shadow-sm hover:shadow-md transition-all"
@@ -465,8 +471,8 @@ export default function BridalManager() {
                   {gown.designer} • {gown.style}
                 </p>
                 <div className="flex gap-2 text-xs font-medium text-pink-600">
-                  {gown.price_rent && <span>Rent: ${gown.price_rent}</span>}
-                  {gown.price_buy && <span>Buy: ${gown.price_buy}</span>}
+                  {gown.price_rent && <span>Rent: ETB {gown.price_rent}</span>}
+                  {gown.price_buy && <span>Buy: ETB {gown.price_buy}</span>}
                 </div>
               </div>
             </div>
@@ -474,7 +480,9 @@ export default function BridalManager() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {services.map((service) => (
+          {services
+            .filter((service) => !search.trim() || service.title.toLowerCase().includes(search.toLowerCase()))
+            .map((service) => (
             <div
               key={service.id}
               className="bg-white p-4 rounded-xl border border-slate-200 flex gap-4 hover:shadow-md transition-all group"
@@ -495,7 +503,7 @@ export default function BridalManager() {
                   <div className="flex justify-between items-start">
                     <h3 className="font-bold text-primary">{service.title}</h3>
                     <span className="text-sm font-bold text-pink-600">
-                      ${service.price_start}
+                      ETB {service.price_start}
                     </span>
                   </div>
                   <p className="text-xs text-slate-500 mt-1 line-clamp-2">

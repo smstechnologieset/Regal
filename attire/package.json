@@ -23,10 +23,11 @@
     "react-dom": "19.2.3",
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3",
-    "styled": "^1.0.0"
+    "styled": "^1.0.0",
+    "tailwindcss": "^4",
+    "@tailwindcss/postcss": "^4"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/dotenv": "^6.1.1",
     "@types/node": "^20",
     "@types/node-telegram-bot-api": "^0.64.13",
@@ -34,7 +35,6 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
-    "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5"
   }

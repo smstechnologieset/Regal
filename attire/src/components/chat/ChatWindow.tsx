@@ -60,28 +60,41 @@ export default function ChatWindow({ conversationId, isAdmin = false }: ChatWind
         }
     };
 
-    // Initial fetch of messages via API
+    // Initial & Polling fetch of messages via API
     useEffect(() => {
+        let isMounted = true;
+
         async function fetchMessages() {
             try {
                 const endpoint = isAdmin
                     ? `/api/admin/conversations/${conversationId}`
-                    : `/api/conversations/${conversationId}`; // Need to ensure user-side API exists too
+                    : `/api/conversations/${conversationId}`;
 
                 const response = await fetch(endpoint);
-                if (response.ok) {
+                if (response.ok && isMounted) {
                     const data = await response.json();
                     setMessages(data.messages || []);
                 }
             } catch (error) {
                 console.error('Error fetching messages:', error);
             } finally {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         }
 
         fetchMessages();
-    }, [conversationId, isAdmin]);
+
+        // Enable auto-polling every 3 seconds if WebSockets are unavailable (e.g. Vercel deployment)
+        let interval: NodeJS.Timeout | null = null;
+        if (!isConnected) {
+            interval = setInterval(fetchMessages, 3000);
+        }
+
+        return () => {
+            isMounted = false;
+            if (interval) clearInterval(interval);
+        };
+    }, [conversationId, isAdmin, isConnected]);
 
     // Socket listeners setup
     useEffect(() => {
@@ -130,13 +143,26 @@ export default function ChatWindow({ conversationId, isAdmin = false }: ChatWind
         }
     }, [messages, conversationId, user?.id, markAsRead]);
 
-    const handleSend = (e: React.FormEvent) => {
+    const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMessage.trim() || !user) return;
+        const text = newMessage.trim();
+        if (!text || !user) return;
 
-        sendMessage(conversationId, newMessage.trim());
         setNewMessage('');
         stopTyping(conversationId);
+
+        // Optimistically add message to UI for instant feedback
+        const tempMsg: Message = {
+            id: `temp-${Date.now()}`,
+            conversation_id: conversationId,
+            sender_id: user.id,
+            content: text,
+            read: false,
+            created_at: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, tempMsg]);
+
+        await sendMessage(conversationId, text, isAdmin);
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,8 +200,9 @@ export default function ChatWindow({ conversationId, isAdmin = false }: ChatWind
         <div className="flex flex-col h-[600px] bg-slate-50 rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             {/* Connection Status */}
             {!isConnected && (
-                <div className="bg-amber-50 text-amber-700 text-xs py-1 px-4 text-center border-b border-amber-100 italic">
-                    Connecting to real-time service...
+                <div className="bg-sky-50 text-sky-800 text-[11px] py-1 px-4 text-center border-b border-sky-100 flex items-center justify-center gap-1.5 font-medium">
+                    <span className="w-2 h-2 bg-sky-500 rounded-full animate-pulse" />
+                    Messaging active (Vercel Serverless Mode)
                 </div>
             )}
 

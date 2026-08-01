@@ -176,7 +176,7 @@ export default function AccountPage() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium text-primary">
-                      ${order.total.toFixed(2)}
+                      ETB {order.total.toFixed(2)}
                     </p>
                     <span
                       className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full capitalize ${getStatusBadge(

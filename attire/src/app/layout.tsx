@@ -6,7 +6,8 @@
  */
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 export const runtime = "nodejs";
@@ -25,11 +26,17 @@ import LoadingWrapper from "@/components/layout/LoadingWrapper";
 
 import AIAssistant from "@/components/chat/AIAssistant";
 
-// Load Inter font with next/font for optimal performance
-const inter = Inter({
+// Load Plus Jakarta Sans (body & UI) and exact Organo custom display font
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-inter",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const organo = localFont({
+  src: "../../public/fonts/Organo.ttf",
+  variable: "--font-organo",
   display: "swap",
 });
 
@@ -39,6 +46,9 @@ export const metadata: Metadata = {
     "Discover the latest trends in fashion. Shop clothing, accessories, and more with free shipping on orders over ETB500.",
   keywords:
     "fashion, clothing, accessories, online shopping, women's fashion, men's fashion",
+  icons: {
+    icon: "/Logo-bg.ico",
+  },
   openGraph: {
     title: "Regal - All your needs At one place",
     description: "Discover the latest trends in fashion.",
@@ -54,7 +64,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} font-sans min-h-screen flex flex-col`}
+        className={`${plusJakarta.variable} ${organo.variable} font-sans min-h-screen flex flex-col`}
+        suppressHydrationWarning
       >
         <AppProvider>
           <AuthProvider>

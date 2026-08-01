@@ -280,7 +280,7 @@ export default function AdminOrdersClient() {
                           </span>
                         </td>
                         <td className="px-6 py-4 font-medium text-primary">
-                          ${order.total.toFixed(2)}
+                          ETB {order.total.toFixed(2)}
                         </td>
                         <td className="px-6 py-4 text-slate-600">
                           {new Date(order.created_at).toLocaleDateString()}

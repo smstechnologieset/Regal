@@ -1,5 +1,5 @@
 import { getSupabaseClient } from '@/lib/supabase/client';
-import { withRetry } from '@/lib/supabase/utils';
+import { withRetry, isAbortError, getErrorMessage } from '@/lib/supabase/utils';
 import { Product, Category, FilterOptions, SortOption, PaginatedResponse, ProductColor, ProductBadge } from '@/types';
 
 /**
@@ -84,8 +84,12 @@ export async function getProducts(
             pageSize,
             totalPages,
         };
-    } catch (error) {
-        console.error('Error fetching products:', error);
+    } catch (error: any) {
+        if (isAbortError(error, signal)) {
+            console.log('[attireService] getProducts aborted');
+        } else {
+            console.error('Error fetching products:', getErrorMessage(error));
+        }
         return { data: [], total: 0, page, pageSize, totalPages: 0 };
     }
 }
@@ -131,8 +135,10 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
             estimatedDeliveryDays: p.estimated_delivery_days,
         };
     } catch (error: any) {
-        if (error?.code !== 'PGRST116') {
-            console.error('Error fetching product:', error);
+        if (isAbortError(error, signal)) {
+            console.log('[attireService] getProductById aborted');
+        } else if (error?.code !== 'PGRST116') {
+            console.error('Error fetching product:', getErrorMessage(error));
         }
         return null;
     }
@@ -160,8 +166,12 @@ export async function getCategories(signal?: AbortSignal): Promise<Category[]> {
             image: cat.image as string,
             subcategories: (cat.subcategories as any[]) || [],
         }));
-    } catch (error) {
-        console.error('Error fetching categories:', error);
+    } catch (error: any) {
+        if (isAbortError(error, signal)) {
+            console.log('[attireService] getCategories aborted');
+        } else {
+            console.error('Error fetching categories:', getErrorMessage(error));
+        }
         return [];
     }
 }
@@ -269,23 +279,10 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
         }
 
         const preorderStatus = hasPreorders ? (allPreorders ? 'all' : 'partial') : 'none';
-        const { data: order, error: orderError } = await supabase.from('orders').insert({
-            user_id: orderData.userId,
-            total: orderData.total,
-            status: 'pending',
-            details: orderData.items,
-            shipping_address: orderData.shippingAddress,
-            service_type: 'attire',
-            promo_code: orderData.promoCode || null,
-            discount_amount: orderData.discount || 0,
-            has_preorders: hasPreorders,
-            preorder_status: preorderStatus,
-        }).select().single();
 
-        if (orderError || !order) throw orderError;
-
-        const orderItemsToInsert = items.map(item => ({
-            order_id: order.id,
+        // Order + order_items are written atomically via a Postgres function so a
+        // partial failure can't leave an order with no items (or orphaned items).
+        const itemsPayload = items.map(item => ({
             product_id: item.productId,
             quantity: item.quantity,
             price: item.price,
@@ -296,11 +293,21 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
             preorder_status: item.isPreorder ? 'pending' : null,
         }));
 
-        const { error: itemsError } = await supabase.from('order_items').insert(orderItemsToInsert);
-        if (itemsError) {
-            await supabase.from('orders').delete().eq('id', order.id);
-            throw itemsError;
-        }
+        const { data: newOrderId, error: rpcError } = await supabase.rpc('create_attire_order', {
+            p_user_id: orderData.userId,
+            p_total: orderData.total,
+            p_details: orderData.items,
+            p_shipping_address: orderData.shippingAddress,
+            p_promo_code: orderData.promoCode || null,
+            p_discount: orderData.discount || 0,
+            p_has_preorders: hasPreorders,
+            p_preorder_status: preorderStatus,
+            p_items: itemsPayload,
+        });
+
+        if (rpcError || !newOrderId) throw rpcError || new Error('Order creation failed');
+
+        const order = { id: newOrderId as string };
 
         if (orderData.promoCode) {
             await supabase.rpc('increment_promo_usage', { p_code: orderData.promoCode }).catch(console.error);

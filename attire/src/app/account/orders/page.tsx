@@ -159,7 +159,7 @@ export default function OrdersPage() {
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <p className="font-semibold text-primary">
-                        ${order.total.toFixed(2)}
+                        ETB {order.total.toFixed(2)}
                       </p>
                       <span
                         className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full capitalize ${getStatusBadge(order.status)}`}

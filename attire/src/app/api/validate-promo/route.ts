@@ -1,12 +1,27 @@
+export const runtime = 'nodejs';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { enforceRateLimit } from '@/lib/rate-limit';
+
+// Uniform response for any code that can't be applied, so this endpoint can't
+// be used to enumerate which codes exist or their exact state.
+const INVALID = { success: false, error: 'This promo code is invalid or has expired' };
+
+function formatEtb(amount: number): string {
+  return `ETB ${amount.toFixed(2)}`;
+}
 
 export async function GET(request: NextRequest) {
+  // Rate limit to prevent brute-force enumeration of promo codes.
+  const limited = enforceRateLimit(request, 'validate-promo', 20, 60_000);
+  if (limited) return limited;
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const code = searchParams.get('code');
     const subtotalStr = searchParams.get('subtotal');
-    
+
     if (!code) {
       return NextResponse.json(
         { success: false, error: 'Promo code is required' },
@@ -14,59 +29,41 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const subtotal = parseFloat(subtotalStr || '0');
+    const parsed = parseFloat(subtotalStr || '0');
+    const subtotal = Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
     const supabase = await createClient();
-    
+
     const { data: promo, error } = await supabase
       .from('promo_codes')
       .select('*')
       .eq('code', code.toUpperCase())
       .single();
 
+    // Non-existent, inactive, not-yet-active, expired, and used-up codes all
+    // return the same message (and 400) so existence can't be inferred.
     if (error || !promo) {
-      return NextResponse.json(
-        { success: false, error: 'Promo code does not exist' },
-        { status: 404 }
-      );
+      return NextResponse.json(INVALID, { status: 400 });
     }
-
     if (!promo.is_active) {
-      return NextResponse.json(
-        { success: false, error: 'This promo code is no longer active' },
-        { status: 400 }
-      );
+      return NextResponse.json(INVALID, { status: 400 });
     }
-
-    // Check if promo has started
     if (promo.start_date && new Date(promo.start_date) > new Date()) {
-      return NextResponse.json(
-        { success: false, error: 'This promo code is not yet active' },
-        { status: 400 }
-      );
+      return NextResponse.json(INVALID, { status: 400 });
     }
-
-    // Check if promo has expired
     if (promo.end_date && new Date(promo.end_date) < new Date()) {
-      return NextResponse.json(
-        { success: false, error: 'This promo code has expired' },
-        { status: 400 }
-      );
+      return NextResponse.json(INVALID, { status: 400 });
     }
-
-    // Check usage limit
     if (promo.usage_limit && promo.usage_count >= promo.usage_limit) {
-      return NextResponse.json(
-        { success: false, error: 'This promo code has exceeded its usage limit' },
-        { status: 400 }
-      );
+      return NextResponse.json(INVALID, { status: 400 });
     }
 
-    // Check minimum purchase amount
+    // Minimum purchase is a genuine "valid code, add more to cart" nudge, so we
+    // keep a helpful message here.
     if (promo.min_purchase && subtotal < promo.min_purchase) {
       return NextResponse.json(
         {
           success: false,
-          error: `This promo code requires a minimum purchase of $${promo.min_purchase.toFixed(2)}. Your current subtotal is $${subtotal.toFixed(2)}.`
+          error: `This promo code requires a minimum purchase of ${formatEtb(promo.min_purchase)}. Your current subtotal is ${formatEtb(subtotal)}.`,
         },
         { status: 400 }
       );

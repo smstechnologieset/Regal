@@ -16,6 +16,7 @@ import { useAuth } from "@/context/AuthContext";
 import Button from "@/components/ui/Button";
 import PreOrderBadge from "@/components/attire/PreOrderBadge";
 import { formatPrice } from "@/lib/utils";
+import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "@/lib/constants";
 
 export default function CartPage() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function CartPage() {
   const { user } = useAuth();
 
   const subtotal = getCartTotal();
-  const shipping = subtotal >= 50 ? 0 : 9.99;
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
   const total = subtotal + shipping;
 
   // Empty cart state

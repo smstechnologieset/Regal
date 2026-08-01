@@ -10,29 +10,42 @@
 /* CSS Variables */
 :root {
   --background: #ffffff;
-  --foreground: #000080;
-  --primary: #0b4b23;
-  --secondary: #179c22;
-  --accent: #2ecc0e;
-  /* --secondary: #e11d48;
-  --accent: #f43f5e; */
-  --muted: #f1f5f9;
+  --foreground: #0f172a;
+  --primary: #1e3a8a;
+  --secondary: #0284c7;
+  --accent: #38bdf8;
+  --muted: #f8fafc;
   --border: #e2e8f0;
 }
 
+@font-face {
+  font-family: 'Organo';
+  src: url('/fonts/Organo.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
-  --color-primary: var(--primary);
-  --color-secondary: var(--secondary);
-  --color-accent: var(--accent);
-  --color-muted-custom: var(--muted);
+  --color-primary: #1e3a8a;
+  --color-secondary: #0284c7;
+  --color-accent: #38bdf8;
+  --color-muted-custom: #f8fafc;
+  --font-sans: var(--font-sans), 'Plus Jakarta Sans', sans-serif;
+  --font-organo: var(--font-organo), 'Organo', sans-serif;
+  --font-display: var(--font-organo), 'Organo', sans-serif;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--background);
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, .font-organo, .font-display, .font-serif {
+  font-family: var(--font-organo), 'Organo', sans-serif;
 }
 
 /* Custom scrollbar */
@@ -300,41 +313,41 @@ main {
 @keyframes before8 {
   0% {
     width: 0.5em;
-    box-shadow: 1em -0.5em rgba(37, 225, 20, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75);
+    box-shadow: 1em -0.5em rgba(30, 58, 138, 0.75), -1em 0.5em rgba(56, 189, 248, 0.75);
   }
 
   35% {
     width: 2.5em;
-    box-shadow: 0 -0.5em rgba(85, 225, 20, 0.75), 0 0.5em rgba(111, 202, 220, 0.75);
+    box-shadow: 0 -0.5em rgba(2, 132, 199, 0.75), 0 0.5em rgba(56, 189, 248, 0.75);
   }
 
   70% {
     width: 0.5em;
-    box-shadow: -1em -0.5em rgba(102, 225, 20, 0.75), 1em 0.5em rgba(111, 202, 220, 0.75);
+    box-shadow: -1em -0.5em rgba(30, 58, 138, 0.75), 1em 0.5em rgba(56, 189, 248, 0.75);
   }
 
   100% {
-    box-shadow: 1em -0.5em rgba(20, 225, 37, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75);
+    box-shadow: 1em -0.5em rgba(2, 132, 199, 0.75), -1em 0.5em rgba(56, 189, 248, 0.75);
   }
 }
 
 @keyframes after6 {
   0% {
     height: 0.5em;
-    box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(122, 233, 32, 0.75);
+    box-shadow: 0.5em 1em rgba(30, 58, 138, 0.75), -0.5em -1em rgba(56, 189, 248, 0.75);
   }
 
   35% {
     height: 2.5em;
-    box-shadow: 0.5em 0 rgba(61, 184, 143, 0.75), -0.5em 0 rgba(122, 233, 32, 0.75);
+    box-shadow: 0.5em 0 rgba(2, 132, 199, 0.75), -0.5em 0 rgba(56, 189, 248, 0.75);
   }
 
   70% {
     height: 0.5em;
-    box-shadow: 0.5em -1em rgba(61, 184, 143, 0.75), -0.5em 1em rgba(122, 233, 32, 0.75);
+    box-shadow: 0.5em -1em rgba(30, 58, 138, 0.75), -0.5em 1em rgba(56, 189, 248, 0.75);
   }
 
   100% {
-    box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(122, 233, 32, 0.75);
+    box-shadow: 0.5em 1em rgba(2, 132, 199, 0.75), -0.5em -1em rgba(56, 189, 248, 0.75);
   }
 }

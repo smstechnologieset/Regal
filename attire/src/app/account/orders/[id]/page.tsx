@@ -351,7 +351,7 @@ export default function UserOrderDetailPage() {
                     {item.selected_size && <p>Size: {item.selected_size}</p>}
                     {item.selected_color && <p>Color: {item.selected_color}</p>}
                     <p>Quantity: {item.quantity}</p>
-                    <p className="font-medium">${item.price.toFixed(2)} each</p>
+                    <p className="font-medium">ETB {item.price.toFixed(2)} each</p>
                   </div>
 
                   {/* Pre-order badge and info */}
@@ -439,7 +439,7 @@ export default function UserOrderDetailPage() {
             <div className="flex justify-between py-2">
               <span className="text-slate-600 text-lg">Total</span>
               <span className="font-bold text-slate-900 text-lg">
-                ${order.total.toFixed(2)}
+                ETB {order.total.toFixed(2)}
               </span>
             </div>
           </div>

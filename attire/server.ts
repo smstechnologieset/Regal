@@ -20,7 +20,7 @@ const hostname = 'localhost';
 const port = parseInt(process.env.PORT || '3000', 10);
 
 // Initialize Next.js
-const app = next({ dev, hostname, port });
+const app = next({ dev, hostname, port, dir: __dirname });
 const handle = app.getRequestHandler();
 
 // Initialize Supabase admin client for server-side operations
@@ -317,3 +317,5 @@ app.prepare().then(() => {
         console.log(`> Socket.io server running`);
     });
 });
+
+

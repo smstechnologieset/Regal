@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         // Optional filters
         const service = searchParams.get('service');
         const status = searchParams.get('status');
-        const limit = parseInt(searchParams.get('limit') || '100');
+        const limit = Math.min(500, Math.max(1, parseInt(searchParams.get('limit') || '100') || 100));
 
         let query = supabase
             .from('orders')

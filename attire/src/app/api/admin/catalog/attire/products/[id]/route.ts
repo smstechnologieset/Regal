@@ -10,6 +10,7 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdmin, forbiddenResponse, unauthorizedResponse } from '@/lib/admin-auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { pick, ALLOWED_FIELDS } from '@/lib/sanitize';
 
 /**
  * Handle stock arrival for pre-orders with FIFO reservation
@@ -23,7 +24,8 @@ async function handleStockArrival(productId: string, productName: string, previo
 
     const supabase = createAdminClient();
 
-    // Find all pending pre-orders for this product, ordered by created_at (FIFO)
+    // Find all pending pre-orders for this product, ordered by created_at (FIFO).
+    // (Customer identity comes from orders.user_id — there is no `users` table.)
     const { data: preorderItems, error: preorderError } = await supabase
         .from('order_items')
         .select(`
@@ -33,12 +35,7 @@ async function handleStockArrival(productId: string, productName: string, previo
             created_at,
             orders!inner (
                 id,
-                user_id,
-                users!inner (
-                    id,
-                    email,
-                    full_name
-                )
+                user_id
             )
         `)
         .eq('product_id', productId)
@@ -60,10 +57,12 @@ async function handleStockArrival(productId: string, productName: string, previo
     const availableStock = newStock;
     const insufficientStock = totalDemand > availableStock;
 
-    // Reserve stock in FIFO order
+    // Reserve stock in strict FIFO order. Once an item can't be fully served the
+    // queue is "blocked": that item and everyone after it wait for more stock,
+    // and the leftover stock is preserved (never thrown away).
     let remainingStock = availableStock;
+    let blocked = false;
     const fulfilledItems: string[] = [];
-    const partiallyFulfilledItems: string[] = [];
     const unfulfilledItems: string[] = [];
     const notificationData: Array<{
         userId: string;
@@ -75,12 +74,12 @@ async function handleStockArrival(productId: string, productName: string, previo
 
     for (const item of preorderItems) {
         const order = item.orders as any;
-        
-        if (remainingStock >= item.quantity) {
+
+        if (!blocked && remainingStock >= item.quantity) {
             // Full fulfillment
             fulfilledItems.push(item.id);
             remainingStock -= item.quantity;
-            
+
             if (order?.user_id) {
                 notificationData.push({
                     userId: order.user_id,
@@ -90,10 +89,11 @@ async function handleStockArrival(productId: string, productName: string, previo
                     availableQty: item.quantity,
                 });
             }
-        } else if (remainingStock > 0) {
-            // Partial fulfillment (not implemented - treat as unfulfilled)
+        } else {
+            // Can't fully serve this one — block the rest of the FIFO queue.
+            blocked = true;
             unfulfilledItems.push(item.id);
-            
+
             if (order?.user_id) {
                 notificationData.push({
                     userId: order.user_id,
@@ -101,21 +101,6 @@ async function handleStockArrival(productId: string, productName: string, previo
                     status: 'insufficient',
                     requestedQty: item.quantity,
                     availableQty: remainingStock,
-                });
-            }
-            
-            remainingStock = 0;
-        } else {
-            // No stock remaining
-            unfulfilledItems.push(item.id);
-            
-            if (order?.user_id) {
-                notificationData.push({
-                    userId: order.user_id,
-                    orderId: order.id,
-                    status: 'insufficient',
-                    requestedQty: item.quantity,
-                    availableQty: 0,
                 });
             }
         }
@@ -132,13 +117,27 @@ async function handleStockArrival(productId: string, productName: string, previo
             console.error('Error updating pre-order status:', updateError);
         }
 
+        // Persist the stock actually consumed by fulfilled pre-orders so we don't
+        // oversell. Final stock = whatever is left after FIFO reservation.
+        const consumed = availableStock - remainingStock;
+        if (consumed > 0) {
+            const { error: stockError } = await supabase
+                .from('products')
+                .update({ stock_count: remainingStock, in_stock: remainingStock > 0 })
+                .eq('id', productId);
+
+            if (stockError) {
+                console.error('Error decrementing stock after fulfillment:', stockError);
+            }
+        }
+
         // Update order status to 'processing' for orders with ready pre-orders
         const fulfilledOrderIds = [...new Set(
             preorderItems
                 .filter(item => fulfilledItems.includes(item.id))
                 .map(item => item.order_id)
         )];
-        
+
         const { error: orderUpdateError } = await supabase
             .from('orders')
             .update({ status: 'processing' })
@@ -208,6 +207,7 @@ export async function PATCH(
     try {
         const { id } = await params;
         const body = await request.json();
+        const payload = pick(body, ALLOWED_FIELDS.product);
         const supabase = createAdminClient();
 
         // Get current product state before update
@@ -220,7 +220,7 @@ export async function PATCH(
         // Update product
         const { data, error: dbError } = await supabase
             .from('products')
-            .update(body)
+            .update(payload)
             .eq('id', id)
             .select()
             .single();
@@ -228,15 +228,15 @@ export async function PATCH(
         if (dbError) throw dbError;
 
         // Check if stock arrival occurred
-        let stockArrivalResult = { 
-            notifiedCount: 0, 
-            insufficientStock: false, 
-            fulfilledCount: 0, 
-            unfulfilledCount: 0 
+        let stockArrivalResult = {
+            notifiedCount: 0,
+            insufficientStock: false,
+            fulfilledCount: 0,
+            unfulfilledCount: 0
         };
-        if (currentProduct && body.stock_count !== undefined) {
+        if (currentProduct && payload.stock_count !== undefined) {
             const previousStock = currentProduct.stock_count || 0;
-            const newStock = body.stock_count || 0;
+            const newStock = (payload.stock_count as number) || 0;
             
             stockArrivalResult = await handleStockArrival(
                 id,

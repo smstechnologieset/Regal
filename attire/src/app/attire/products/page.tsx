@@ -105,11 +105,11 @@ function ProductsContent() {
                     setLoading(false);
                 }
             } catch (error: any) {
-                if (error.name === 'AbortError') {
+                if (error?.name === 'AbortError' || controller.signal.aborted) {
                     console.log('Attire Products: fetch aborted');
                     return;
                 }
-                console.error('Attire Products: fetch error', error);
+                console.error('Attire Products: fetch error', error?.message || error);
                 addToast('Failed to load products', 'error');
                 setLoading(false);
             }

@@ -69,22 +69,34 @@ export async function PATCH(
 
         if (allItems) {
             const preorderItems = allItems.filter(item => item.is_preorder);
-            const allFulfilled = preorderItems.every(item => item.preorder_status === 'fulfilled');
-            const allReady = preorderItems.every(item => 
-                item.preorder_status === 'ready' || item.preorder_status === 'fulfilled'
-            );
+            const hasRegularItems = allItems.some(item => !item.is_preorder);
+            // Cancelled pre-orders shouldn't block completion of the rest.
+            const activePreorders = preorderItems.filter(item => item.preorder_status !== 'cancelled');
 
-            // Update order status if appropriate
-            if (allFulfilled) {
+            const allFulfilled =
+                activePreorders.length > 0 &&
+                activePreorders.every(item => item.preorder_status === 'fulfilled');
+            const allReady =
+                activePreorders.length > 0 &&
+                activePreorders.every(
+                    item => item.preorder_status === 'ready' || item.preorder_status === 'fulfilled'
+                );
+
+            // Only auto-complete a PURE pre-order order. If the order also has
+            // regular items, those ship/complete separately, so completion stays
+            // a manual admin decision (avoids marking unshipped items done).
+            if (allFulfilled && !hasRegularItems) {
                 await supabase
                     .from('orders')
                     .update({ status: 'completed' })
                     .eq('id', orderId);
             } else if (allReady && preorder_status === 'ready') {
+                // Move a still-pending order into processing when pre-orders are ready.
                 await supabase
                     .from('orders')
                     .update({ status: 'processing' })
-                    .eq('id', orderId);
+                    .eq('id', orderId)
+                    .eq('status', 'pending');
             }
         }
 

@@ -356,7 +356,7 @@ function PreOrderCard({
                 Size: {preorder.size} | Color: {preorder.color}
               </p>
               <p className="text-xs text-slate-500">
-                Qty: {preorder.quantity} × ${preorder.price}
+                Qty: {preorder.quantity} × ETB {preorder.price}
               </p>
             </div>
             <div>

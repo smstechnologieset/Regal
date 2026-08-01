@@ -9,6 +9,7 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2 } from "lucide-react";
 import Button from "@/components/ui/Button";
@@ -179,10 +180,11 @@ function LoginContent() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-block mb-2">
-            <span className="text-secondary font-bold text-3xl">REGAL</span>
+          <Link href="/" className="inline-flex items-center gap-2 mb-2 group">
+            <Image src="/Logo-bg.png" alt="Regal Logo" width={64} height={64} className="h-14 w-auto object-contain transition-transform group-hover:scale-105" />
+            <span className="text-primary font-extrabold text-3xl tracking-tight">REGAL</span>
           </Link>
-          <h1 className="text-2xl font-bold text-primary mb-2">Welcome Back</h1>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Welcome Back</h1>
           <p className="text-slate-600">Sign in to your account to continue</p>
         </div>
 

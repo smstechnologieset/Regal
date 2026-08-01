@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { MessageCircle, X, Send, User, Bot, Sparkles, ArrowRight, Loader2, Minimize2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useApp } from '@/context/AppContext';
@@ -117,13 +118,13 @@ export default function AIAssistant() {
                 {/* Header */}
                 <div className="bg-primary p-4 flex items-center justify-between text-white">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md">
-                            <Bot size={22} className="text-secondary" />
+                        <div className="w-10 h-10 rounded-full bg-white/10 p-1 flex items-center justify-center backdrop-blur-md">
+                            <Image src="/Logo-bg.png" alt="Regal AI" width={28} height={28} className="object-contain" />
                         </div>
                         <div>
                             <h3 className="font-bold text-sm">REGAL Assistant</h3>
                             <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                                <span className="w-2 h-2 bg-sky-400 rounded-full animate-pulse" />
                                 <span className="text-[10px] text-white/70 uppercase tracking-widest font-bold">Online</span>
                             </div>
                         </div>

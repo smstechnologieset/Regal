@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit2, Trash2, X, Utensils, Loader2, Info, Upload } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, X, Utensils, Loader2, Info } from 'lucide-react';
 import ImageUpload from './ImageUpload';
 import { useApp } from '@/context/AppContext';
 
@@ -36,6 +36,7 @@ export default function CateringManager() {
     const [submitting, setSubmitting] = useState(false);
     const [dietaryInput, setDietaryInput] = useState('');
     const [inclusionsInput, setInclusionsInput] = useState('');
+    const [search, setSearch] = useState('');
 
     // Form states
     const [packageForm, setPackageForm] = useState({
@@ -60,7 +61,6 @@ export default function CateringManager() {
                 : '/api/admin/catalog/catering/items';
             const res = await fetch(url);
             const data = await res.json();
-            if (activeTab === 'packages') setPackages(data.packages || []);
             if (activeTab === 'packages') setPackages(data.packages || []);
             else setItems(data.items || []);
         } catch (error) {
@@ -247,6 +247,8 @@ export default function CateringManager() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input
                         type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
                         placeholder={`Search ${activeTab}...`}
                         className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                     />
@@ -266,7 +268,9 @@ export default function CateringManager() {
                 </div>
             ) : activeTab === 'packages' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {packages.map((pkg) => (
+                    {packages
+                        .filter((pkg) => !search.trim() || pkg.name.toLowerCase().includes(search.toLowerCase()))
+                        .map((pkg) => (
                         <div key={pkg.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all group">
                             <div className="aspect-video bg-emerald-50 relative">
                                 {pkg.image ? (
@@ -288,7 +292,7 @@ export default function CateringManager() {
                             <div className="p-5">
                                 <div className="flex justify-between items-start mb-2">
                                     <h3 className="font-bold text-primary truncate">{pkg.name}</h3>
-                                    <span className="text-emerald-600 font-bold">${pkg.price_per_guest}<span className="text-[10px] text-slate-400 font-normal">/pp</span></span>
+                                    <span className="text-emerald-600 font-bold">ETB {pkg.price_per_guest}<span className="text-[10px] text-slate-400 font-normal">/pp</span></span>
                                 </div>
                                 <p className="text-xs text-slate-500 mb-4 line-clamp-2">{pkg.description}</p>
                                 <div className="space-y-2">
@@ -319,7 +323,9 @@ export default function CateringManager() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {items.map((item) => (
+                            {items
+                                .filter((item) => !search.trim() || item.name.toLowerCase().includes(search.toLowerCase()))
+                                .map((item) => (
                                 <tr key={item.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="px-6 py-4">
                                         <p className="font-medium text-primary">{item.name}</p>
@@ -328,7 +334,7 @@ export default function CateringManager() {
                                     <td className="px-6 py-4">
                                         <span className="text-xs px-2 py-1 bg-emerald-50 text-emerald-700 rounded-md font-medium capitalize">{item.category}</span>
                                     </td>
-                                    <td className="px-6 py-4 font-bold text-slate-700">${item.price}</td>
+                                    <td className="px-6 py-4 font-bold text-slate-700">ETB {item.price}</td>
                                     <td className="px-6 py-4">
                                         <div className="flex flex-wrap gap-1">
                                             {item.dietary?.map((d: string) => (

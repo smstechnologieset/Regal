@@ -20,11 +20,11 @@ export async function GET(request: NextRequest) {
         const supabase = createAdminClient();
         const { searchParams } = new URL(request.url);
 
-        // Parse query parameters
+        // Parse query parameters (clamped to safe ranges)
         const status = searchParams.get('status') || 'all';
         const productId = searchParams.get('product_id');
-        const page = parseInt(searchParams.get('page') || '1');
-        const limit = parseInt(searchParams.get('limit') || '20');
+        const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20') || 20));
 
         // Build query
         let query = supabase
@@ -80,26 +80,41 @@ export async function GET(request: NextRequest) {
         
         console.log('Pre-orders query successful, found:', data?.length || 0, 'items');
 
-        // Fetch user information for all orders
+        // Fetch customer info for all orders. Names/phone come from `profiles`
+        // (there is no public `users` table); emails live in auth and are
+        // fetched best-effort per user (page size keeps this bounded).
         const userIds = [...new Set((data || []).map((item: any) => item.orders.user_id))];
-        const { data: users } = await supabase
-            .from('users')
-            .select('id, email, full_name')
-            .in('id', userIds);
 
-        const userMap = new Map(users?.map(u => [u.id, u]) || []);
+        const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, full_name, phone')
+            .in('id', userIds);
+        const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
+
+        const emailMap = new Map<string, string>();
+        await Promise.all(
+            userIds.map(async (uid) => {
+                try {
+                    const { data: authUser } = await supabase.auth.admin.getUserById(uid as string);
+                    if (authUser?.user?.email) emailMap.set(uid as string, authUser.user.email);
+                } catch {
+                    // best-effort; ignore lookup failures
+                }
+            })
+        );
 
         // Transform data to match expected format
         const preorders = (data || []).map((item: any) => {
-            const user = userMap.get(item.orders.user_id);
+            const profile = profileMap.get(item.orders.user_id) as any;
             // Use first 8 characters of order_id as order number
             const orderNumber = item.order_id.substring(0, 8).toUpperCase();
             return {
                 id: item.id,
                 order_id: item.order_id,
                 order_number: orderNumber,
-                customer_name: user?.full_name || 'Unknown',
-                customer_email: user?.email || 'Unknown',
+                customer_name: profile?.full_name || 'Unknown',
+                customer_email: emailMap.get(item.orders.user_id) || profile?.phone || 'Unknown',
+                customer_phone: profile?.phone || null,
                 product_id: item.product_id,
                 product_name: item.products.name,
                 product_image: item.products.images?.[0] || null,

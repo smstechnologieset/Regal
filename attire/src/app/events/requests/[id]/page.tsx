@@ -109,19 +109,9 @@ export default function EventRequestPage({ params }: RequestPageProps) {
                         </div>
                     </div>
 
-                    {/* Right Column: Chat */}
+                    {/* Right Column: Chat (real conversation backed by Socket.io) */}
                     <div className="lg:col-span-2">
-                        <ChatInterface
-                            requestId={request.id}
-                            initialMessages={[
-                                {
-                                    id: '1',
-                                    sender: 'admin',
-                                    text: `Hello! I'm Sarah, your dedicated event planner at Regal. I've received your request for a ${request.type} event and am currently reviewing the details. I'll have a preliminary proposal ready for you shortly!`,
-                                    timestamp: new Date('2025-01-14T09:30:00Z')
-                                }
-                            ]}
-                        />
+                        <ChatInterface conversationId={request.id} />
                     </div>
                 </div>
             </div>

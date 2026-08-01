@@ -10,6 +10,7 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdmin, forbiddenResponse, unauthorizedResponse } from '@/lib/admin-auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { pick, ALLOWED_FIELDS } from '@/lib/sanitize';
 
 export async function GET(request: NextRequest) {
     const { isAdmin, userId, error } = await verifyAdmin();
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
 
         const { data, error: dbError } = await supabase
             .from('gift_packages')
-            .insert(body)
+            .insert(pick(body, ALLOWED_FIELDS.giftPackage))
             .select()
             .single();
 

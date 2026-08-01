@@ -81,7 +81,7 @@ export default function CartDrawer() {
                                 >
                                     {/* Product image */}
                                     <Link
-                                        href={`/products/${item.product.id}`}
+                                        href={`/attire/products/${item.product.id}`}
                                         onClick={closeCart}
                                         className="flex-shrink-0 w-20 h-24 rounded-md overflow-hidden bg-white"
                                     >
@@ -98,7 +98,7 @@ export default function CartDrawer() {
                                     {/* Product details */}
                                     <div className="flex-1 min-w-0">
                                         <Link
-                                            href={`/products/${item.product.id}`}
+                                            href={`/attire/products/${item.product.id}`}
                                             onClick={closeCart}
                                             className="font-medium text-primary hover:text-secondary line-clamp-2 transition-colors"
                                         >

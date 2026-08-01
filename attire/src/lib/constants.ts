@@ -2,6 +2,12 @@
  * Global application constants
  */
 
+// Currency + shipping (all amounts in ETB)
+export const CURRENCY = 'ETB';
+// Orders at or above this subtotal ship free; otherwise SHIPPING_FEE applies.
+export const FREE_SHIPPING_THRESHOLD = 2000;
+export const SHIPPING_FEE = 150;
+
 export const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
 export const COLORS = [

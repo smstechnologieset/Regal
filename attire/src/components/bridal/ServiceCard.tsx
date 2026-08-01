@@ -33,7 +33,7 @@ export default function ServiceCard({ title, description, image, link, priceStar
                 </p>
                 {priceStart !== undefined && (
                     <p className="text-sm font-medium text-primary mb-4">
-                        Starts at ${priceStart}
+                        Starts at ETB {priceStart}
                     </p>
                 )}
                 <Link href={link}>

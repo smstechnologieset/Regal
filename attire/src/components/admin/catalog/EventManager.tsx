@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit2, Trash2, X, Calendar, Loader2, Users, Upload } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, X, Calendar, Loader2, Users } from 'lucide-react';
 import ImageUpload from './ImageUpload';
 import { useApp } from '@/context/AppContext';
 
@@ -215,7 +215,7 @@ export default function EventManager() {
                                         </div>
                                         <div className="text-right">
                                             <span className="text-sm text-slate-500 block">Starts from</span>
-                                            <span className="text-xl font-bold text-amber-600">${pkg.price_start}</span>
+                                            <span className="text-xl font-bold text-amber-600">ETB {pkg.price_start}</span>
                                         </div>
                                     </div>
                                     <p className="text-slate-600 text-sm line-clamp-2 mb-4">{pkg.description}</p>

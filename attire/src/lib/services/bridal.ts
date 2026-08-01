@@ -322,7 +322,7 @@ export async function submitBridalTransaction(orderData: {
 **New Bridal ${displayItemType} ${displayOrderType}**
 
 ✨ **Item:** ${orderData.itemName}
-💰 **Total:** $${orderData.price}
+💰 **Total:** ETB ${orderData.price}
 ${orderData.transactionType === 'rent' ? `
 📅 **Rental Date:** ${orderData.appointmentDate}
 ` : '📦 **Action:** Direct Purchase'}

@@ -1,5 +1,9 @@
+export const runtime = 'nodejs';
+
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { randomUUID } from 'crypto';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 // Initialize the Supabase admin client (using service role key to bypass RLS)
 const supabaseAdmin = createClient(
@@ -13,7 +17,27 @@ const supabaseAdmin = createClient(
   }
 );
 
+/**
+ * Find an auth user by email, paginating through all pages so it keeps working
+ * past the first 50 users (listUsers only returns a single page by default).
+ */
+async function findUserByEmail(admin: SupabaseClient, email: string) {
+  const perPage = 200;
+  for (let page = 1; page <= 50; page++) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
+    if (error) throw error;
+    const found = data.users.find((u) => u.email === email);
+    if (found) return found;
+    if (data.users.length < perPage) break; // reached the last page
+  }
+  return null;
+}
+
 export async function POST(request: Request) {
+  // Rate limit to throttle verification-code brute-forcing.
+  const limited = enforceRateLimit(request, 'telegram-verify', 10, 60_000);
+  if (limited) return limited;
+
   try {
     const { sessionId, code } = await request.json();
 
@@ -40,17 +64,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Prepare user identifer (using phone number as a unique point)
+    // 2. Prepare user identifier (using phone number as a unique point).
+    // Generate a fresh random password on every verification. It is handed to
+    // the client once to complete signInWithPassword, and is never derived from
+    // any secret. For existing users we rotate their password to this value so
+    // the just-issued credential is the only one that works.
     const emailIdentifier = `${attempt.phone_number}@telegram.regal`;
-    const password = `tg_${attempt.telegram_id}_${process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(0, 10)}`;
+    const password = `tg-${randomUUID()}-${randomUUID()}`;
 
-    // 3. Try to find if user exists or create new one
-    // We use a custom email-like format for Telegram users
-    const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
-    
-    if (listError) throw listError;
-
-    let targetUser = users.find(u => u.email === emailIdentifier);
+    // 3. Find existing user (paginated) or create a new one.
+    let targetUser = await findUserByEmail(supabaseAdmin, emailIdentifier);
 
     if (!targetUser) {
       // Create new user if not found
@@ -70,6 +93,16 @@ export async function POST(request: Request) {
         throw signUpError;
       }
       targetUser = newUser.user;
+    } else {
+      // Existing user: rotate the password to the freshly generated one so the
+      // returned credential is valid exactly once for this login.
+      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+        targetUser.id,
+        { password }
+      );
+      if (updateError) {
+        throw updateError;
+      }
     }
 
     // 4. Mark attempt as verified

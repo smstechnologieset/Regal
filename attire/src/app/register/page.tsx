@@ -9,6 +9,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -112,12 +113,13 @@ export default function RegisterPage() {
             <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <Link href="/" className="inline-block mb-2">
-                        <span className="text-3xl font-bold bg-gradient-to-r from-rose-600 to-purple-600 bg-clip-text text-transparent">
+                    <Link href="/" className="inline-flex items-center gap-2 mb-2 group">
+                        <Image src="/Logo-bg.png" alt="Regal Logo" width={64} height={64} className="h-14 w-auto object-contain transition-transform group-hover:scale-105" />
+                        <span className="text-3xl font-extrabold tracking-tight text-primary">
                             REGAL
                         </span>
                     </Link>
-                    <h1 className="text-2xl font-bold text-primary mb-2">Create Account</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 mb-2">Create Account</h1>
                     <p className="text-slate-600">Join us and start your journey</p>
                 </div>
 

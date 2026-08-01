@@ -167,7 +167,7 @@ function CateringQuoteForm() {
                             >
                                 <option value="">Custom / No Package</option>
                                 {packages.map((pkg: CateringPackage) => (
-                                    <option key={pkg.id} value={pkg.id}>{pkg.name} (${pkg.pricePerGuest}/guest)</option>
+                                    <option key={pkg.id} value={pkg.id}>{pkg.name} (ETB {pkg.pricePerGuest}/guest)</option>
                                 ))}
                             </select>
                         </div>

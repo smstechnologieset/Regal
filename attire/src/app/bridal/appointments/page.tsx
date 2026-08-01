@@ -198,7 +198,7 @@ export default function BridalAppointmentPage() {
                                                 />
                                                 <div>
                                                     <div className="font-medium text-primary">{service.title}</div>
-                                                    <div className="text-xs text-slate-500">{service.duration} • Starts at ${service.priceStart}</div>
+                                                    <div className="text-xs text-slate-500">{service.duration} • Starts at ETB {service.priceStart}</div>
                                                 </div>
                                             </label>
                                         ))}

@@ -37,7 +37,7 @@ interface SocketContextType {
     isConnected: boolean;
     joinConversation: (conversationId: string) => void;
     leaveConversation: (conversationId: string) => void;
-    sendMessage: (conversationId: string, content: string) => void;
+    sendMessage: (conversationId: string, content: string, isAdmin?: boolean) => Promise<void> | void;
     startTyping: (conversationId: string) => void;
     stopTyping: (conversationId: string) => void;
     markAsRead: (conversationId: string, messageIds?: string[]) => void;
@@ -121,10 +121,22 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
         }
     }, []);
 
-    const sendMessage = useCallback((conversationId: string, content: string) => {
+    const sendMessage = useCallback(async (conversationId: string, content: string, isAdmin: boolean = false) => {
         const sock = getSocket();
         if (sock?.connected) {
             sock.emit('send_message', { conversationId, content });
+        } else {
+            // HTTP Fallback for serverless environments (e.g. Vercel)
+            try {
+                const endpoint = isAdmin ? '/api/admin/messages' : `/api/conversations/${conversationId}`;
+                await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ conversationId, content }),
+                });
+            } catch (err) {
+                console.error('HTTP sendMessage fallback error:', err);
+            }
         }
     }, []);
 

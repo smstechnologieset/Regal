@@ -10,6 +10,7 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdmin, forbiddenResponse, unauthorizedResponse } from '@/lib/admin-auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { pick, ALLOWED_FIELDS } from '@/lib/sanitize';
 
 export async function PATCH(
     request: NextRequest,
@@ -26,7 +27,7 @@ export async function PATCH(
 
         const { data, error: dbError } = await supabase
             .from('gift_packages')
-            .update(body)
+            .update(pick(body, ALLOWED_FIELDS.giftPackage))
             .eq('id', id)
             .select()
             .single();

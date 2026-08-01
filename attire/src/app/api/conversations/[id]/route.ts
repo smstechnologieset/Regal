@@ -79,3 +79,75 @@ export async function GET(
         );
     }
 }
+
+export async function POST(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                getAll() {
+                    return cookieStore.getAll();
+                },
+                setAll() {},
+            },
+        }
+    );
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    try {
+        const { id } = await params;
+        const body = await request.json();
+        const { content } = body;
+
+        if (!content || !content.trim()) {
+            return NextResponse.json({ error: 'Message content is required' }, { status: 400 });
+        }
+
+        // Verify conversation belongs to user
+        const { data: conversation, error: convErr } = await supabase
+            .from('conversations')
+            .select('id')
+            .eq('id', id)
+            .eq('user_id', user.id)
+            .single();
+
+        if (convErr || !conversation) {
+            return NextResponse.json({ error: 'Conversation not found or access denied' }, { status: 404 });
+        }
+
+        // Insert message
+        const { data: message, error: messageError } = await supabase
+            .from('messages')
+            .insert({
+                conversation_id: id,
+                sender_id: user.id,
+                content: content.trim(),
+                read: false,
+            })
+            .select()
+            .single();
+
+        if (messageError) throw messageError;
+
+        // Update last_message_at
+        await supabase
+            .from('conversations')
+            .update({ last_message_at: new Date().toISOString() })
+            .eq('id', id);
+
+        return NextResponse.json({ message });
+    } catch (error) {
+        console.error('Error posting message:', error);
+        return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
+    }
+}

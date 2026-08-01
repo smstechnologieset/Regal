@@ -9,6 +9,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
     LayoutDashboard,
@@ -84,11 +85,12 @@ function AdminSidebar({
                 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
                 <div className="flex items-center justify-between p-6 border-b border-slate-800">
-                    <Link href="/admin" className="flex items-center gap-2">
-                        <span className="text-2xl font-bold bg-gradient-to-r from-rose-400 to-purple-400 bg-clip-text text-transparent">
+                    <Link href="/admin" className="flex items-center gap-2 group">
+                        <Image src="/Logo-bg.png" alt="Regal Logo" width={48} height={48} className="h-11 w-auto object-contain transition-transform group-hover:scale-105" />
+                        <span className="text-xl font-extrabold tracking-tight text-white">
                             REGAL
                         </span>
-                        <span className="text-xs bg-secondary px-2 py-0.5 rounded-full">Admin</span>
+                        <span className="text-xs bg-secondary px-2 py-0.5 rounded-full font-semibold">Admin</span>
                     </Link>
                     <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-1">
                         <X size={20} />

@@ -52,7 +52,10 @@ export default function NotificationDropdown({
     switch (type) {
       case "message":
         return <MessageSquare size={18} className="text-blue-600" />;
-      case "order_status":
+      case "order":
+      case "preorder_ready":
+      case "preorder_insufficient_stock":
+      case "preorder_update":
         return <Package size={18} className="text-purple-600" />;
       default:
         return <Bell size={18} className="text-slate-600" />;

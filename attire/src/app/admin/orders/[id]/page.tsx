@@ -353,7 +353,7 @@ export default function AdminOrderDetailPage() {
                 <div>
                   <p className="text-sm text-slate-500">Total Amount</p>
                   <p className="text-2xl font-bold text-slate-900">
-                    ${order.total.toFixed(2)}
+                    ETB {order.total.toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -393,7 +393,7 @@ export default function AdminOrderDetailPage() {
                     </div>
                     <div className="text-right">
                       <p className="font-medium text-slate-900">
-                        ${((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                        ETB {((item.price || 0) * (item.quantity || 1)).toFixed(2)}
                       </p>
                       <p className="text-sm text-slate-500">
                         {item.quantity || 1} x $
@@ -426,7 +426,7 @@ export default function AdminOrderDetailPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-xl font-bold text-slate-900">
-                        ${order.total?.toFixed(2)}
+                        ETB {order.total?.toFixed(2)}
                       </p>
                     </div>
                   </div>

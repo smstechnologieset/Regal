@@ -18,10 +18,18 @@ import { getSupabaseClient } from "@/lib/supabase/client";
 import { useAuth } from "./AuthContext";
 import { useApp } from "./AppContext";
 
+export type NotificationType =
+  | "message"
+  | "order"
+  | "general"
+  | "preorder_ready"
+  | "preorder_insufficient_stock"
+  | "preorder_update";
+
 export interface Notification {
   id: string;
   user_id: string;
-  type: "message" | "order" | "general";
+  type: NotificationType;
   title: string;
   message: string;
   link: string | null;

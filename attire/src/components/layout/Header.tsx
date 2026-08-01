@@ -9,6 +9,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import {
   Search,
@@ -185,13 +186,23 @@ export default function Header() {
             {/* Logo */}
             <Link
               href="/"
-              className="flex items-center"
+              className="flex items-center gap-2 group"
               onClick={closeMobileMenu}
             >
+              <div className="relative flex items-center justify-center p-0.5 rounded-lg transition-transform group-hover:scale-105">
+                <Image
+                  src="/Logo-bg.png"
+                  alt="Regal Logo"
+                  width={100}
+                  height={100}
+                  className="h-12 lg:h-14 w-auto object-contain filter drop-shadow-sm"
+                  priority
+                />
+              </div>
               <span
                 className={cn(
-                  "text-2xl lg:text-3xl font-bold tracking-tight transition-colors",
-                  isTransparent ? "text-white" : "text-secondary"
+                  "text-2xl lg:text-3xl font-extrabold tracking-wider font-organo transition-colors",
+                  isTransparent ? "text-white" : "text-primary"
                 )}
               >
                 REGAL
@@ -199,8 +210,8 @@ export default function Header() {
               {isAttireSection && (
                 <span
                   className={cn(
-                    "hidden sm:inline text-lg ml-2 font-light transition-colors",
-                    isTransparent ? "text-white/60" : "text-slate-400"
+                    "hidden sm:inline text-base ml-1 font-medium transition-colors",
+                    isTransparent ? "text-white/70" : "text-slate-400"
                   )}
                 >
                   | Attire

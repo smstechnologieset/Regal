@@ -270,7 +270,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium text-primary text-sm">
-                      ${order.total}
+                      ETB {order.total}
                     </p>
                     <p className="text-xs text-slate-500 capitalize">
                       {order.status}

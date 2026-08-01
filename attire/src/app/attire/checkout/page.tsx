@@ -27,6 +27,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import PreOrderNotice from "@/components/attire/PreOrderNotice";
 import { formatPrice, isValidEmail, isValidPhone } from "@/lib/utils";
+import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "@/lib/constants";
 import {
   hasPreOrderItems,
   getEstimatedDeliveryDate,
@@ -81,7 +82,7 @@ export default function CheckoutPage() {
   } | null>(null);
 
   const subtotal = getCartTotal();
-  const shipping = subtotal >= 50 ? 0 : 9.99;
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
   const discount = appliedPromo?.discountAmount || 0;
   const total = Math.max(0, subtotal - discount + shipping);
 
@@ -213,6 +214,15 @@ export default function CheckoutPage() {
       });
 
       if (success) {
+        // Fire-and-forget confirmation email (never blocks the redirect).
+        if (orderId) {
+          fetch("/api/orders/confirmation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderId, email: formData.email }),
+          }).catch((err) => console.error("Confirmation email request failed:", err));
+        }
+
         // Clear cart and redirect to confirmation
         clearCart();
         addToast("Order placed successfully!", "success");

@@ -78,3 +78,23 @@ export async function withRetry<T>(
 
     throw lastError || new Error('Request failed after retries');
 }
+
+/**
+ * Helper to check if an error is an abort error from AbortSignal / AbortController
+ */
+export function isAbortError(error: any, signal?: AbortSignal): boolean {
+    if (signal?.aborted) return true;
+    if (!error) return false;
+    if (error.name === 'AbortError' || error.message === 'Request aborted' || error.message === 'AbortError') return true;
+    return false;
+}
+
+/**
+ * Safely format error messages (handling non-enumerable Supabase error properties)
+ */
+export function getErrorMessage(error: any): string {
+    if (!error) return 'Unknown error';
+    if (typeof error === 'string') return error;
+    return error.message || error.details || error.hint || error.code || String(error);
+}
+

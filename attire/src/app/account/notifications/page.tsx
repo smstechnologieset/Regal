@@ -84,6 +84,9 @@ export default function NotificationsPage() {
       case "message":
         return <MessageSquare size={20} className="text-blue-500" />;
       case "order":
+      case "preorder_ready":
+      case "preorder_insufficient_stock":
+      case "preorder_update":
         return <Package size={20} className="text-green-500" />;
       default:
         return <Bell size={20} className="text-slate-500" />;

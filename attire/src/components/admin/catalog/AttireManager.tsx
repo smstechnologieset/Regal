@@ -9,7 +9,6 @@ import {
   X,
   Image as ImageIcon,
   Loader2,
-  Upload,
 } from "lucide-react";
 import ImageUpload from "./ImageUpload";
 import { useApp } from "@/context/AppContext";
@@ -479,11 +478,11 @@ export default function AttireManager() {
                   </h3>
                   <div className="flex flex-col items-end">
                     <span className="font-bold text-secondary">
-                      ${product.price}
+                      ETB {product.price}
                     </span>
                     {product.original_price && (
                       <span className="text-[10px] text-slate-400 line-through">
-                        ${product.original_price}
+                        ETB {product.original_price}
                       </span>
                     )}
                   </div>

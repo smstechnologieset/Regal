@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdmin, forbiddenResponse, unauthorizedResponse } from '@/lib/admin-auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { pick, ALLOWED_FIELDS } from '@/lib/sanitize';
 
 export async function PATCH(
     req: NextRequest,
@@ -17,7 +18,7 @@ export async function PATCH(
 
         const { data, error } = await supabase
             .from('promo_codes')
-            .update(body)
+            .update(pick(body, ALLOWED_FIELDS.promoCode))
             .eq('id', id)
             .select()
             .single();

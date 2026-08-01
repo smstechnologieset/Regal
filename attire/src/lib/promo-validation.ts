@@ -37,49 +37,31 @@ export async function validatePromoCode(
       .eq('code', code.toUpperCase())
       .single();
 
+    // Uniform message for non-existent / inactive / not-started / expired /
+    // used-up codes so this can't be used to enumerate valid codes.
+    const INVALID = 'This promo code is invalid or has expired';
+
     if (error || !promo) {
-      return {
-        success: false,
-        error: 'Invalid promo code',
-      };
+      return { success: false, error: INVALID };
     }
-
     if (!promo.is_active) {
-      return {
-        success: false,
-        error: 'This promo code is no longer active',
-      };
+      return { success: false, error: INVALID };
     }
-
-    // Check if promo has started
     if (promo.start_date && new Date(promo.start_date) > new Date()) {
-      return {
-        success: false,
-        error: 'This promo code is not yet active',
-      };
+      return { success: false, error: INVALID };
     }
-
-    // Check if promo has expired
     if (promo.end_date && new Date(promo.end_date) < new Date()) {
-      return {
-        success: false,
-        error: 'This promo code has expired',
-      };
+      return { success: false, error: INVALID };
     }
-
-    // Check usage limit
     if (promo.usage_limit && promo.usage_count >= promo.usage_limit) {
-      return {
-        success: false,
-        error: 'This promo code has reached its usage limit',
-      };
+      return { success: false, error: INVALID };
     }
 
-    // Check minimum purchase amount
+    // Check minimum purchase amount (helpful nudge, kept explicit)
     if (promo.min_purchase && subtotal < promo.min_purchase) {
       return {
         success: false,
-        error: `Minimum order amount of $${promo.min_purchase} required`,
+        error: `Minimum order amount of ETB ${promo.min_purchase.toFixed(2)} required`,
       };
     }
 

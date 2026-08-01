@@ -6,7 +6,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Instagram, Facebook, Twitter, Youtube, Mail } from 'lucide-react';
+import Image from 'next/image';
+import { Instagram, Facebook, Twitter, Youtube } from 'lucide-react';
+import NewsletterForm from './NewsletterForm';
 
 const footerLinks = {
     services: [
@@ -52,23 +54,7 @@ export default function Footer() {
                         <p className="text-white/60 mb-6">
                             Subscribe to get updates on all our services, special offers, and exclusive deals.
                         </p>
-                        <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                            <div className="flex-1 relative">
-                                <input
-                                    type="email"
-                                    placeholder="Enter your email"
-                                    suppressHydrationWarning
-                                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:border-secondary transition-colors"
-                                />
-                                <Mail size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40" />
-                            </div>
-                            <button
-                                type="submit"
-                                className="px-6 py-3 bg-secondary hover:opacity-90 text-white font-medium rounded-lg transition-colors"
-                            >
-                                Subscribe
-                            </button>
-                        </form>
+                        <NewsletterForm />
                     </div>
                 </div>
             </div>
@@ -78,12 +64,26 @@ export default function Footer() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     {/* Brand section */}
                     <div className="col-span-2 md:col-span-1 mb-6 lg:mb-0">
-                        <Link href="/" className="inline-block mb-4">
-                            <span className="text-2xl font-bold text-secondary">
-                                REGAL
-                            </span>
+                        <Link href="/" className="inline-flex items-center gap-3 mb-4 group">
+                            <div className="p-1.5 bg-white/10 rounded-xl backdrop-blur-sm group-hover:scale-105 transition-transform">
+                                <Image 
+                                    src="/Logo-bg.png" 
+                                    alt="Regal Logo" 
+                                    width={100} 
+                                    height={100} 
+                                    className="h-14 w-auto object-contain"
+                                />
+                            </div>
+                            <div>
+                                <span className="text-2xl font-extrabold tracking-wider font-organo text-white block">
+                                    REGAL
+                                </span>
+                                <span className="text-[10px] tracking-widest text-slate-300 font-semibold uppercase block">
+                                    Curated. Crafted. Crowned.
+                                </span>
+                            </div>
                         </Link>
-                        <p className="text-slate-400 text-sm mb-4">
+                        <p className="text-slate-300 text-sm mb-4 leading-relaxed">
                             Your destination for style, celebrations, and unforgettable experiences.
                         </p>
                         {/* Social links */}

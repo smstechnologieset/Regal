@@ -213,7 +213,7 @@ export async function submitEventRequest(requestData: {
 
 📅 **Event Type:** ${requestData.eventType}
 👥 **Guest Count:** ${requestData.guestCount}
-💰 **Budget:** $${requestData.budget.toLocaleString()}
+💰 **Budget:** ETB ${requestData.budget.toLocaleString()}
 📆 **Preferred Date:** ${requestData.date || 'Flexible'}
 
 **Selected Services:**
