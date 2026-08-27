@@ -128,10 +128,11 @@ export async function POST(request: Request) {
       password: password
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Telegram verification error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Verification failed';
     return NextResponse.json(
-      { error: error.message || 'Verification failed' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
