@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "ts-node --project tsconfig.server.json server.ts",
     "start:next": "next start",
+    "start:bot": "ts-node --project tsconfig.server.json telegram_bot.ts",
     "lint": "next lint"
   },
   "dependencies": {
