@@ -5,17 +5,21 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { randomUUID } from 'crypto';
 import { enforceRateLimit } from '@/lib/rate-limit';
 
-// Initialize the Supabase admin client (using service role key to bypass RLS)
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-);
+// Lazily create the Supabase admin client inside request handlers,
+// never at module level. This prevents Vercel build failures caused by
+// missing env vars during the static page-data collection phase.
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  );
+}
 
 /**
  * Find an auth user by email, paginating through all pages so it keeps working
@@ -37,6 +41,8 @@ export async function POST(request: Request) {
   // Rate limit to throttle verification-code brute-forcing.
   const limited = enforceRateLimit(request, 'telegram-verify', 10, 60_000);
   if (limited) return limited;
+
+  const supabaseAdmin = getSupabaseAdmin();
 
   try {
     const { sessionId, code } = await request.json();
