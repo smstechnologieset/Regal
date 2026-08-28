@@ -162,9 +162,11 @@ export default function EventDetailPage({ params }: EventDetailPageProps) {
                                         Customize Proposal
                                     </Button>
                                 </Link>
-                                <Button fullWidth variant="outline" size="lg">
-                                    Contact Planner
-                                </Button>
+                                <Link href={`/events/custom?package=${pkg.id}`}>
+                                    <Button fullWidth variant="outline" size="lg">
+                                        Contact Planner
+                                    </Button>
+                                </Link>
                             </div>
 
                             <p className="mt-4 text-xs text-center text-slate-400">

@@ -26,6 +26,7 @@ function CustomEventForm() {
     const [loading, setLoading] = useState(false);
     const [checkingDate, setCheckingDate] = useState(false);
     const [dateError, setDateError] = useState('');
+    const [step1Errors, setStep1Errors] = useState<{ eventType?: string; date?: string; guestCount?: string }>({});
     const [formData, setFormData] = useState({
         eventType: '',
         guestCount: '' as string | number,
@@ -37,6 +38,13 @@ function CustomEventForm() {
         email: '',
         phone: '',
     });
+
+    // Redirect to login immediately if not authenticated
+    useEffect(() => {
+        if (user === null) {
+            router.push('/login?redirect=/events/custom');
+        }
+    }, [user, router]);
 
     // Check date availability when it changes
     useEffect(() => {
@@ -97,14 +105,24 @@ function CustomEventForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (step < 3) {
+
+        // Step 1 validation
+        if (step === 1) {
+            const errors: { eventType?: string; date?: string; guestCount?: string } = {};
+            if (!formData.eventType) errors.eventType = 'Please select an event type.';
+            if (!formData.date) errors.date = 'Please select a preferred date.';
+            if (!formData.guestCount || Number(formData.guestCount) <= 0) errors.guestCount = 'Please enter the expected guest count.';
+            if (Object.keys(errors).length > 0) {
+                setStep1Errors(errors);
+                return;
+            }
+            setStep1Errors({});
             setStep(step + 1);
             return;
         }
 
-        if (!user) {
-            addToast('Please log in to submit a request', 'error');
-            router.push('/login?redirect=/events/custom');
+        if (step < 3) {
+            setStep(step + 1);
             return;
         }
 
@@ -126,8 +144,8 @@ function CustomEventForm() {
             });
 
             if (result.success) {
-                addToast('Request submitted successfully!', 'success');
-                router.push(`/account/orders`);
+                addToast('Your event request has been submitted! Our team will contact you within 24 hours.', 'success');
+                router.push(`/events/requests/${result.orderId}`);
             } else {
                 addToast(result.error || 'Failed to submit request. Please try again.', 'error');
             }
@@ -168,10 +186,13 @@ function CustomEventForm() {
                                     <button
                                         key={type.value}
                                         type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, eventType: type.value }))}
+                                        onClick={() => {
+                                            setFormData(prev => ({ ...prev, eventType: type.value }));
+                                            setStep1Errors(prev => ({ ...prev, eventType: undefined }));
+                                        }}
                                         className={`p-3 rounded-lg border text-sm font-medium transition-all ${formData.eventType === type.value
                                             ? 'border-rose-600 bg-rose-50 text-rose-700'
-                                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                                            : step1Errors.eventType ? 'border-red-300 hover:border-red-400 text-slate-600' : 'border-slate-200 hover:border-slate-300 text-slate-600'
                                             }`}
                                     >
                                         {type.label}
@@ -179,15 +200,19 @@ function CustomEventForm() {
                                 ))}
                                 <button
                                     type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, eventType: 'custom' }))}
+                                    onClick={() => {
+                                        setFormData(prev => ({ ...prev, eventType: 'custom' }));
+                                        setStep1Errors(prev => ({ ...prev, eventType: undefined }));
+                                    }}
                                     className={`p-3 rounded-lg border text-sm font-medium transition-all ${formData.eventType === 'custom'
                                         ? 'border-rose-600 bg-rose-50 text-rose-700'
-                                        : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                                        : step1Errors.eventType ? 'border-red-300 hover:border-red-400 text-slate-600' : 'border-slate-200 hover:border-slate-300 text-slate-600'
                                         }`}
                                 >
                                     Custom / Other
                                 </button>
                             </div>
+                            {step1Errors.eventType && <p className="text-xs text-red-600 font-medium">{step1Errors.eventType}</p>}
                         </div>
 
                         <div className="grid sm:grid-cols-2 gap-6">
@@ -197,14 +222,15 @@ function CustomEventForm() {
                                     type="number"
                                     name="guestCount"
                                     value={formData.guestCount}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => { handleInputChange(e); setStep1Errors(prev => ({ ...prev, guestCount: undefined })); }}
                                     placeholder="e.g. 100"
-                                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all"
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all ${step1Errors.guestCount ? 'border-red-300' : 'border-slate-300'}`}
                                     required
                                 />
+                                {step1Errors.guestCount && <p className="text-xs text-red-600 font-medium">{step1Errors.guestCount}</p>}
                             </div>
                             <div className="space-y-2">
-                                <label className="block text-sm font-medium text-slate-700">Budget Range ($)</label>
+                                <label className="block text-sm font-medium text-slate-700">Budget Range (ETB)</label>
                                 <input
                                     type="number"
                                     name="budget"
@@ -219,20 +245,25 @@ function CustomEventForm() {
 
                         <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                                <label className="block text-sm font-medium text-slate-700">Preferred Date (Optional)</label>
+                                <label className="block text-sm font-medium text-slate-700">Preferred Date</label>
                                 {checkingDate && <span className="text-[10px] text-slate-400 animate-pulse">Checking availability...</span>}
                             </div>
                             <input
                                 type="date"
                                 name="date"
                                 value={formData.date}
-                                onChange={handleInputChange}
-                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${dateError
+                                onChange={(e) => {
+                                    handleInputChange(e);
+                                    setStep1Errors(prev => ({ ...prev, date: undefined }));
+                                }}
+                                min={new Date().toISOString().split('T')[0]}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${dateError || step1Errors.date
                                     ? 'border-red-300 focus:ring-red-500'
                                     : 'border-slate-300 focus:ring-rose-500'
                                     }`}
                             />
                             {dateError && <p className="text-xs text-red-600 font-medium">{dateError}</p>}
+                            {!dateError && step1Errors.date && <p className="text-xs text-red-600 font-medium">{step1Errors.date}</p>}
                         </div>
                     </div>
                 )}

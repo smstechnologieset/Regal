@@ -448,6 +448,80 @@ export default function AdminOrderDetailPage() {
                     </div>
                   )}
                 </div>
+              ) : order.service_type === 'events' || order.service_type === 'catering' ? (
+                <div className="space-y-4">
+                  {/* Event header */}
+                  <div className="flex items-start justify-between">
+                    <div className="flex gap-4">
+                      <div className="w-16 h-16 bg-rose-50 rounded-lg flex items-center justify-center text-rose-300">
+                        <Calendar size={28} />
+                      </div>
+                      <div>
+                        <p className="font-bold text-lg text-slate-900 capitalize">
+                          {order.details?.eventType || 'Custom'} Event
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          {order.details?.packageId ? `Package ID: ${order.details.packageId.slice(0, 8)}` : 'Custom Request'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-400 uppercase font-bold mb-1">Budget</p>
+                      <p className="text-xl font-bold text-slate-900">
+                        ETB {(order.details?.budget || order.total)?.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Key details grid */}
+                  <div className="grid sm:grid-cols-3 gap-3">
+                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                      <p className="text-xs text-slate-400 uppercase font-bold mb-1">Event Date</p>
+                      <p className="font-medium text-slate-800">{order.details?.date || 'Flexible'}</p>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                      <p className="text-xs text-slate-400 uppercase font-bold mb-1">Guest Count</p>
+                      <p className="font-medium text-slate-800">{order.details?.guestCount ?? '—'} guests</p>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                      <p className="text-xs text-slate-400 uppercase font-bold mb-1">Contact</p>
+                      <p className="font-medium text-slate-800 text-sm truncate">{order.details?.contactName || order.profiles?.full_name || '—'}</p>
+                      <p className="text-xs text-slate-500 truncate">{order.details?.contactPhone || order.profiles?.phone || ''}</p>
+                    </div>
+                  </div>
+
+                  {/* Features */}
+                  {Array.isArray(order.details?.features) && order.details.features.length > 0 && (
+                    <div>
+                      <p className="text-xs text-slate-400 uppercase font-bold mb-2">Requested Services</p>
+                      <div className="flex flex-wrap gap-2">
+                        {order.details.features.map((f: string, i: number) => (
+                          <span key={i} className="px-2 py-1 bg-rose-50 text-rose-700 text-xs rounded-full font-medium">{f}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Description */}
+                  {order.details?.description && (
+                    <div className="pt-3 border-t border-slate-100">
+                      <p className="text-xs text-slate-400 uppercase font-bold mb-1">Client&apos;s Vision</p>
+                      <p className="text-sm text-slate-600 italic bg-slate-50 p-3 rounded-lg">
+                        &ldquo;{order.details.description}&rdquo;
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Contact email */}
+                  {order.details?.contactEmail && (
+                    <div className="pt-2">
+                      <p className="text-xs text-slate-400 uppercase font-bold mb-1">Email</p>
+                      <a href={`mailto:${order.details.contactEmail}`} className="text-sm text-blue-600 hover:underline">
+                        {order.details.contactEmail}
+                      </a>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <p className="text-slate-500 text-sm">
                   Service details: {JSON.stringify(order.details)}

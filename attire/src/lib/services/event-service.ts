@@ -103,14 +103,14 @@ export async function checkEventAvailability(date: string): Promise<{ available:
     const supabase = getSupabaseClient();
 
     try {
-        // Search for any existing event or catering order on that date that isn't cancelled
-        // Note: details is JSONB, so we use the ->> operator to extract the date string
+        // Only block the date if an order is confirmed or actively in-progress.
+        // Pending requests do NOT block a date so multiple users can enquire simultaneously.
         const { data, error } = await supabase
             .from('orders')
             .select('id')
             .in('service_type', ['events', 'catering'])
-            .neq('status', 'cancelled')
-            .or(`details->>date.eq.${date},details->>eventDate.eq.${date}`)
+            .in('status', ['confirmed', 'in_progress'])
+            .or(`details->>'date'.eq.${date},details->>'eventDate'.eq.${date}`)
             .limit(1);
 
         if (error) {
