@@ -126,6 +126,11 @@ function CustomEventForm() {
             return;
         }
 
+        if (!user) {
+            router.push('/login?redirect=/events/custom');
+            return;
+        }
+
         setLoading(true);
 
         try {

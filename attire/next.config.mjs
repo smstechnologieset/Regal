@@ -1,7 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: false,
   images: {
     remotePatterns: [
@@ -12,7 +10,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "dziapuidlqvqqkedudme.supabase.co",
+        hostname: "**.supabase.co",
         pathname: "/**",
       },
     ],

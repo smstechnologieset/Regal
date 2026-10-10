@@ -14,6 +14,9 @@
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.89.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "dotenv": "^17.3.1",
@@ -26,17 +29,14 @@
     "socket.io-client": "^4.8.3",
     "styled": "^1.0.0",
     "tailwindcss": "^4",
-    "@tailwindcss/postcss": "^4"
+    "@tailwindcss/postcss": "^4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.1",
-    "@types/node": "^20",
     "@types/node-telegram-bot-api": "^0.64.13",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.1.1",
-    "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "eslint-config-next": "16.1.1"
   }
 }
