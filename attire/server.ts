@@ -11,6 +11,7 @@ import next from 'next';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
+import { initTelegramBot } from './telegram_bot';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -315,6 +316,7 @@ app.prepare().then(() => {
     httpServer.listen(port, () => {
         console.log(`> Ready on http://${hostname}:${port}`);
         console.log(`> Socket.io server running`);
+        initTelegramBot();
     });
 });
 

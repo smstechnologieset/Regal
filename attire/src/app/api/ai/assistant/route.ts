@@ -77,31 +77,48 @@ export async function POST(req: NextRequest) {
             { role: 'user', content: message.slice(0, 2000) }
         ];
 
-        console.log('[AI Assistant] Calling HF Router endpoint...');
+        const candidateModels = [
+            'meta-llama/Llama-3.1-8B-Instruct',
+            'Qwen/Qwen2.5-7B-Instruct',
+            'mistralai/Mistral-7B-Instruct-v0.3'
+        ];
 
-        const response = await fetch(HF_API_URL, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${HF_TOKEN}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                model: 'meta-llama/Llama-3.1-8B-Instruct',
-                messages: messages,
-                max_tokens: 200,
-                temperature: 0.7,
-            }),
-        });
+        let reply = '';
+        let lastErrorText = '';
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('[AI Assistant] HF API Error:', response.status, errorText);
-            throw new Error(`HF API failed: ${response.status} - ${errorText}`);
+        for (const model of candidateModels) {
+            try {
+                console.log(`[AI Assistant] Querying model: ${model}...`);
+                const response = await fetch(HF_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${HF_TOKEN}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model,
+                        messages,
+                        max_tokens: 200,
+                        temperature: 0.7,
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    reply = data.choices?.[0]?.message?.content || '';
+                    if (reply) break;
+                } else {
+                    lastErrorText = await response.text();
+                    console.warn(`[AI Assistant] Model ${model} returned ${response.status}: ${lastErrorText}`);
+                }
+            } catch (err: any) {
+                console.warn(`[AI Assistant] Model ${model} error:`, err?.message || err);
+            }
         }
 
-        const data = await response.json();
-
-        const reply = data.choices?.[0]?.message?.content || '';
+        if (!reply) {
+            throw new Error(`All free models failed. Last error: ${lastErrorText}`);
+        }
 
         // Extract links from markdown [Label](/path)
         const links: { label: string; url: string }[] = [];
