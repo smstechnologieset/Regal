@@ -316,11 +316,7 @@ app.prepare().then(() => {
     httpServer.listen(port, () => {
         console.log(`> Ready on http://${hostname}:${port}`);
         console.log(`> Socket.io server running`);
-        if (!dev || process.env.ENABLE_LOCAL_TELEGRAM_BOT === 'true') {
-            initTelegramBot();
-        } else {
-            console.log('[Telegram Bot] Skipped in local dev (already running on Render). Set ENABLE_LOCAL_TELEGRAM_BOT=true to enable locally.');
-        }
+        initTelegramBot();
     });
 });
 

@@ -40,24 +40,32 @@ export function initTelegramBot(): any {
     // Simple in-memory session tracking (chatId -> sessionId)
     const sessionStore = new Map<number, string>();
 
+    let lastConflictTime = 0;
     bot.on('polling_error', (error: any) => {
-      console.warn('[Telegram Bot] Polling notice:', error?.message || error);
+      const msg = error?.message || String(error);
+      if (msg.includes('409 Conflict')) {
+        const now = Date.now();
+        if (now - lastConflictTime > 60000) {
+          console.log('[Telegram Bot] Notice: another instance is active (e.g. Render). Bot running in standby.');
+          lastConflictTime = now;
+        }
+        return;
+      }
+      console.warn('[Telegram Bot] Polling notice:', msg);
     });
 
     console.log('[Telegram Bot] Started and listening for messages...');
 
-    // Handle /start command with session_id
-    bot.onText(/\/start (.+)/, async (msg: any, match: any) => {
+    // Handle /start command (with or without session_id)
+    bot.onText(/\/start(?:\s+(.+))?/, async (msg: any, match: any) => {
       const chatId = msg?.chat?.id;
-      const sessionId = match?.[1];
+      const sessionId = match?.[1]?.trim();
 
-      if (!sessionId || !chatId) {
-        if (chatId) bot.sendMessage(chatId, 'Invalid start link. Please try again from the website.');
-        return;
+      if (!chatId) return;
+
+      if (sessionId) {
+        sessionStore.set(chatId, sessionId);
       }
-
-      // Store session_id for this chat
-      sessionStore.set(chatId, sessionId);
 
       const opts = {
         reply_markup: {
@@ -72,11 +80,19 @@ export function initTelegramBot(): any {
         }
       };
 
-      bot.sendMessage(
-        chatId,
-        `Welcome to Regal Platform! To continue with your login, please share your contact so we can verify your identity.`,
-        opts
-      );
+      if (sessionId || sessionStore.has(chatId)) {
+        bot.sendMessage(
+          chatId,
+          `Welcome to Regal Platform! To continue with your login, please tap the button below to share your contact so we can verify your identity.`,
+          opts
+        );
+      } else {
+        bot.sendMessage(
+          chatId,
+          `Welcome to Regal Platform! 👋\n\nTo log in, please click "Continue with Telegram" on the website login page.\n\nIf you just clicked it on the website, please tap the button below to share your contact:`,
+          opts
+        );
+      }
     });
 
     // Handle contact sharing
