@@ -16,9 +16,9 @@ import path from 'path';
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
-let activeBot: TelegramBot | null = null;
+let activeBot: any = null;
 
-export function initTelegramBot(): TelegramBot | null {
+export function initTelegramBot(): any {
   if (activeBot) {
     return activeBot;
   }
@@ -47,12 +47,12 @@ export function initTelegramBot(): TelegramBot | null {
     console.log('[Telegram Bot] Started and listening for messages...');
 
     // Handle /start command with session_id
-    bot.onText(/\/start (.+)/, async (msg: TelegramBot.Message, match: RegExpMatchArray | null) => {
-      const chatId = msg.chat.id;
+    bot.onText(/\/start (.+)/, async (msg: any, match: any) => {
+      const chatId = msg?.chat?.id;
       const sessionId = match?.[1];
 
-      if (!sessionId) {
-        bot.sendMessage(chatId, 'Invalid start link. Please try again from the website.');
+      if (!sessionId || !chatId) {
+        if (chatId) bot.sendMessage(chatId, 'Invalid start link. Please try again from the website.');
         return;
       }
 
@@ -80,10 +80,12 @@ export function initTelegramBot(): TelegramBot | null {
     });
 
     // Handle contact sharing
-    bot.on('contact', async (msg: TelegramBot.Message) => {
-      const chatId = msg.chat.id;
-      const contact = msg.contact;
-      const sessionId = sessionStore.get(chatId);
+    bot.on('contact', async (msg: any) => {
+      const chatId = msg?.chat?.id;
+      const contact = msg?.contact;
+      const sessionId = chatId ? sessionStore.get(chatId) : undefined;
+
+      if (!chatId) return;
 
       if (!contact || !contact.phone_number) {
         bot.sendMessage(chatId, 'Error receiving contact. Please try again.');
