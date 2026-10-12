@@ -76,7 +76,7 @@ export async function POST(request: Request) {
     // any secret. For existing users we rotate their password to this value so
     // the just-issued credential is the only one that works.
     const emailIdentifier = `${attempt.phone_number}@telegram.regal`;
-    const password = `tg-${randomUUID()}-${randomUUID()}`;
+    const password = `tg-${randomUUID()}`;
 
     // 3. Find existing user (paginated) or create a new one.
     let targetUser = await findUserByEmail(supabaseAdmin, emailIdentifier);
@@ -104,7 +104,16 @@ export async function POST(request: Request) {
       // returned credential is valid exactly once for this login.
       const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
         targetUser.id,
-        { password }
+        {
+          password,
+          user_metadata: {
+            ...targetUser.user_metadata,
+            full_name: attempt.full_name || targetUser.user_metadata?.full_name,
+            phone: attempt.phone_number || targetUser.user_metadata?.phone,
+            telegram_id: attempt.telegram_id || targetUser.user_metadata?.telegram_id,
+            provider: 'telegram'
+          }
+        }
       );
       if (updateError) {
         throw updateError;
