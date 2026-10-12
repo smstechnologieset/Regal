@@ -2,11 +2,9 @@
  * Root Layout
  *
  * Wraps all pages with providers, header, footer, and global components.
- * Uses next/font for optimized font loading.
  */
 
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 
@@ -25,14 +23,6 @@ import ScrollToTop from "@/components/layout/ScrollToTop";
 import LoadingWrapper from "@/components/layout/LoadingWrapper";
 
 import AIAssistant from "@/components/chat/AIAssistant";
-
-// Load Plus Jakarta Sans (body & UI) and exact Organo custom display font
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-sans",
-  display: "swap",
-});
 
 const organo = localFont({
   src: "../../public/fonts/Organo.ttf",
@@ -63,8 +53,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
-        className={`${plusJakarta.variable} ${organo.variable} font-sans min-h-screen flex flex-col`}
+        className={`${organo.variable} font-sans min-h-screen flex flex-col`}
         suppressHydrationWarning
       >
         <AppProvider>
@@ -92,4 +90,3 @@ export default function RootLayout({
     </html>
   );
 }
-
