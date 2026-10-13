@@ -25,7 +25,8 @@ import {
     Heart,
     UtensilsCrossed,
     LogOut,
-    Home
+    Home,
+    Gift
 } from 'lucide-react';
 import { useAuth, Profile } from '@/context/AuthContext';
 
@@ -44,6 +45,7 @@ const navItems = [
             { name: 'Events', href: '/admin/orders?service=events', icon: Calendar },
             { name: 'Bridal', href: '/admin/orders?service=bridal', icon: Heart },
             { name: 'Catering', href: '/admin/orders?service=catering', icon: UtensilsCrossed },
+            { name: 'Gifts', href: '/admin/orders?service=gifts', icon: Gift },
         ]
     },
     { name: 'Messages', href: '/admin/messages', icon: MessageSquare },
@@ -80,11 +82,11 @@ function AdminSidebar({
 
             {/* Sidebar */}
             <aside className={`
-                fixed top-0 left-0 h-full w-72 bg-primary text-white z-50
+                fixed top-0 left-0 h-full w-72 bg-primary text-white z-50 flex flex-col
                 transform transition-transform duration-300 lg:translate-x-0
                 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             `}>
-                <div className="flex items-center justify-between p-6 border-b border-slate-800">
+                <div className="flex items-center justify-between p-6 border-b border-slate-800 shrink-0">
                     <Link href="/admin" className="flex items-center gap-2 group">
                         <Image src="/Logo-bg.png" alt="Regal Logo" width={48} height={48} className="h-11 w-auto object-contain transition-transform group-hover:scale-105" />
                         <span className="text-xl font-extrabold tracking-tight text-white">
@@ -98,7 +100,7 @@ function AdminSidebar({
                 </div>
 
                 {/* User Info */}
-                <div className="p-4 border-b border-slate-800">
+                <div className="p-4 border-b border-slate-800 shrink-0">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-white font-bold">
                             {profile?.full_name?.charAt(0) || 'A'}
@@ -111,7 +113,7 @@ function AdminSidebar({
                 </div>
 
                 {/* Navigation */}
-                <nav className="p-4 space-y-1 flex-1 overflow-y-auto">
+                <nav className="p-4 space-y-1 flex-1 min-h-0 overflow-y-auto">
                     {navItems.map((item) => {
                         const isActive = item.href === '/admin'
                             ? pathname === '/admin'

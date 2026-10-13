@@ -19,11 +19,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles = {
-    primary: 'bg-primary text-white hover:opacity-90 focus:ring-primary',
-    secondary: 'bg-secondary text-white hover:opacity-90 focus:ring-secondary',
-    outline: 'bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary',
-    ghost: 'bg-transparent text-slate-700 hover:bg-slate-100 focus:ring-slate-500',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-600',
+    primary: 'bg-primary text-[#FDFBF7] hover:bg-[#3D4D40] focus:ring-primary shadow-sm hover:shadow',
+    secondary: 'bg-secondary text-[#2B2D2F] font-semibold hover:bg-[#B8944D] focus:ring-secondary shadow-sm hover:shadow',
+    outline: 'bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-[#FDFBF7] focus:ring-primary',
+    ghost: 'bg-transparent text-foreground hover:bg-[#F4EFEA] focus:ring-primary',
+    danger: 'bg-red-700 text-white hover:bg-red-800 focus:ring-red-700',
 };
 
 const sizeStyles = {

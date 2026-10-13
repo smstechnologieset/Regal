@@ -119,3 +119,59 @@ export async function PATCH(request: NextRequest) {
         );
     }
 }
+
+export async function DELETE(request: NextRequest) {
+    // Verify admin access
+    const { isAdmin, userId, error } = await verifyAdmin();
+    
+    if (!userId) {
+        return unauthorizedResponse(error);
+    }
+    
+    if (!isAdmin) {
+        return forbiddenResponse(error);
+    }
+
+    try {
+        const body = await request.json();
+        const ids: string[] = Array.isArray(body.ids)
+            ? body.ids
+            : body.id
+            ? [body.id]
+            : [];
+
+        if (ids.length === 0) {
+            return NextResponse.json(
+                { error: 'Missing required field: id or ids array' },
+                { status: 400 }
+            );
+        }
+
+        const supabase = createAdminClient();
+
+        // 1. Delete associated order_items
+        await supabase
+            .from('order_items')
+            .delete()
+            .in('order_id', ids);
+
+        // 2. Delete the orders
+        const { error: deleteError } = await supabase
+            .from('orders')
+            .delete()
+            .in('id', ids);
+
+        if (deleteError) {
+            throw deleteError;
+        }
+
+        return NextResponse.json({ success: true, deletedCount: ids.length });
+    } catch (error: any) {
+        console.error('Error deleting orders:', error);
+        return NextResponse.json(
+            { error: error.message || 'Failed to delete orders' },
+            { status: 500 }
+        );
+    }
+}
+

@@ -8,15 +8,20 @@
  * Note: Google Fonts are loaded via next/font in layout.tsx for better performance
  */
 
-/* CSS Variables */
+/* CSS Variables - Regal Earth & Editorial Luxury Palette */
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --primary: #1e3a8a;
-  --secondary: #0284c7;
-  --accent: #38bdf8;
-  --muted: #f8fafc;
-  --border: #e2e8f0;
+  --background: #FDFBF7;
+  --foreground: #2B2D2F;
+  --primary: #4A5D4E;
+  --secondary: #C5A059;
+  --accent: #C5A059;
+  --muted: #F4EFEA;
+  --border: #E0D6C8;
+  --color-olive: #4A5D4E;
+  --color-gold: #C5A059;
+  --color-linen: #FDFBF7;
+  --color-sand: #F4EFEA;
+  --color-charcoal: #2B2D2F;
 }
 
 @font-face {
@@ -28,25 +33,43 @@
 }
 
 @theme {
-  --color-primary: #1e3a8a;
-  --color-secondary: #0284c7;
-  --color-accent: #38bdf8;
-  --color-muted-custom: #f8fafc;
-  --font-sans: var(--font-sans), 'Plus Jakarta Sans', sans-serif;
+  --color-primary: #4A5D4E;
+  --color-secondary: #C5A059;
+  --color-accent: #C5A059;
+  --color-muted-custom: #F4EFEA;
+  --color-linen: #FDFBF7;
+  --color-sand: #F4EFEA;
+  --color-olive: #4A5D4E;
+  --color-gold: #C5A059;
+  --color-charcoal: #2B2D2F;
+  --font-sans: 'Plus Jakarta Sans', 'Noto Sans Ethiopic', sans-serif;
+  --font-serif: 'Playfair Display', 'Cormorant Garamond', 'Noto Serif Ethiopic', Georgia, serif;
   --font-organo: var(--font-organo), 'Organo', sans-serif;
-  --font-display: var(--font-organo), 'Organo', sans-serif;
+  --font-display: 'Playfair Display', 'Noto Serif Ethiopic', Georgia, serif;
 }
 
 body {
-  font-family: var(--font-sans), 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Noto Sans Ethiopic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--background);
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, .font-organo, .font-display, .font-serif {
-  font-family: var(--font-organo), 'Organo', sans-serif;
+h1, h2, h3, .font-display, .font-serif {
+  font-family: 'Playfair Display', 'Noto Serif Ethiopic', Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+/* Amharic specific typography refinement */
+html.lang-am h1, html.lang-am h2, html.lang-am h3, html.lang-am .font-display, html.lang-am .font-serif {
+  font-family: 'Noto Serif Ethiopic', 'Playfair Display', serif;
+  line-height: 1.35;
+}
+
+html.lang-am body {
+  font-family: 'Noto Sans Ethiopic', 'Plus Jakarta Sans', sans-serif;
+  line-height: 1.6;
 }
 
 /* Custom scrollbar */
@@ -56,16 +79,16 @@ h1, h2, h3, .font-organo, .font-display, .font-serif {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #F4EFEA;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #C5A059;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #4A5D4E;
 }
 
 /* Hide scrollbar for horizontal scrolling areas */
@@ -314,41 +337,41 @@ main {
 @keyframes before8 {
   0% {
     width: 0.5em;
-    box-shadow: 1em -0.5em rgba(30, 58, 138, 0.75), -1em 0.5em rgba(56, 189, 248, 0.75);
+    box-shadow: 1em -0.5em rgba(74, 93, 78, 0.75), -1em 0.5em rgba(197, 160, 89, 0.75);
   }
 
   35% {
     width: 2.5em;
-    box-shadow: 0 -0.5em rgba(2, 132, 199, 0.75), 0 0.5em rgba(56, 189, 248, 0.75);
+    box-shadow: 0 -0.5em rgba(197, 160, 89, 0.75), 0 0.5em rgba(74, 93, 78, 0.75);
   }
 
   70% {
     width: 0.5em;
-    box-shadow: -1em -0.5em rgba(30, 58, 138, 0.75), 1em 0.5em rgba(56, 189, 248, 0.75);
+    box-shadow: -1em -0.5em rgba(74, 93, 78, 0.75), 1em 0.5em rgba(197, 160, 89, 0.75);
   }
 
   100% {
-    box-shadow: 1em -0.5em rgba(2, 132, 199, 0.75), -1em 0.5em rgba(56, 189, 248, 0.75);
+    box-shadow: 1em -0.5em rgba(197, 160, 89, 0.75), -1em 0.5em rgba(74, 93, 78, 0.75);
   }
 }
 
 @keyframes after6 {
   0% {
     height: 0.5em;
-    box-shadow: 0.5em 1em rgba(30, 58, 138, 0.75), -0.5em -1em rgba(56, 189, 248, 0.75);
+    box-shadow: 0.5em 1em rgba(74, 93, 78, 0.75), -0.5em -1em rgba(197, 160, 89, 0.75);
   }
 
   35% {
     height: 2.5em;
-    box-shadow: 0.5em 0 rgba(2, 132, 199, 0.75), -0.5em 0 rgba(56, 189, 248, 0.75);
+    box-shadow: 0.5em 0 rgba(197, 160, 89, 0.75), -0.5em 0 rgba(74, 93, 78, 0.75);
   }
 
   70% {
     height: 0.5em;
-    box-shadow: 0.5em -1em rgba(30, 58, 138, 0.75), -0.5em 1em rgba(56, 189, 248, 0.75);
+    box-shadow: 0.5em -1em rgba(74, 93, 78, 0.75), -0.5em 1em rgba(197, 160, 89, 0.75);
   }
 
   100% {
-    box-shadow: 0.5em 1em rgba(2, 132, 199, 0.75), -0.5em -1em rgba(56, 189, 248, 0.75);
+    box-shadow: 0.5em 1em rgba(197, 160, 89, 0.75), -0.5em -1em rgba(74, 93, 78, 0.75);
   }
 }

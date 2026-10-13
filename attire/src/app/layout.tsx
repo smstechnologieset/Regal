@@ -15,6 +15,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { SocketProvider } from "@/context/SocketContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
@@ -31,17 +32,17 @@ const organo = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Regal - All your needs At one place",
+  title: "Regal — Curated. Crafted. Crowned. | የተመረጠ። በጥበብ የተሰራ። የነገሰ።",
   description:
-    "Discover the latest trends in fashion. Shop clothing, accessories, and more with free shipping on orders over ETB500.",
+    "Restoring dignity, health, and natural living through chemical-free body care, additive-free foods, modest attire, grounded toys, and guided journals.",
   keywords:
-    "fashion, clothing, accessories, online shopping, women's fashion, men's fashion",
+    "pure living, modest attire, organic skincare, natural food, grounded toys, mindful journals, Ethiopia",
   icons: {
     icon: "/Logo-bg.ico",
   },
   openGraph: {
-    title: "Regal - All your needs At one place",
-    description: "Discover the latest trends in fashion.",
+    title: "Regal — Curated. Crafted. Crowned.",
+    description: "Restoring dignity, health, and natural living to everyday essentials.",
     type: "website",
   },
 };
@@ -57,35 +58,37 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+Ethiopic:wght@300;400;500;600;700&family=Noto+Serif+Ethiopic:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
       </head>
       <body
-        className={`${organo.variable} font-sans min-h-screen flex flex-col`}
+        className={`${organo.variable} font-sans min-h-screen flex flex-col bg-[#FDFBF7] text-[#2B2D2F]`}
         suppressHydrationWarning
       >
-        <AppProvider>
-          <AuthProvider>
-            <SocketProvider>
-              <NotificationProvider>
-                <WishlistProvider>
-                  <CartProvider>
-                    <LoadingWrapper>
-                      <Header />
-                      <main className="flex-1">{children}</main>
-                      <Footer />
-                      <CartDrawer />
-                      <ToastContainer />
-                      <ScrollToTop />
-                      <AIAssistant />
-                    </LoadingWrapper>
-                  </CartProvider>
-                </WishlistProvider>
-              </NotificationProvider>
-            </SocketProvider>
-          </AuthProvider>
-        </AppProvider>
+        <LanguageProvider>
+          <AppProvider>
+            <AuthProvider>
+              <SocketProvider>
+                <NotificationProvider>
+                  <WishlistProvider>
+                    <CartProvider>
+                      <LoadingWrapper>
+                        <Header />
+                        <main className="flex-1">{children}</main>
+                        <Footer />
+                        <CartDrawer />
+                        <ToastContainer />
+                        <ScrollToTop />
+                        <AIAssistant />
+                      </LoadingWrapper>
+                    </CartProvider>
+                  </WishlistProvider>
+                </NotificationProvider>
+              </SocketProvider>
+            </AuthProvider>
+          </AppProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
