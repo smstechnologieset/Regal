@@ -43,7 +43,11 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
                 .select('product_id')
                 .eq('user_id', userId);
 
-            if (error) throw error;
+            if (error) {
+                const savedWishlist = storage.get<Product[]>(WISHLIST_STORAGE_KEY, []);
+                setItems(savedWishlist);
+                return;
+            }
 
             if (data && data.length > 0) {
                 // Fetch product details for each wishlist item
@@ -54,7 +58,8 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
                 setItems([]);
             }
         } catch (error) {
-            console.error('Error fetching wishlist:', error);
+            const savedWishlist = storage.get<Product[]>(WISHLIST_STORAGE_KEY, []);
+            setItems(savedWishlist);
         } finally {
             setIsLoading(false);
         }

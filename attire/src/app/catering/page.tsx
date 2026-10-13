@@ -5,10 +5,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ChefHat, Utensils, Coffee, ArrowRight } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function CateringPage() {
+    const { t } = useLanguage();
+
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-[#FDFBF7]">
             {/* Hero */}
             <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
                 <Image
@@ -19,22 +22,26 @@ export default function CateringPage() {
                     className="object-cover"
                     priority
                 />
-                <div className="absolute inset-0 bg-black/50" />
+                <div className="absolute inset-0 bg-black/60" />
                 <div className="container mx-auto px-4 relative z-10 text-center text-white">
-                    <h1 className="text-4xl md:text-6xl font-bold mb-6 font-serif">Exquisite Tastes</h1>
-                    <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto font-light">
-                        Elevate your event with our world-class culinary experiences,
-                        crafted with passion and the finest ingredients.
+                    <span className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white font-medium text-xs sm:text-sm mb-6 border border-white/30">
+                        {t.services.cateringTagline}
+                    </span>
+                    <h1 className="text-4xl md:text-6xl font-bold mb-6 font-serif">
+                        {t.cateringPage.title}
+                    </h1>
+                    <p className="text-lg md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+                        {t.cateringPage.subtitle}
                     </p>
-                    <div className="flex justify-center gap-4">
+                    <div className="flex flex-col sm:flex-row justify-center gap-4">
                         <Link href="/catering/menu">
-                            <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white min-w-[180px]">
-                                View Menu
+                            <Button size="lg" className="bg-[#4A5D4E] hover:bg-[#38463B] text-white min-w-[180px]">
+                                {t.cateringPage.viewMenu}
                             </Button>
                         </Link>
                         <Link href="/catering/quote">
                             <Button size="lg" variant="outline" className="text-white border-white hover:bg-white/10 min-w-[180px]">
-                                Get a Quote
+                                {t.cateringPage.getQuote}
                             </Button>
                         </Link>
                     </div>
@@ -42,34 +49,40 @@ export default function CateringPage() {
             </section>
 
             {/* Features */}
-            <section className="py-20">
+            <section className="py-20 bg-[#FDFBF7]">
                 <div className="container mx-auto px-4">
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="text-center p-6">
-                            <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mx-auto mb-6">
+                    <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                        <div className="text-center p-8 bg-white rounded-2xl border border-[#E0D6C8] shadow-xs hover:shadow-md transition-shadow">
+                            <div className="w-16 h-16 bg-[#4A5D4E]/10 rounded-full flex items-center justify-center text-[#4A5D4E] mx-auto mb-6">
                                 <ChefHat size={32} />
                             </div>
-                            <h3 className="text-xl font-bold text-primary mb-3">Master Chefs</h3>
-                            <p className="text-slate-600">
-                                Our culinary team brings decades of experience from top restaurants around the world.
+                            <h3 className="text-xl font-bold font-serif text-[#2B2D2F] mb-3">
+                                {t.cateringPage.feature1Title}
+                            </h3>
+                            <p className="text-[#2B2D2F]/70 text-sm leading-relaxed">
+                                {t.cateringPage.feature1Desc}
                             </p>
                         </div>
-                        <div className="text-center p-6">
-                            <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mx-auto mb-6">
+                        <div className="text-center p-8 bg-white rounded-2xl border border-[#E0D6C8] shadow-xs hover:shadow-md transition-shadow">
+                            <div className="w-16 h-16 bg-[#4A5D4E]/10 rounded-full flex items-center justify-center text-[#4A5D4E] mx-auto mb-6">
                                 <Utensils size={32} />
                             </div>
-                            <h3 className="text-xl font-bold text-primary mb-3">Full Service</h3>
-                            <p className="text-slate-600">
-                                From table settings to service staff, we handle every detail of your dining experience.
+                            <h3 className="text-xl font-bold font-serif text-[#2B2D2F] mb-3">
+                                {t.cateringPage.feature2Title}
+                            </h3>
+                            <p className="text-[#2B2D2F]/70 text-sm leading-relaxed">
+                                {t.cateringPage.feature2Desc}
                             </p>
                         </div>
-                        <div className="text-center p-6">
-                            <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mx-auto mb-6">
+                        <div className="text-center p-8 bg-white rounded-2xl border border-[#E0D6C8] shadow-xs hover:shadow-md transition-shadow">
+                            <div className="w-16 h-16 bg-[#4A5D4E]/10 rounded-full flex items-center justify-center text-[#4A5D4E] mx-auto mb-6">
                                 <Coffee size={32} />
                             </div>
-                            <h3 className="text-xl font-bold text-primary mb-3">Custom Menus</h3>
-                            <p className="text-slate-600">
-                                We tailor every menu to your specific tastes, dietary requirements, and event theme.
+                            <h3 className="text-xl font-bold font-serif text-[#2B2D2F] mb-3">
+                                {t.cateringPage.feature3Title}
+                            </h3>
+                            <p className="text-[#2B2D2F]/70 text-sm leading-relaxed">
+                                {t.cateringPage.feature3Desc}
                             </p>
                         </div>
                     </div>
@@ -77,9 +90,9 @@ export default function CateringPage() {
             </section>
 
             {/* CTA Section */}
-            <section className="py-20 bg-white">
+            <section className="py-20 bg-[#F4EFEA] border-t border-[#E0D6C8]">
                 <div className="container mx-auto px-4">
-                    <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-12 bg-primary rounded-2xl overflow-hidden shadow-2xl">
+                    <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-12 bg-[#2B2D2F] rounded-2xl overflow-hidden shadow-2xl">
                         <div className="relative w-full md:w-1/2 aspect-video md:aspect-auto md:self-stretch min-h-[300px]">
                             <Image
                                 src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&fit=crop"
@@ -89,14 +102,16 @@ export default function CateringPage() {
                                 className="object-cover"
                             />
                         </div>
-                        <div className="w-full md:w-1/2 p-8 md:py-12 md:pr-12 text-white">
-                            <h2 className="text-3xl font-bold mb-4 font-serif">Curated for You</h2>
-                            <p className="text-slate-300 mb-8">
-                                Whether it&apos;s an intimate dinner or a grand gala, we have packages to suit every occasion.
+                        <div className="w-full md:w-1/2 p-8 md:py-12 md:pr-12 text-[#FDFBF7]">
+                            <h2 className="text-3xl font-bold mb-4 font-serif text-[#FDFBF7]">
+                                {t.cateringPage.curatedTitle}
+                            </h2>
+                            <p className="text-[#FDFBF7]/75 mb-8 text-sm leading-relaxed">
+                                {t.cateringPage.curatedDesc}
                             </p>
                             <Link href="/catering/quote">
-                                <Button className="bg-amber-600 hover:bg-amber-700 text-white w-full md:w-auto">
-                                    Start Planning
+                                <Button className="bg-[#C5A059] hover:bg-[#AF8B45] text-[#2B2D2F] font-bold w-full md:w-auto">
+                                    {t.cateringPage.startPlanning}
                                     <ArrowRight size={16} className="ml-2" />
                                 </Button>
                             </Link>

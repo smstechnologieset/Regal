@@ -29,7 +29,10 @@ import {
   Smile,
   BookOpen,
   LogOut,
-  Globe,
+  Calendar,
+  Gift,
+  UtensilsCrossed,
+  Shirt,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
@@ -58,6 +61,7 @@ export default function Header() {
   const [localSearch, setLocalSearch] = useState(searchQuery);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -69,39 +73,41 @@ export default function Header() {
   const isMainPage = pathname === "/";
   const isAdminPage = pathname.startsWith("/admin");
 
-  // The 5 Pillars for main navigation
-  const pillarsList = [
+  // The 5 Premier Services for main navigation
+  const servicesList = [
     {
-      name: t.pillars.pillar1Title,
+      name: t.services.attireTitle,
       href: "/attire",
-      icon: Sparkles,
-      description: isAmharic ? "ክላሲክ የተሟላ ልብስ" : "Modest & graceful silhouettes",
+      icon: Shirt,
+      description: t.services.attireTagline,
     },
     {
-      name: t.pillars.pillar2Title,
-      href: "/attire/products?category=skincare",
-      icon: Droplets,
-      description: isAmharic ? "100% ተፈጥሯዊ ቅባቶች" : "100% chemical-free botanicals",
+      name: t.services.eventsTitle,
+      href: "/events",
+      icon: Calendar,
+      description: t.services.eventsTagline,
     },
     {
-      name: t.pillars.pillar3Title,
+      name: t.services.bridalTitle,
+      href: "/bridal",
+      icon: Heart,
+      description: t.services.bridalTagline,
+    },
+    {
+      name: t.services.cateringTitle,
       href: "/catering",
-      icon: Leaf,
-      description: isAmharic ? "ንጹህ የተፈጥሮ ምግቦች" : "Additive-free nourishment",
+      icon: UtensilsCrossed,
+      description: t.services.cateringTagline,
     },
     {
-      name: t.pillars.pillar4Title,
-      href: "/attire/products?category=toys",
-      icon: Smile,
-      description: isAmharic ? "እውነተኛ አስተማሪ አሻንጉሊቶች" : "Realistic, modest dolls",
-    },
-    {
-      name: t.pillars.pillar5Title,
+      name: t.services.giftsTitle,
       href: "/gifts",
-      icon: BookOpen,
-      description: isAmharic ? "ማስታወሻዎች እና ስጦታዎች" : "Reflection tools & gift sets",
+      icon: Gift,
+      description: t.services.giftsTagline,
     },
   ];
+
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -238,14 +244,14 @@ export default function Header() {
                   </>
                 ) : (
                   <>
-                    {/* The 5 Pillars Dropdown */}
+                    {/* Services Dropdown */}
                     <div
                       className="relative"
                       onMouseEnter={() => setIsServicesOpen(true)}
                       onMouseLeave={() => setIsServicesOpen(false)}
                     >
                       <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors">
-                        <span>{isAmharic ? "ምሰሶዎቻችን" : "Our Pillars"}</span>
+                        <span>{t.nav.services}</span>
                         <ChevronDown
                           size={13}
                           className={`transition-transform duration-200 ${
@@ -261,23 +267,23 @@ export default function Header() {
                           onMouseLeave={() => setIsServicesOpen(false)}
                         >
                           <div className="px-4 py-2 border-b border-[#E0D6C8]/60 text-[11px] font-semibold text-[#C5A059] uppercase tracking-wider">
-                            {t.pillars.tagline}
+                            {t.services.tagline}
                           </div>
-                          {pillarsList.map((pillar) => (
+                          {servicesList.map((service) => (
                             <Link
-                              key={pillar.name}
-                              href={pillar.href}
+                              key={service.name}
+                              href={service.href}
                               className="flex items-start gap-3 px-4 py-2.5 text-sm hover:bg-[#F4EFEA] transition-colors group"
                             >
                               <div className="w-8 h-8 rounded-lg bg-[#4A5D4E]/10 text-[#4A5D4E] group-hover:bg-[#4A5D4E] group-hover:text-[#FDFBF7] transition-colors flex items-center justify-center shrink-0 mt-0.5">
-                                <pillar.icon size={16} />
+                                <service.icon size={16} />
                               </div>
                               <div>
                                 <div className="font-serif font-bold text-[#2B2D2F] group-hover:text-[#4A5D4E]">
-                                  {pillar.name}
+                                  {service.name}
                                 </div>
                                 <div className="text-xs text-[#2B2D2F]/60 line-clamp-1">
-                                  {pillar.description}
+                                  {service.description}
                                 </div>
                               </div>
                             </Link>
@@ -333,24 +339,8 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* RIGHT SECTION: Language Switcher & User Actions */}
-            <div className="flex-1 flex items-center justify-end gap-2 sm:gap-3">
-              {/* Bilingual Language Switcher Toggle */}
-              <button
-                onClick={toggleLocale}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-[#E0D6C8] bg-white/70 hover:bg-[#F4EFEA] text-[#2B2D2F] hover:text-[#4A5D4E] transition-all text-xs font-semibold shadow-2xs cursor-pointer"
-                title={isAmharic ? "Switch to English" : "ወደ አማርኛ ቀይር"}
-              >
-                <Globe size={13} className="text-[#C5A059]" />
-                <span className={cn(locale === "en" ? "text-[#4A5D4E] font-bold" : "text-[#2B2D2F]/50")}>
-                  EN
-                </span>
-                <span className="text-[#E0D6C8]">|</span>
-                <span className={cn(locale === "am" ? "text-[#4A5D4E] font-bold" : "text-[#2B2D2F]/50")}>
-                  አማ
-                </span>
-              </button>
-
+            {/* RIGHT SECTION: User Actions & Language Switcher */}
+            <div className="flex-1 flex items-center justify-end gap-1.5 sm:gap-2 lg:gap-3">
               {/* Search (Attire section) */}
               {isAttireSection && (
                 <>
@@ -383,7 +373,7 @@ export default function Header() {
               {user && (
                 <Link
                   href="/attire/wishlist"
-                  className="relative p-2 text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
+                  className="hidden sm:flex relative p-2 text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
                   aria-label="Wishlist"
                 >
                   <Heart size={20} />
@@ -396,11 +386,15 @@ export default function Header() {
               )}
 
               {/* Notification Bell */}
-              {user && <NotificationBell />}
+              {user && (
+                <div className="hidden sm:flex items-center">
+                  <NotificationBell />
+                </div>
+              )}
 
               {/* User Account / Sign In */}
               {user ? (
-                <div className="flex items-center gap-1">
+                <div className="hidden sm:flex items-center gap-1">
                   <Link
                     href="/account"
                     className="p-1.5 text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors flex items-center gap-1.5 text-xs sm:text-sm font-medium"
@@ -421,29 +415,36 @@ export default function Header() {
               ) : (
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#4A5D4E] text-[#4A5D4E] hover:bg-[#4A5D4E] hover:text-[#FDFBF7] transition-all text-xs sm:text-sm font-medium"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#4A5D4E] text-[#4A5D4E] hover:bg-[#4A5D4E] hover:text-[#FDFBF7] transition-all text-xs sm:text-sm font-medium"
                   aria-label="Sign In"
                 >
                   <User size={15} />
-                  <span className="hidden sm:inline">{t.nav.signIn}</span>
+                  <span>{t.nav.signIn}</span>
                 </Link>
               )}
 
-              {/* Cart Drawer Toggle */}
-              {user && (
-                <button
-                  onClick={toggleCart}
-                  className="relative p-2 text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors cursor-pointer"
-                  aria-label="Cart"
-                >
-                  <ShoppingBag size={20} />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#4A5D4E] text-[#FDFBF7] text-[10px] font-bold rounded-full flex items-center justify-center">
-                      {cartCount > 99 ? "99+" : cartCount}
-                    </span>
-                  )}
-                </button>
-              )}
+              {/* Cart Drawer Toggle (Desktop & Tablet only, hidden on mobile) */}
+              <button
+                onClick={toggleCart}
+                className="hidden sm:flex relative p-2 text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors cursor-pointer"
+                aria-label="Cart"
+              >
+                <ShoppingBag size={20} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#4A5D4E] text-[#FDFBF7] text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {cartCount > 99 ? "99+" : cartCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Compact Language Toggle (Far Right) */}
+              <button
+                onClick={toggleLocale}
+                className="px-2.5 py-1 rounded-full border border-[#E0D6C8] bg-white/90 hover:bg-[#F4EFEA] text-[#4A5D4E] hover:border-[#4A5D4E] transition-all text-xs font-bold shadow-2xs cursor-pointer min-w-[32px] text-center"
+                title={isAmharic ? "Switch to English" : "ወደ አማርኛ ቀይር"}
+              >
+                {isAmharic ? "EN" : "አማ"}
+              </button>
             </div>
           </div>
         </div>
@@ -504,63 +505,86 @@ export default function Header() {
                     REGAL
                   </span>
                 </div>
-                {/* Language Switcher inside Drawer */}
-                <button
-                  onClick={toggleLocale}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#E0D6C8] bg-white text-xs font-semibold text-[#4A5D4E]"
-                >
-                  <Globe size={12} className="text-[#C5A059]" />
-                  <span>{isAmharic ? "English" : "አማርኛ"}</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={toggleLocale}
+                    className="px-2.5 py-0.5 rounded-full border border-[#E0D6C8] bg-white text-xs font-bold text-[#4A5D4E] cursor-pointer"
+                    title={isAmharic ? "Switch to English" : "ወደ አማርኛ ቀይር"}
+                  >
+                    {isAmharic ? "EN" : "አማ"}
+                  </button>
+                  <button
+                    onClick={closeMobileMenu}
+                    className="p-1.5 text-[#2B2D2F]/70 hover:text-[#2B2D2F] rounded-lg hover:bg-[#F4EFEA] transition-colors"
+                    aria-label="Close menu"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
               </div>
 
               {/* Navigation Items */}
-              <nav className="p-4">
-                {/* The 5 Pillars */}
-                <div className="mb-6">
-                  <p className="text-xs font-semibold text-[#C5A059] uppercase tracking-wider mb-2 font-sans">
-                    {t.pillars.tagline}
-                  </p>
-                  <div className="space-y-1">
-                    {pillarsList.map((pillar) => (
-                      <Link
-                        key={pillar.name}
-                        href={pillar.href}
-                        onClick={closeMobileMenu}
-                        className="flex items-center gap-3 p-2.5 rounded-xl text-[#2B2D2F] hover:bg-[#F4EFEA] hover:text-[#4A5D4E] transition-colors"
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-[#4A5D4E]/10 text-[#4A5D4E] flex items-center justify-center shrink-0">
-                          <pillar.icon size={16} />
-                        </div>
-                        <div>
-                          <div className="font-serif font-bold text-sm">
-                            {pillar.name}
+              <nav className="p-4 space-y-3">
+                {/* Services Collapsible Dropdown */}
+                <div className="border border-[#E0D6C8]/70 rounded-xl overflow-hidden bg-white/60">
+                  <button
+                    onClick={() => setIsMobileServicesOpen(!isMobileServicesOpen)}
+                    className="flex items-center justify-between w-full p-3 text-sm font-semibold text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors cursor-pointer"
+                    aria-expanded={isMobileServicesOpen}
+                  >
+                    <span className="text-xs font-bold text-[#C5A059] uppercase tracking-wider font-sans">
+                      {t.nav.services}
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform duration-200 text-[#4A5D4E] ${
+                        isMobileServicesOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {isMobileServicesOpen && (
+                    <div className="px-2 pb-2 space-y-1 border-t border-[#E0D6C8]/40 pt-2 animate-fade-in">
+                      {servicesList.map((service) => (
+                        <Link
+                          key={service.name}
+                          href={service.href}
+                          onClick={closeMobileMenu}
+                          className="flex items-center gap-3 p-2 rounded-lg text-[#2B2D2F] hover:bg-[#F4EFEA] hover:text-[#4A5D4E] transition-colors"
+                        >
+                          <div className="w-7 h-7 rounded-md bg-[#4A5D4E]/10 text-[#4A5D4E] flex items-center justify-center shrink-0">
+                            <service.icon size={14} />
                           </div>
-                          <div className="text-xs text-[#2B2D2F]/60">
-                            {pillar.description}
+                          <div>
+                            <div className="font-serif font-bold text-xs">
+                              {service.name}
+                            </div>
+                            <div className="text-[11px] text-[#2B2D2F]/60 line-clamp-1">
+                              {service.description}
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Company Links */}
-                <div className="mb-4 pt-3 border-t border-[#E0D6C8]">
+                <div className="pt-2 border-t border-[#E0D6C8]">
                   <p className="text-xs font-semibold text-[#C5A059] uppercase tracking-wider mb-2 font-sans">
                     {t.footer.colPhilosophy}
                   </p>
                   <Link
                     href="/about"
                     onClick={closeMobileMenu}
-                    className="block py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E]"
+                    className="block py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
                   >
                     {t.nav.about}
                   </Link>
                   <Link
                     href="/contact"
                     onClick={closeMobileMenu}
-                    className="block py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E]"
+                    className="block py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
                   >
                     {t.nav.contact}
                   </Link>
@@ -572,36 +596,111 @@ export default function Header() {
             <div className="p-4 border-t border-[#E0D6C8] bg-white">
               {user ? (
                 <div className="space-y-2">
+                  <div className="flex items-center gap-3 pb-3 border-b border-[#E0D6C8]/60">
+                    <div className="w-9 h-9 rounded-full bg-[#4A5D4E]/10 text-[#4A5D4E] flex items-center justify-center font-bold text-sm shrink-0">
+                      <User size={18} />
+                    </div>
+                    <div className="overflow-hidden">
+                      <p className="text-[11px] text-[#2B2D2F]/60 font-sans leading-tight">{t.nav.account}</p>
+                      <p className="text-sm font-semibold text-[#2B2D2F] truncate leading-tight mt-0.5">{user.email}</p>
+                    </div>
+                  </div>
+
+                  {/* Cart inside Drawer */}
+                  <button
+                    onClick={() => {
+                      closeMobileMenu();
+                      toggleCart();
+                    }}
+                    className="flex items-center justify-between w-full py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors cursor-pointer"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <ShoppingBag size={16} className="text-[#4A5D4E]" />
+                      {t.nav.cart || "Cart"}
+                    </span>
+                    {cartCount > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#4A5D4E] text-[#FDFBF7]">
+                        {cartCount > 99 ? "99+" : cartCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Wishlist inside Drawer */}
+                  <Link
+                    href="/attire/wishlist"
+                    onClick={closeMobileMenu}
+                    className="flex items-center justify-between py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <Heart size={16} className="text-[#C5A059]" />
+                      {t.nav.wishlist || "Wishlist"}
+                    </span>
+                    {wishlistCount > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#C5A059] text-[#2B2D2F]">
+                        {wishlistCount}
+                      </span>
+                    )}
+                  </Link>
+
+                  {/* My Account */}
                   <Link
                     href="/account"
                     onClick={closeMobileMenu}
-                    className="block py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E]"
+                    className="flex items-center gap-2.5 py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
                   >
+                    <User size={16} className="text-[#4A5D4E]" />
                     {t.nav.account}
                   </Link>
+
+                  {/* Sign Out */}
                   <button
-                    onClick={handleSignOut}
-                    className="block w-full text-left py-2 text-sm font-medium text-rose-600 hover:text-rose-700"
+                    onClick={() => {
+                      closeMobileMenu();
+                      handleSignOut();
+                    }}
+                    className="flex items-center gap-2.5 w-full text-left py-2 text-sm font-medium text-rose-600 hover:text-rose-700 transition-colors cursor-pointer"
                   >
+                    <LogOut size={16} />
                     {t.nav.signOut}
                   </button>
                 </div>
               ) : (
-                <div className="flex gap-2">
-                  <Link
-                    href="/login"
-                    onClick={closeMobileMenu}
-                    className="flex-1 py-2 text-center text-sm font-medium rounded-lg border border-[#4A5D4E] text-[#4A5D4E]"
+                <div className="space-y-3">
+                  {/* Cart for guest */}
+                  <button
+                    onClick={() => {
+                      closeMobileMenu();
+                      toggleCart();
+                    }}
+                    className="flex items-center justify-between w-full py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors cursor-pointer"
                   >
-                    {t.nav.signIn}
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={closeMobileMenu}
-                    className="flex-1 py-2 text-center text-sm font-medium rounded-lg bg-[#4A5D4E] text-[#FDFBF7]"
-                  >
-                    {isAmharic ? "ይመዝገቡ" : "Register"}
-                  </Link>
+                    <span className="flex items-center gap-2.5">
+                      <ShoppingBag size={16} className="text-[#4A5D4E]" />
+                      {t.nav.cart || "Cart"}
+                    </span>
+                    {cartCount > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#4A5D4E] text-[#FDFBF7]">
+                        {cartCount > 99 ? "99+" : cartCount}
+                      </span>
+                    )}
+                  </button>
+
+                  <div className="flex gap-2 pt-1 border-t border-[#E0D6C8]/60">
+                    <Link
+                      href="/login"
+                      onClick={closeMobileMenu}
+                      className="flex-1 py-2 text-center text-sm font-medium rounded-lg border border-[#4A5D4E] text-[#4A5D4E]"
+                    >
+                      {t.nav.signIn}
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={closeMobileMenu}
+                      className="flex-1 py-2 text-center text-sm font-medium rounded-lg bg-[#4A5D4E] text-[#FDFBF7]"
+                    >
+                      {isAmharic ? "ይመዝገቡ" : "Register"}
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>

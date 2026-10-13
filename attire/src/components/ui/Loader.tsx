@@ -5,18 +5,27 @@ import React from 'react';
 /**
  * Loader Component
  * 
- * A premium, animated loader used for initial page loads and 
- * data fetching states across the platform.
- * Styles are defined in globals.css for maximum compatibility.
+ * Animated speeder loader for page transitions and data fetching.
  */
 const Loader = () => {
     return (
-        <div className="flex items-center justify-center min-h-[100px] w-full">
-            <div className="loader-wrapper">
-                <div className="loader" />
+        <div className="relative w-full min-h-[140px] flex items-center justify-center overflow-hidden py-4">
+            <div className="relative w-48 h-28 overflow-hidden flex items-center justify-center">
+                <div className="loader">
+                    <span>
+                        <span /><span /><span /><span />
+                    </span>
+                    <div className="base">
+                        <span />
+                        <div className="face" />
+                    </div>
+                </div>
+                <div className="longfazers">
+                    <span /><span /><span /><span />
+                </div>
             </div>
         </div>
     );
-}
+};
 
 export default Loader;

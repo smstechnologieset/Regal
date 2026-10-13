@@ -42,7 +42,7 @@ export async function getProducts(
             const result = await q;
             if (result.error) throw result.error;
             return result;
-        }, 3, 500, 30000, signal);
+        }, 2, 400, 8000, signal);
 
         const total = count || 0;
         const totalPages = Math.ceil(total / pageSize);
@@ -87,6 +87,7 @@ export async function getProducts(
     } catch (error: any) {
         if (isAbortError(error, signal)) {
             console.log('[attireService] getProducts aborted');
+            throw error;
         } else {
             console.error('Error fetching products:', getErrorMessage(error));
         }
@@ -106,7 +107,7 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
             const result = await q;
             if (result.error) throw result.error;
             return result.data;
-        }, 3, 500, 30000, signal);
+        }, 2, 400, 8000, signal);
 
         if (!data) return null;
 

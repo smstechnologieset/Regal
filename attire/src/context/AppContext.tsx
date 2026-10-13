@@ -186,13 +186,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const controller = new AbortController();
         fetchCategories(controller.signal);
 
-        // Safety: if for some reason we're still "loading" after 30s, force it off
+        // Safety: if for some reason we're still "loading" after 10s, force it off
         const safetyTimer = setTimeout(() => {
-            console.warn('[AppProvider] STUCK PROTECTION: Safety timer reached. Forcing bootstrap ready.');
-            setCategoriesLoading(false);
-            isBootstrapRef.current = true;
-            setIsAppBootstrapReady(true);
-        }, 30000);
+            if (!isBootstrapRef.current) {
+                console.warn('[AppProvider] STUCK PROTECTION: Safety timer reached. Forcing bootstrap ready.');
+                setCategoriesLoading(false);
+                isBootstrapRef.current = true;
+                setIsAppBootstrapReady(true);
+            }
+        }, 10000);
 
         return () => {
             controller.abort();

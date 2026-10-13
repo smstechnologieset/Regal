@@ -2,13 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Gift, Sparkles, Filter, Search, ArrowRight } from 'lucide-react';
 import { GIFT_CATEGORIES } from '@/lib/constants';
 import { getGiftPackages, GiftPackage } from '@/lib/services/gifts';
 import GiftPackageCard from '@/components/gifts/GiftPackageCard';
 import Loader from '@/components/ui/Loader';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function GiftsPage() {
+    const { t, isAmharic } = useLanguage();
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
     const [packages, setPackages] = useState<GiftPackage[]>([]);
     const [loading, setLoading] = useState(true);
@@ -37,7 +40,7 @@ export default function GiftsPage() {
     });
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-[#FDFBF7]">
             {/* Hero Section */}
             <section className="relative h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden">
                 <Image
@@ -47,48 +50,46 @@ export default function GiftsPage() {
                     unoptimized
                     className="object-cover"
                 />
-                <div className="absolute inset-0 bg-slate-900/60 transition-opacity" />
+                <div className="absolute inset-0 bg-[#2B2D2F]/70 transition-opacity" />
                 
                 <div className="container mx-auto px-4 relative z-10 text-center">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-purple-500/20 backdrop-blur-md rounded-full text-purple-200 font-medium text-sm mb-6 animate-fade-in-up border border-purple-500/30">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#C5A059]/20 backdrop-blur-md rounded-full text-[#C5A059] font-medium text-xs sm:text-sm mb-6 border border-[#C5A059]/30">
                         <Sparkles size={16} />
-                        <span>Curated Moment Makers</span>
+                        <span>{t.giftsPage.badge}</span>
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-black text-white mb-6 animate-fade-in-up tracking-tight" style={{ animationDelay: '0.1s' }}>
-                        Perfect Gifts for <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300">Every Occasion</span>
+                    <h1 className="text-4xl md:text-6xl font-bold font-serif text-white mb-6 tracking-tight">
+                        {t.giftsPage.title}
                     </h1>
-                    <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 animate-fade-in-up leading-relaxed" style={{ animationDelay: '0.2s' }}>
-                        Thoughtfully curated gift packages designed to make your loved ones feel special. 
-                        Order now and we'll handle the magic.
+                    <p className="text-base md:text-xl text-[#FDFBF7]/85 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+                        {t.giftsPage.subtitle}
                     </p>
                 </div>
             </section>
 
             {/* Filter & Search Bar */}
-            <section className="sticky top-16 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200">
+            <section className="sticky top-16 z-30 bg-[#FDFBF7]/90 backdrop-blur-xl border-b border-[#E0D6C8]">
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         {/* Categories */}
                         <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto scrollbar-hide">
                             <button
                                 onClick={() => setSelectedCategory('all')}
-                                className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
+                                className={`px-5 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
                                     selectedCategory === 'all'
-                                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-200'
-                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                        ? 'bg-[#4A5D4E] text-[#FDFBF7] shadow-md shadow-[#4A5D4E]/20'
+                                        : 'bg-white text-[#2B2D2F]/80 hover:bg-[#F4EFEA] border border-[#E0D6C8]'
                                 }`}
                             >
-                                All Gifts
+                                {t.giftsPage.allGifts}
                             </button>
                             {GIFT_CATEGORIES.map((cat) => (
                                 <button
                                     key={cat.value}
                                     onClick={() => setSelectedCategory(cat.value)}
-                                    className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
+                                    className={`px-5 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
                                         selectedCategory === cat.value
-                                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-200'
-                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            ? 'bg-[#4A5D4E] text-[#FDFBF7] shadow-md shadow-[#4A5D4E]/20'
+                                            : 'bg-white text-[#2B2D2F]/80 hover:bg-[#F4EFEA] border border-[#E0D6C8]'
                                     }`}
                                 >
                                     {cat.label}
@@ -98,13 +99,13 @@ export default function GiftsPage() {
 
                         {/* Search */}
                         <div className="relative w-full md:w-72">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#2B2D2F]/40" size={18} />
                             <input
                                 type="text"
-                                placeholder="Search packages..."
+                                placeholder={t.giftsPage.searchPlaceholder}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full outline-none focus:ring-2 focus:ring-purple-500/50 text-sm font-medium transition-all"
+                                className="w-full pl-10 pr-4 py-2 bg-white border border-[#E0D6C8] rounded-full outline-none focus:ring-2 focus:ring-[#4A5D4E]/40 text-sm font-medium text-[#2B2D2F] transition-all"
                             />
                         </div>
                     </div>
@@ -116,7 +117,9 @@ export default function GiftsPage() {
                 {loading ? (
                     <div className="py-20 flex flex-col items-center justify-center gap-4">
                         <Loader />
-                        <p className="text-slate-400 font-medium animate-pulse">Unwrapping treasures...</p>
+                        <p className="text-[#2B2D2F]/50 font-medium animate-pulse text-sm">
+                            {isAmharic ? "ጥቅሎች እየተዘጋጁ ነው..." : "Unwrapping packages..."}
+                        </p>
                     </div>
                 ) : (
                     <>
@@ -127,15 +130,19 @@ export default function GiftsPage() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-24 bg-white rounded-3xl border border-dashed border-slate-200">
-                                <Search size={48} className="text-slate-200 mx-auto mb-4" />
-                                <h3 className="text-xl font-bold text-slate-800">No packages found</h3>
-                                <p className="text-slate-500 mt-1">Try adjusting your category or search term.</p>
+                            <div className="text-center py-24 bg-white rounded-3xl border border-dashed border-[#E0D6C8]">
+                                <Search size={48} className="text-[#2B2D2F]/30 mx-auto mb-4" />
+                                <h3 className="text-xl font-bold font-serif text-[#2B2D2F]">
+                                    {t.giftsPage.noPackages}
+                                </h3>
+                                <p className="text-[#2B2D2F]/60 mt-1 text-sm">
+                                    {isAmharic ? "ምድቡን ወይም የፍለጋ ቃሉን ያስተካክሉ።" : "Try adjusting your category or search term."}
+                                </p>
                                 <button 
                                     onClick={() => {setSelectedCategory('all'); setSearchTerm('');}}
-                                    className="mt-6 text-purple-600 font-bold hover:text-purple-700 underline underline-offset-4"
+                                    className="mt-6 text-[#4A5D4E] font-bold hover:text-[#38463B] underline underline-offset-4"
                                 >
-                                    Clear all filters
+                                    {isAmharic ? "ሁሉንም አጽዳ" : "Clear all filters"}
                                 </button>
                             </div>
                         )}
@@ -144,22 +151,20 @@ export default function GiftsPage() {
             </section>
 
             {/* Custom Gift CTA */}
-            <section className="bg-slate-900 py-24 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
+            <section className="bg-[#2B2D2F] py-24 relative overflow-hidden border-t border-[#E0D6C8]">
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="max-w-3xl mx-auto text-center">
-                        <Gift size={64} className="text-purple-400 mx-auto mb-8" strokeWidth={1.5} />
-                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-                            Tailor-Made <span className="text-purple-400">Surprises</span>
+                        <Gift size={56} className="text-[#C5A059] mx-auto mb-6" strokeWidth={1.5} />
+                        <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#FDFBF7] mb-5">
+                            {t.giftsPage.customGiftTitle}
                         </h2>
-                        <p className="text-xl text-slate-400 mb-10 leading-relaxed">
-                            Need something truly unique? Our gift specialists can curate a completely custom package 
-                            based on your recipient's tastes and your budget.
+                        <p className="text-base sm:text-lg text-[#FDFBF7]/75 mb-10 leading-relaxed font-light">
+                            {t.giftsPage.customGiftDesc}
                         </p>
-                        <button className="px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl shadow-xl shadow-purple-900/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-2 mx-auto">
-                            <span>Inquire for Custom Gift</span>
-                            <ArrowRight size={20} />
-                        </button>
+                        <Link href="/contact" className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#4A5D4E] hover:bg-[#38463B] text-white font-bold rounded-xl shadow-lg transition-all hover:scale-105 active:scale-95">
+                            <span>{t.giftsPage.contactGiftTeam}</span>
+                            <ArrowRight size={18} />
+                        </Link>
                     </div>
                 </div>
             </section>

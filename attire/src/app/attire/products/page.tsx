@@ -22,106 +22,97 @@ import { useCart } from '@/context/CartContext';
 import { useApp } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
 
+import { isAbortError } from '@/lib/supabase/utils';
+
+function parseFiltersFromParams(searchParams: ReturnType<typeof useSearchParams>): {
+    filters: FilterOptions;
+    sort: SortOption;
+} {
+    const category = searchParams.get('category');
+    const subcategory = searchParams.get('subcategory');
+    const filter = searchParams.get('filter');
+    const sale = searchParams.get('sale');
+    const sort = searchParams.get('sort');
+
+    const f: FilterOptions = {};
+    if (category) f.category = category;
+    if (subcategory) f.subcategory = subcategory;
+    if (filter === 'new') f.badges = ['new'];
+    else if (filter === 'bestseller') f.badges = ['bestseller'];
+    if (sale === 'true') f.onSale = true;
+
+    return {
+        filters: f,
+        sort: (sort as SortOption) || 'popularity',
+    };
+}
+
 function ProductsContent() {
     const searchParams = useSearchParams();
+    const initialParams = parseFiltersFromParams(searchParams);
 
     const [products, setProducts] = useState<Product[]>([]);
     const { categories, categoriesLoading } = useApp();
     const [loading, setLoading] = useState(true);
     const [totalProducts, setTotalProducts] = useState(0);
-    const [filters, setFilters] = useState<FilterOptions>({});
-    const [sortOption, setSortOption] = useState<SortOption>('popularity');
+    const [filters, setFilters] = useState<FilterOptions>(initialParams.filters);
+    const [sortOption, setSortOption] = useState<SortOption>(initialParams.sort);
     const [showMobileFilters, setShowMobileFilters] = useState(false);
 
     const { addToCart, toggleCart } = useCart();
     const { addToast, searchQuery } = useApp();
 
-    // Categories are now managed globally in AppContext
-
-    // 2. Sync URL params to local state
+    // 2. Sync URL params to local state if searchParams change
     useEffect(() => {
-        const category = searchParams.get('category');
-        const subcategory = searchParams.get('subcategory');
-        const filter = searchParams.get('filter');
-        const sale = searchParams.get('sale');
-        const sort = searchParams.get('sort');
+        const { filters: nextFilters, sort: nextSort } = parseFiltersFromParams(searchParams);
 
         setFilters(prev => {
-            const newFilters: FilterOptions = { ...prev };
-
-            // 1. Category & Subcategory
-            newFilters.category = category || undefined;
-            newFilters.subcategory = subcategory || undefined;
-
-            // 2. Highlights (Mutually exclusive sections from landing page)
-            if (filter === 'new') {
-                newFilters.badges = ['new'];
-            } else if (filter === 'bestseller') {
-                newFilters.badges = ['bestseller'];
-            } else if (filter === null) {
-                // Only clear if the parameter is explicitly missing from a new navigation
-                newFilters.badges = undefined;
-            }
-
-            // 3. Sale status
-            if (sale === 'true') {
-                newFilters.onSale = true;
-            } else if (sale === null) {
-                newFilters.onSale = undefined;
-            }
-
-            // Only update if actually different to avoid unnecessary cycles
             const isDifferent =
-                prev.category !== newFilters.category ||
-                prev.subcategory !== newFilters.subcategory ||
-                JSON.stringify(prev.badges) !== JSON.stringify(newFilters.badges) ||
-                prev.onSale !== newFilters.onSale;
+                prev.category !== nextFilters.category ||
+                prev.subcategory !== nextFilters.subcategory ||
+                JSON.stringify(prev.badges) !== JSON.stringify(nextFilters.badges) ||
+                prev.onSale !== nextFilters.onSale;
 
-            return isDifferent ? newFilters : prev;
+            return isDifferent ? nextFilters : prev;
         });
 
-        if (sort) {
-            setSortOption(sort as SortOption);
-        }
+        setSortOption(prev => (prev !== nextSort ? nextSort : prev));
     }, [searchParams]);
 
     // 3. Fetch products whenever filters or sort changes
     useEffect(() => {
+        let isCurrent = true;
         const controller = new AbortController();
-        console.log('Attire Products: performFetch triggered', { filters, sortOption });
 
         const performFetch = async () => {
             setLoading(true);
             try {
-                console.log('Attire Products: fetching products...');
                 const result = await getProducts(filters, sortOption, 1, 24, controller.signal);
 
-                // If the signal was aborted, result will be a fallback/error from withRetry
-                // but we should still double check if it's the one we wanted
-                if (!controller.signal.aborted) {
-                    console.log('Attire Products: fetch success', { count: result.data.length, total: result.total });
-                    setProducts(result.data);
-                    setTotalProducts(result.total);
+                if (isCurrent && !controller.signal.aborted) {
+                    setProducts(result.data || []);
+                    setTotalProducts(result.total || 0);
                     setLoading(false);
                 }
             } catch (error: any) {
-                if (error?.name === 'AbortError' || controller.signal.aborted) {
-                    console.log('Attire Products: fetch aborted');
+                if (!isCurrent || controller.signal.aborted || isAbortError(error, controller.signal)) {
                     return;
                 }
                 console.error('Attire Products: fetch error', error?.message || error);
                 addToast('Failed to load products', 'error');
-                setLoading(false);
+                if (isCurrent) {
+                    setLoading(false);
+                }
             }
         };
 
         performFetch();
 
         return () => {
-            console.log('Attire Products: cleanup (aborting fetch)');
+            isCurrent = false;
             controller.abort();
         };
-    }, [filters, sortOption, addToast]);
+    }, [filters, sortOption]);
 
     // Filter products by search query (client-side)
     const displayedProducts = searchQuery

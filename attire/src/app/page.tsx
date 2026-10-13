@@ -3,8 +3,12 @@
 /**
  * Regal Main Landing Page
  *
- * Rebranded with organic luxury styling, warm earth tones (Warm Linen, Olive Sage, Muted Gold),
- * bilingual localization (English / Amharic), and the Five Pillars of Regal.
+ * Full featured homepage showcasing:
+ * - Bilingual localization (English / Amharic)
+ * - Warm earth tones & editorial luxury typography
+ * - ALL 5 Premier Services: Attire, Event Planning, Bridal Services, Catering, Gifts
+ * - The Five Pillars of Pure Living (Attire, Skincare, Wholesome Food, Toys, Mindful Journals)
+ * - The Regal Difference with 4 Purity Bullets & Social Proof
  */
 
 import React from "react";
@@ -12,15 +16,19 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowRight,
-  Sparkles,
-  Droplets,
+  Shirt,
+  PartyPopper,
+  Heart,
+  UtensilsCrossed,
+  Gift,
   Leaf,
+  Droplets,
   Smile,
   BookOpen,
+  Sparkles,
   CheckCircle2,
   ShieldCheck,
   Star,
-  Heart,
   Users,
   Compass,
 } from "lucide-react";
@@ -30,57 +38,101 @@ import { useLanguage } from "@/context/LanguageContext";
 export default function RegalLandingPage() {
   const { t, isAmharic } = useLanguage();
 
-  // The Five Pillars of Regal
-  const pillars = [
+  // All 5 Premier Regal Services
+  const premierServices = [
     {
       id: "attire",
-      title: t.pillars.pillar1Title,
-      description: t.pillars.pillar1Desc,
-      icon: Sparkles,
+      title: t.services.attireTitle,
+      tagline: t.services.attireTagline,
+      description: t.services.attireDesc,
+      icon: Shirt,
       image:
-        "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&h=600&fit=crop",
+        "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&h=600&fit=crop",
       href: "/attire",
-      badge: isAmharic ? "አለባበስ" : "Attire",
+      badge: isAmharic ? "አልባሳት" : "Attire",
     },
     {
-      id: "skincare",
-      title: t.pillars.pillar2Title,
-      description: t.pillars.pillar2Desc,
-      icon: Droplets,
+      id: "events",
+      title: t.services.eventsTitle,
+      tagline: t.services.eventsTagline,
+      description: t.services.eventsDesc,
+      icon: PartyPopper,
       image:
-        "https://images.unsplash.com/photo-1608248597359-52822a6136a6?w=800&h=600&fit=crop",
-      href: "/attire/products?category=skincare",
-      badge: isAmharic ? "ቆዳ እንክብካቤ" : "Skincare",
+        "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop",
+      href: "/events",
+      badge: isAmharic ? "ዝግጅቶች" : "Events",
+    },
+    {
+      id: "bridal",
+      title: t.services.bridalTitle,
+      tagline: t.services.bridalTagline,
+      description: t.services.bridalDesc,
+      icon: Heart,
+      image:
+        "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop",
+      href: "/bridal",
+      badge: isAmharic ? "የሰርግ አገልግሎት" : "Bridal",
     },
     {
       id: "catering",
-      title: t.pillars.pillar3Title,
-      description: t.pillars.pillar3Desc,
-      icon: Leaf,
+      title: t.services.cateringTitle,
+      tagline: t.services.cateringTagline,
+      description: t.services.cateringDesc,
+      icon: UtensilsCrossed,
       image:
         "https://images.unsplash.com/photo-1555244162-803834f70033?w=800&h=600&fit=crop",
       href: "/catering",
       badge: isAmharic ? "ምግብ ዝግጅት" : "Catering",
     },
     {
+      id: "gifts",
+      title: t.services.giftsTitle,
+      tagline: t.services.giftsTagline,
+      description: t.services.giftsDesc,
+      icon: Gift,
+      image:
+        "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=600&fit=crop",
+      href: "/gifts",
+      badge: isAmharic ? "ስጦታዎች" : "Gifts & Packages",
+    },
+  ];
+
+  // The 5 Pillars of Pure Living
+  const purityPillars = [
+    {
+      id: "attire",
+      title: t.pillars.pillar1Title,
+      description: t.pillars.pillar1Desc,
+      icon: Sparkles,
+      href: "/attire",
+    },
+    {
+      id: "skincare",
+      title: t.pillars.pillar2Title,
+      description: t.pillars.pillar2Desc,
+      icon: Droplets,
+      href: "/attire/products?category=skincare",
+    },
+    {
+      id: "food",
+      title: t.pillars.pillar3Title,
+      description: t.pillars.pillar3Desc,
+      icon: Leaf,
+      href: "/catering",
+    },
+    {
       id: "toys",
       title: t.pillars.pillar4Title,
       description: t.pillars.pillar4Desc,
       icon: Smile,
-      image:
-        "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=800&h=600&fit=crop",
       href: "/attire/products?category=toys",
-      badge: isAmharic ? "አሻንጉሊቶች" : "Childhood",
     },
     {
-      id: "gifts",
+      id: "journals",
       title: t.pillars.pillar5Title,
       description: t.pillars.pillar5Desc,
       icon: BookOpen,
-      image:
-        "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=600&fit=crop",
       href: "/gifts",
-      badge: isAmharic ? "ስጦታ እና ማስታወሻ" : "Journals & Gifts",
     },
   ];
 
@@ -94,7 +146,7 @@ export default function RegalLandingPage() {
     {
       icon: Compass,
       value: "5",
-      label: isAmharic ? "መሰረታዊ ምሰሶዎች" : "Core Living Pillars",
+      label: isAmharic ? "ዋና ዋና አገልግሎቶች" : "Premier Services",
     },
     {
       icon: Users,
@@ -132,7 +184,6 @@ export default function RegalLandingPage() {
     <div className="min-h-screen bg-[#FDFBF7] text-[#2B2D2F]">
       {/* Hero Section */}
       <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#F4EFEA] via-[#FDFBF7] to-[#FDFBF7] pt-28 pb-20">
-        {/* Subtle Organic Background Accents */}
         <div className="absolute top-0 inset-x-0 h-96 bg-[radial-gradient(circle_at_top,_rgba(74,93,78,0.08),_transparent_70%)] pointer-events-none" />
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#C5A059]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 -right-24 w-96 h-96 bg-[#4A5D4E]/8 rounded-full blur-3xl pointer-events-none" />
@@ -150,7 +201,7 @@ export default function RegalLandingPage() {
               {t.hero.headline}
             </h1>
 
-            {/* Sub-Tagline in Alternate Language for Rich Cultural Elegance */}
+            {/* Sub-Tagline in Alternate Language */}
             <p className="text-lg sm:text-2xl font-serif text-[#C5A059] font-medium tracking-wide mb-8 animate-fade-in-up">
               {t.hero.amharicTagline}
             </p>
@@ -168,14 +219,14 @@ export default function RegalLandingPage() {
               className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up"
               style={{ animationDelay: "0.2s" }}
             >
-              <Link href="/attire">
+              <Link href="#services">
                 <Button
                   size="lg"
                   variant="primary"
                   rightIcon={<ArrowRight size={18} />}
                   className="px-8 py-3.5 shadow-md hover:shadow-lg transition-transform hover:-translate-y-0.5"
                 >
-                  {t.hero.primaryCta}
+                  {isAmharic ? "አገልግሎቶቻችንን ያስሱ" : "Explore Services"}
                 </Button>
               </Link>
               <Link href="/about#purity">
@@ -199,68 +250,66 @@ export default function RegalLandingPage() {
         </div>
       </section>
 
-      {/* The Five Pillars Section */}
+      {/* SECTION 1: ALL 5 PREMIER SERVICES (Attire, Events, Bridal, Catering, Gifts) */}
       <section id="services" className="py-24 md:py-32 bg-[#FDFBF7]">
         <div className="container mx-auto px-4">
-          {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-[#C5A059] font-semibold text-xs sm:text-sm uppercase tracking-widest block mb-2 font-sans">
-              {t.pillars.tagline}
+              {t.services.tagline}
             </span>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#2B2D2F] mt-2 mb-5 leading-tight">
-              {t.pillars.headline}
+              {t.services.headline}
             </h2>
             <div className="w-16 h-0.5 bg-[#C5A059] mx-auto mb-6" />
             <p className="text-base sm:text-lg text-[#2B2D2F]/75 leading-relaxed font-sans">
-              {t.pillars.subheadline}
+              {t.services.subheadline}
             </p>
           </div>
 
-          {/* Pillars Responsive Grid (3 on top row, 2 centered on bottom) */}
+          {/* 5 Services Grid (3 on top row, 2 centered on bottom) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {pillars.map((pillar, idx) => {
-              const Icon = pillar.icon;
-              const isWideBottom = idx >= 3;
+            {premierServices.map((service, idx) => {
+              const Icon = service.icon;
+              const isBottomRow = idx >= 3;
               return (
                 <Link
-                  key={pillar.id}
-                  href={pillar.href}
+                  key={service.id}
+                  href={service.href}
                   className={`group relative overflow-hidden rounded-2xl border border-[#E0D6C8] bg-white shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 flex flex-col ${
-                    isWideBottom && idx === 3 ? "lg:col-span-1 lg:col-start-1" : ""
-                  } ${isWideBottom && idx === 4 ? "lg:col-span-1" : ""}`}
+                    isBottomRow && idx === 3 ? "lg:col-span-1 lg:col-start-1" : ""
+                  } ${isBottomRow && idx === 4 ? "lg:col-span-1" : ""}`}
                 >
-                  {/* Image Container with Natural Toned Gradient */}
                   <div className="aspect-[16/11] relative overflow-hidden bg-[#F4EFEA]">
                     <Image
-                      src={pillar.image}
-                      alt={pillar.title}
+                      src={service.image}
+                      alt={service.title}
                       fill
                       unoptimized
                       className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#2B2D2F]/80 via-[#2B2D2F]/30 to-transparent opacity-75 group-hover:opacity-85 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#2B2D2F]/80 via-[#2B2D2F]/25 to-transparent opacity-75 group-hover:opacity-85 transition-opacity" />
 
-                    {/* Badge */}
                     <div className="absolute top-4 left-4">
                       <span className="px-3 py-1 rounded-full bg-[#FDFBF7]/90 text-[#4A5D4E] text-xs font-semibold backdrop-blur-md shadow-xs">
-                        {pillar.badge}
+                        {service.badge}
                       </span>
                     </div>
 
-                    {/* Pillar Icon inside Image */}
                     <div className="absolute bottom-4 left-4 w-11 h-11 rounded-xl bg-[#FDFBF7]/90 backdrop-blur-md flex items-center justify-center text-[#4A5D4E] shadow-xs group-hover:scale-110 transition-transform">
                       <Icon size={20} />
                     </div>
                   </div>
 
-                  {/* Card Content */}
                   <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between bg-white">
                     <div>
-                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#2B2D2F] mb-2.5 group-hover:text-[#4A5D4E] transition-colors">
-                        {pillar.title}
+                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#2B2D2F] mb-1.5 group-hover:text-[#4A5D4E] transition-colors">
+                        {service.title}
                       </h3>
+                      <p className="text-xs uppercase tracking-wider text-[#C5A059] font-semibold mb-3">
+                        {service.tagline}
+                      </p>
                       <p className="text-sm sm:text-base text-[#2B2D2F]/70 leading-relaxed font-sans mb-6">
-                        {pillar.description}
+                        {service.description}
                       </p>
                     </div>
 
@@ -279,8 +328,55 @@ export default function RegalLandingPage() {
         </div>
       </section>
 
+      {/* SECTION 2: THE FIVE PILLARS OF PURE LIVING */}
+      <section className="py-20 md:py-28 bg-[#F4EFEA] border-y border-[#E0D6C8]">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-[#C5A059] font-semibold text-xs sm:text-sm uppercase tracking-widest block mb-2 font-sans">
+              {t.pillars.tagline}
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#2B2D2F] mt-2 mb-4">
+              {t.pillars.headline}
+            </h2>
+            <div className="w-16 h-0.5 bg-[#C5A059] mx-auto mb-5" />
+            <p className="text-sm sm:text-base text-[#2B2D2F]/75 leading-relaxed font-sans max-w-2xl mx-auto">
+              {t.pillars.subheadline}
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
+            {purityPillars.map((pillar) => {
+              const Icon = pillar.icon;
+              return (
+                <Link
+                  key={pillar.id}
+                  href={pillar.href}
+                  className="p-6 rounded-2xl bg-white border border-[#E0D6C8] shadow-2xs hover:shadow-lg hover:border-[#4A5D4E]/40 transition-all flex flex-col justify-between group"
+                >
+                  <div>
+                    <div className="w-10 h-10 rounded-xl bg-[#4A5D4E]/10 text-[#4A5D4E] group-hover:bg-[#4A5D4E] group-hover:text-[#FDFBF7] transition-colors flex items-center justify-center mb-4">
+                      <Icon size={18} />
+                    </div>
+                    <h4 className="font-serif font-bold text-lg text-[#2B2D2F] mb-2 group-hover:text-[#4A5D4E] transition-colors">
+                      {pillar.title}
+                    </h4>
+                    <p className="text-xs text-[#2B2D2F]/70 leading-relaxed font-sans">
+                      {pillar.description}
+                    </p>
+                  </div>
+                  <div className="mt-5 pt-3 border-t border-[#F4EFEA] flex items-center gap-1 text-xs font-semibold text-[#4A5D4E] group-hover:text-[#C5A059]">
+                    <span>{t.common.exploreNow}</span>
+                    <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* Stats Section */}
-      <section className="py-16 bg-[#F4EFEA] border-y border-[#E0D6C8]">
+      <section className="py-16 bg-[#FDFBF7] border-b border-[#E0D6C8]">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
             {stats.map((stat, index) => {
@@ -307,31 +403,30 @@ export default function RegalLandingPage() {
       <section className="py-24 md:py-32 bg-[#FDFBF7]">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left Column: Atmospheric Image with Reviews Floating Card */}
+            {/* Left Column: Regal Logo Emblem with Reviews Card */}
             <div className="relative">
-              <div className="aspect-[4/5] rounded-2xl overflow-hidden relative shadow-lg border border-[#E0D6C8]">
-                <Image
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=1000&fit=crop"
-                  alt="Pure and dignified lifestyle"
-                  fill
-                  unoptimized
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#2B2D2F]/40 to-transparent" />
+              <div className="aspect-[4/5] rounded-3xl overflow-hidden relative shadow-xl border border-[#E0D6C8] bg-gradient-to-br from-[#F4EFEA] via-[#FDFBF7] to-[#EAE3D8] flex flex-col items-center justify-center p-8 sm:p-12">
+                <div className="relative w-52 h-52 sm:w-64 sm:h-64 drop-shadow-xl transition-transform duration-700 hover:scale-105 flex items-center justify-center">
+                  <Image
+                    src="/Logo-bg.png"
+                    alt="Regal Logo"
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+                <div className="mt-6 text-center">
+                  <span className="text-2xl sm:text-3xl font-serif font-extrabold tracking-widest text-[#2B2D2F] block">
+                    REGAL
+                  </span>
+                  <span className="text-xs uppercase tracking-widest text-[#C5A059] font-semibold block mt-1.5 font-sans">
+                    {isAmharic ? "ክብር • ንጽህና • ውበት" : "Curated • Crafted • Crowned"}
+                  </span>
+                </div>
               </div>
 
               {/* Floating Reviews Card */}
               <div className="absolute -bottom-6 -right-4 sm:-right-6 bg-[#FDFBF7] rounded-xl shadow-xl p-5 sm:p-6 max-w-xs border border-[#E0D6C8] backdrop-blur-md">
-                <div className="flex items-center gap-2 mb-2">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Star
-                      key={i}
-                      size={16}
-                      className="text-[#C5A059] fill-[#C5A059]"
-                    />
-                  ))}
-                  <span className="text-xs font-bold text-[#2B2D2F] ml-1">5.0</span>
-                </div>
                 <div className="font-serif font-bold text-[#2B2D2F] text-sm sm:text-base leading-snug">
                   {t.difference.reviewsTitle}
                 </div>
@@ -341,7 +436,7 @@ export default function RegalLandingPage() {
               </div>
             </div>
 
-            {/* Right Column: Mission Narrative & 4 Purity Bullets */}
+            {/* Right Column: Narrative & 4 Bullets */}
             <div>
               <span className="text-[#C5A059] font-semibold text-xs sm:text-sm uppercase tracking-widest block mb-2">
                 {t.difference.tagline}
@@ -417,14 +512,11 @@ export default function RegalLandingPage() {
                 {t.cta.button}
               </Button>
             </Link>
-            <Link href="/about">
-              <Button
-                size="lg"
-                variant="outline"
-                className="px-8 py-3.5 border-[#FDFBF7]/40 text-[#FDFBF7] hover:bg-[#FDFBF7] hover:text-[#4A5D4E]"
-              >
-                {t.nav.about}
-              </Button>
+            <Link
+              href="/about"
+              className="inline-flex items-center justify-center px-8 py-3.5 rounded-lg border-2 border-[#FDFBF7] text-[#FDFBF7] font-semibold hover:bg-[#FDFBF7] hover:text-[#4A5D4E] transition-all duration-200 text-base shadow-sm"
+            >
+              {t.nav.about}
             </Link>
           </div>
         </div>

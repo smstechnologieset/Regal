@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import { MessageCircle, X, Send, User, Bot, Sparkles, ArrowRight, Loader2, Minimize2 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
 import { useApp } from '@/context/AppContext';
-import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Message {
     id: string;
@@ -16,46 +16,45 @@ interface Message {
 }
 
 export default function AIAssistant() {
+    const { addToast } = useApp();
+    const { isAmharic } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
-    const [input, setInput] = useState('');
     const [messages, setMessages] = useState<Message[]>([
         {
-            id: 'welcome',
+            id: '1',
             role: 'assistant',
-            content: "Hello! I'm your REGAL Assistant. How can I help you today?",
+            content: isAmharic
+                ? 'ሰላም! እኔ የሬጋል ረዳት ነኝ። በአልባሳት፣ በሰርግ አገልግሎቶች፣ በዝግጅት እቅድ፣ በምግብ ዝግጅት እና በስጦታዎች ዙሪያ ላግዝዎት እችላለሁ። ዛሬ በምን ልርዳዎት?'
+                : 'Greetings! I am the REGAL Assistant. I can guide you through our Modest Attire, Bridal Services, Event Planning, Wholesome Catering, and Curated Gifts. How can I assist you today?',
             timestamp: new Date(),
             links: [
-                { label: 'Book an Event', url: '/events/custom' },
-                { label: 'Catering Menu', url: '/catering/menu' },
-                { label: 'Bridal Gowns', url: '/bridal/gallery' }
+                { label: isAmharic ? 'የሰርግ ቀሚሶች' : 'Bridal Gowns', url: '/bridal/gallery' },
+                { label: isAmharic ? 'የምግብ ሜኑ' : 'Catering Menu', url: '/catering/menu' },
+                { label: isAmharic ? 'የአልባሳት ስብስቦች' : 'Attire Store', url: '/attire' },
+                { label: isAmharic ? 'የዝግጅት ጥቅሎች' : 'Event Packages', url: '/events' },
+                { label: isAmharic ? 'የስጦታ ጥቅሎች' : 'Gifts', url: '/gifts' },
             ]
         }
     ]);
+    const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const { user } = useAuth();
-    const { addToast } = useApp();
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    // Remove markdown links from text since we show them as buttons
-    const stripMarkdownLinks = (text: string) => {
-        return text.replace(/\[([^\]]+)\]\([^)]+\)/g, '');
-    };
-
     useEffect(() => {
-        if (isOpen) {
+        if (isOpen && !isMinimized) {
             scrollToBottom();
         }
-    }, [messages, isOpen]);
+    }, [messages, isOpen, isMinimized]);
 
-    const handleSend = async (e?: React.FormEvent, presetText?: string) => {
-        e?.preventDefault();
-        const textToSearch = presetText || input.trim();
-        if (!textToSearch || isLoading) return;
+    const handleSend = async (e?: React.FormEvent, customText?: string) => {
+        if (e) e.preventDefault();
+        const textToSearch = customText || input;
+        if (!textToSearch.trim() || isLoading) return;
 
         const userMsg: Message = {
             id: Date.now().toString(),
@@ -78,22 +77,37 @@ export default function AIAssistant() {
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to get response');
+            if (!response.ok) {
+                throw new Error('Fallback needed');
+            }
 
             const data = await response.json();
 
             const assistantMsg: Message = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: data.reply,
+                content: data.reply || (isAmharic ? 'እርስዎን ለመርዳት ዝግጁ ነኝ! አገልግሎቶቻችንን መመልከት ይችላሉ።' : 'I am here to help! You can explore our collections and services.'),
                 timestamp: new Date(),
                 links: data.links
             };
 
             setMessages(prev => [...prev, assistantMsg]);
-        } catch (error) {
-            console.error('AI Error:', error);
-            addToast('Could not reach the assistant. Please try again later.', 'error');
+        } catch {
+            // Friendly in-chat fallback instead of crashing with toast error
+            const fallbackMsg: Message = {
+                id: (Date.now() + 1).toString(),
+                role: 'assistant',
+                content: isAmharic
+                    ? 'እርስዎን ለመርዳት ዝግጁ ነኝ! በአልባሳት፣ በሰርግ አገልግሎቶች፣ በምግብ ዝግጅት፣ በዝግጅት እቅድ ወይም በስጦታዎች ዙሪያ ማገዝ እችላለሁ። በቀጥታ በ +251 912 345 678 ይደውሉልን።'
+                    : 'I am here to guide you through Regal! You can browse our services below or speak with our team at +251 912 345 678.',
+                timestamp: new Date(),
+                links: [
+                    { label: isAmharic ? 'አልባሳት' : 'Attire', url: '/attire' },
+                    { label: isAmharic ? 'የሰርግ አገልግሎቶች' : 'Bridal', url: '/bridal' },
+                    { label: isAmharic ? 'አግኙን' : 'Contact Us', url: '/contact' },
+                ]
+            };
+            setMessages(prev => [...prev, fallbackMsg]);
         } finally {
             setIsLoading(false);
         }
@@ -103,72 +117,78 @@ export default function AIAssistant() {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-6 right-6 w-16 h-16 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all z-50 group border-4 border-white/10"
+                className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-14 h-14 sm:w-16 sm:h-16 bg-[#4A5D4E] text-[#FDFBF7] rounded-full shadow-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50 group border-2 border-[#C5A059]/40"
                 aria-label="Open AI Assistant"
             >
-                <div className="absolute inset-0 rounded-full animate-ping bg-primary/20 scale-125" />
-                <MessageCircle size={28} className="group-hover:rotate-12 transition-transform" />
+                <div className="absolute inset-0 rounded-full animate-ping bg-[#4A5D4E]/20 scale-125" />
+                <MessageCircle size={26} className="group-hover:rotate-12 transition-transform" />
             </button>
         );
     }
 
     return (
-        <div className={`fixed bottom-6 right-6 z-50 flex flex-col transition-all duration-300 ${isMinimized ? 'h-16 w-16' : 'w-[90vw] md:w-[400px] h-[600px] max-h-[80vh]'}`}>
-            <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-full animate-slide-up">
+        <div className={`fixed inset-x-3 bottom-3 sm:inset-x-auto sm:bottom-6 sm:right-6 z-50 flex flex-col transition-all duration-300 ${
+            isMinimized ? 'h-14 w-14' : 'w-auto sm:w-[420px] h-[calc(100dvh-5rem)] sm:h-[600px] max-h-[640px]'
+        }`}>
+            <div className="bg-[#FDFBF7] rounded-3xl shadow-2xl border border-[#E0D6C8] overflow-hidden flex flex-col h-full animate-slide-up">
                 {/* Header */}
-                <div className="bg-primary p-4 flex items-center justify-between text-white">
+                <div className="bg-[#4A5D4E] px-4 py-3.5 flex items-center justify-between text-[#FDFBF7]">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-white/10 p-1 flex items-center justify-center backdrop-blur-md">
-                            <Image src="/Logo-bg.png" alt="Regal AI" width={28} height={28} className="object-contain" />
+                        <div className="w-9 h-9 rounded-full bg-white/10 p-1 flex items-center justify-center backdrop-blur-md border border-[#C5A059]/30">
+                            <Image src="/Logo-bg.png" alt="Regal AI" width={24} height={24} className="object-contain" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-sm">REGAL Assistant</h3>
+                            <h3 className="font-serif font-bold text-sm tracking-wide">REGAL Assistant</h3>
                             <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 bg-sky-400 rounded-full animate-pulse" />
-                                <span className="text-[10px] text-white/70 uppercase tracking-widest font-bold">Online</span>
+                                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                                <span className="text-[10px] text-[#FDFBF7]/70 uppercase tracking-widest font-semibold">Online</span>
                             </div>
                         </div>
                     </div>
                     <div className="flex items-center gap-1">
                         <button
                             onClick={() => setIsOpen(false)}
-                            className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                            className="p-1.5 hover:bg-white/10 rounded-full transition-colors text-[#FDFBF7]"
+                            aria-label="Close"
                         >
-                            <X size={20} />
+                            <X size={18} />
                         </button>
                     </div>
                 </div>
 
                 {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#FDFBF7]/60">
                     {messages.map((msg) => (
                         <div
                             key={msg.id}
                             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
                         >
-                            <div className={`flex gap-2 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border ${msg.role === 'user' ? 'bg-secondary text-white' : 'bg-white text-primary'
-                                    } shadow-sm`}>
-                                    {msg.role === 'user' ? <User size={14} /> : <Bot size={14} />}
+                            <div className={`flex gap-2 max-w-[88%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 border ${
+                                    msg.role === 'user' ? 'bg-[#C5A059] text-[#2B2D2F]' : 'bg-white text-[#4A5D4E] border-[#E0D6C8]'
+                                } shadow-2xs text-xs font-bold`}>
+                                    {msg.role === 'user' ? <User size={13} /> : <Bot size={13} />}
                                 </div>
                                 <div className="space-y-2">
-                                    <div className={`rounded-2xl p-3 shadow-sm ${msg.role === 'user'
-                                        ? 'bg-secondary text-white rounded-tr-none'
-                                        : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none'
-                                        }`}>
-                                        <p className="text-sm leading-relaxed">{stripMarkdownLinks(msg.content).trim()}</p>
+                                    <div className={`rounded-2xl p-3 shadow-2xs ${
+                                        msg.role === 'user'
+                                            ? 'bg-[#4A5D4E] text-[#FDFBF7] rounded-tr-none'
+                                            : 'bg-white border border-[#E0D6C8] text-[#2B2D2F] rounded-tl-none'
+                                    }`}>
+                                        <p className="text-xs sm:text-sm leading-relaxed">{stripMarkdownLinks(msg.content).trim()}</p>
                                     </div>
 
                                     {/* Links/Quick Actions */}
                                     {msg.links && msg.links.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 pt-1">
+                                        <div className="flex flex-wrap gap-1.5 pt-0.5">
                                             {msg.links.map((link, idx) => (
                                                 <Link
                                                     key={idx}
                                                     href={link.url}
-                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-full text-xs font-semibold text-primary hover:border-secondary hover:text-secondary transition-all shadow-sm"
+                                                    onClick={() => setIsOpen(false)}
+                                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-[#E0D6C8] rounded-full text-[11px] font-semibold text-[#4A5D4E] hover:border-[#C5A059] hover:text-[#C5A059] transition-all shadow-2xs"
                                                 >
-                                                    {link.label} <ArrowRight size={12} />
+                                                    {link.label} <ArrowRight size={10} />
                                                 </Link>
                                             ))}
                                         </div>
@@ -179,11 +199,13 @@ export default function AIAssistant() {
                     ))}
                     {isLoading && (
                         <div className="flex justify-start animate-fade-in">
-                            <div className="flex gap-2 items-center text-slate-400">
-                                <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center">
-                                    <Loader2 className="animate-spin" size={14} />
+                            <div className="flex gap-2 items-center text-[#2B2D2F]/50">
+                                <div className="w-7 h-7 rounded-full bg-white border border-[#E0D6C8] flex items-center justify-center">
+                                    <Loader2 className="animate-spin text-[#4A5D4E]" size={13} />
                                 </div>
-                                <span className="text-[10px] font-bold uppercase tracking-wider">Thinking...</span>
+                                <span className="text-[10px] font-bold uppercase tracking-wider">
+                                    {isAmharic ? "እየፈለገ ነው..." : "Thinking..."}
+                                </span>
                             </div>
                         </div>
                     )}
@@ -191,14 +213,17 @@ export default function AIAssistant() {
                 </div>
 
                 {/* Suggestions */}
-                {!isLoading && messages.length === 1 && (
-                    <div className="px-4 py-2 bg-white border-t border-slate-100 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                        <div className="flex gap-2">
-                            {['How do I book?', 'Catering packages?', 'Wedding dresses'].map((suggestion) => (
+                {!isLoading && messages.length <= 2 && (
+                    <div className="px-3 py-2 bg-white border-t border-[#E0D6C8] overflow-x-auto whitespace-nowrap scrollbar-hide">
+                        <div className="flex gap-1.5">
+                            {(isAmharic
+                                ? ['የሰርግ ቀሚስ?', 'የምግብ ሜኑ?', 'የአልባሳት ስብስቦች?', 'የስልክ ቁጥር?']
+                                : ['Bridal gowns?', 'Catering packages?', 'Modest attire?', 'Phone number?']
+                            ).map((suggestion) => (
                                 <button
                                     key={suggestion}
                                     onClick={() => handleSend(undefined, suggestion)}
-                                    className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-600 hover:border-secondary hover:text-secondary transition-all"
+                                    className="px-2.5 py-1 bg-[#FDFBF7] border border-[#E0D6C8] rounded-full text-[11px] font-medium text-[#2B2D2F]/80 hover:border-[#4A5D4E] hover:text-[#4A5D4E] transition-all"
                                 >
                                     {suggestion}
                                 </button>
@@ -208,29 +233,31 @@ export default function AIAssistant() {
                 )}
 
                 {/* Input Area */}
-                <form onSubmit={handleSend} className="p-4 bg-white border-t border-slate-100">
-                    <div className="flex gap-2 bg-slate-100 rounded-2xl p-1.5 items-center focus-within:bg-white focus-within:ring-2 focus-within:ring-secondary/20 transition-all border border-transparent focus-within:border-secondary/30">
+                <form onSubmit={handleSend} className="p-3 bg-white border-t border-[#E0D6C8]">
+                    <div className="flex gap-2 bg-[#F4EFEA] rounded-2xl p-1.5 items-center focus-within:bg-white focus-within:ring-2 focus-within:ring-[#4A5D4E]/20 transition-all border border-transparent focus-within:border-[#4A5D4E]/30">
                         <input
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="Ask me anything about Regal..."
-                            className="flex-1 bg-transparent border-none focus:ring-0 text-sm px-2 text-slate-800 placeholder:text-slate-400 outline-none"
+                            placeholder={isAmharic ? "ስለ ሬጋል ይጠይቁ..." : "Ask anything about Regal..."}
+                            className="flex-1 bg-transparent border-none focus:ring-0 text-xs sm:text-sm px-2 text-[#2B2D2F] placeholder:text-[#2B2D2F]/40 outline-none"
                             disabled={isLoading}
                         />
                         <button
                             type="submit"
                             disabled={!input.trim() || isLoading}
-                            className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-900 transition-colors shadow-lg"
+                            className="w-9 h-9 bg-[#4A5D4E] text-[#FDFBF7] rounded-xl flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#38463B] transition-colors shadow-xs shrink-0"
+                            aria-label="Send message"
                         >
-                            <Send size={18} />
+                            <Send size={15} />
                         </button>
                     </div>
-                    <p className="text-[10px] text-center text-slate-400 mt-2 font-medium">
-                        Powered by REGAL AI • DeepSeek-R1
-                    </p>
                 </form>
             </div>
         </div>
     );
+}
+
+function stripMarkdownLinks(text: string): string {
+    return text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1');
 }

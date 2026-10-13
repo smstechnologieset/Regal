@@ -26,12 +26,12 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   const columns = {
-    pillars: [
-      { label: t.footer.pillarAttire, href: "/attire" },
-      { label: t.footer.pillarFood, href: "/catering" },
-      { label: t.footer.pillarKids, href: "/attire/products?category=toys" },
-      { label: t.footer.pillarSkincare, href: "/attire/products?category=skincare" },
-      { label: t.footer.pillarGifts, href: "/gifts" },
+    services: [
+      { label: t.footer.serviceAttire, href: "/attire" },
+      { label: t.footer.serviceEvents, href: "/events" },
+      { label: t.footer.serviceBridal, href: "/bridal" },
+      { label: t.footer.serviceCatering, href: "/catering" },
+      { label: t.footer.serviceGifts, href: "/gifts" },
     ],
     philosophy: [
       { label: t.footer.linkStory, href: "/about" },
@@ -112,13 +112,13 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 1: Our Pillars */}
+          {/* Column 1: Our Services */}
           <div>
             <h4 className="font-serif font-bold text-base sm:text-lg mb-4 text-[#C5A059] tracking-wide">
-              {t.footer.colPillars}
+              {t.footer.colServices}
             </h4>
             <ul className="space-y-2.5">
-              {columns.pillars.map((link) => (
+              {columns.services.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}
