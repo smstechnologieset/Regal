@@ -1,6 +1,7 @@
 import { getSupabaseClient } from '@/lib/supabase/client';
 import { withRetry, isAbortError, getErrorMessage } from '@/lib/supabase/utils';
 import { Product, Category, FilterOptions, SortOption, PaginatedResponse, ProductColor, ProductBadge } from '@/types';
+import { ALL_STOREFRONT_SEED_PRODUCTS } from '@/lib/data/seedStorefrontProducts';
 
 /**
  * Fetch products from the database with filtering, sorting, and pagination.
@@ -77,6 +78,23 @@ export async function getProducts(
             );
         }
 
+        // Seamless fallback to curated seed catalog if Supabase has not yet been populated
+        if (finalData.length === 0 && options.category && ['skincare', 'toys', 'journals'].includes(options.category)) {
+            let seeds = ALL_STOREFRONT_SEED_PRODUCTS.filter(p => p.category === options.category);
+            if (options.subcategory) seeds = seeds.filter(p => p.subcategory === options.subcategory);
+            if (options.inStock !== undefined) seeds = seeds.filter(p => p.inStock === options.inStock);
+            if (options.badges && options.badges.length > 0) seeds = seeds.filter(p => options.badges!.some(b => p.badges.includes(b)));
+            if (options.priceRange) seeds = seeds.filter(p => p.price >= options.priceRange!.min && p.price <= options.priceRange!.max);
+
+            return {
+                data: seeds,
+                total: seeds.length,
+                page,
+                pageSize,
+                totalPages: Math.max(1, Math.ceil(seeds.length / pageSize)),
+            };
+        }
+
         return {
             data: finalData,
             total,
@@ -91,6 +109,12 @@ export async function getProducts(
         } else {
             console.error('Error fetching products:', getErrorMessage(error));
         }
+
+        if (options.category && ['skincare', 'toys', 'journals'].includes(options.category)) {
+            const seeds = ALL_STOREFRONT_SEED_PRODUCTS.filter(p => p.category === options.category);
+            return { data: seeds, total: seeds.length, page, pageSize, totalPages: 1 };
+        }
+
         return { data: [], total: 0, page, pageSize, totalPages: 0 };
     }
 }
@@ -109,7 +133,11 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
             return result.data;
         }, 2, 400, 8000, signal);
 
-        if (!data) return null;
+        if (!data) {
+            const seed = ALL_STOREFRONT_SEED_PRODUCTS.find(p => p.id === id);
+            if (seed) return seed;
+            return null;
+        }
 
         const p = data as any;
         return {
@@ -141,6 +169,9 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
         } else if (error?.code !== 'PGRST116') {
             console.error('Error fetching product:', getErrorMessage(error));
         }
+
+        const seed = ALL_STOREFRONT_SEED_PRODUCTS.find(p => p.id === id);
+        if (seed) return seed;
         return null;
     }
 }

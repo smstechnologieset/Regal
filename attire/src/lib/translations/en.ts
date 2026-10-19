@@ -65,7 +65,19 @@ export const en = {
     giftsTitle: "Curated Gift Packages",
     giftsTagline: "Thoughtful & Meaningful Giving",
     giftsDesc:
-      "Curated gift sets, grounded realistic toys, and reflective guided journals designed to nourish relationships.",
+      "Curated gift sets and celebratory packages designed to nourish relationships.",
+    skincareTitle: "Pure Skincare & Body Care",
+    skincareTagline: "Nourishment of the Earth",
+    skincareDesc:
+      "Formulated with unrefined botanicals and clean ingredients, avoiding harsh chemicals and synthetic additives.",
+    toysTitle: "Grounded Childhood Toys",
+    toysTagline: "Sweetness & Reality of Childhood",
+    toysDesc:
+      "Modest, realistic dolls designed without exaggerated features or modern makeup, fostering quiet self-worth.",
+    journalsTitle: "Mindful Journals & Tools",
+    journalsTagline: "Space to Reflect & Grow",
+    journalsDesc:
+      "Structured daily journals to track habits, align with personal values, foster daily gratitude, and cultivate inner peace.",
   },
   pillars: {
     tagline: "THE FIVE PILLARS OF REGAL",
@@ -132,6 +144,9 @@ export const en = {
     colPhilosophy: "Philosophy & Living",
     colSupport: "Support & Care",
     serviceAttire: "Attire Store",
+    serviceSkincare: "Pure Skincare",
+    serviceToys: "Grounded Toys",
+    serviceJournals: "Mindful Journals",
     serviceEvents: "Event Planning",
     serviceBridal: "Bridal Services",
     serviceCatering: "Wholesome Catering",

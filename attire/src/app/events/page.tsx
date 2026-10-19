@@ -11,9 +11,21 @@ import EventPackageCard from '@/components/events/EventPackageCard';
 import Button from '@/components/ui/Button';
 import Loader from '@/components/ui/Loader';
 import { useLanguage } from '@/context/LanguageContext';
+import { useServices } from '@/context/ServicesContext';
+import ServiceDisabledCard from '@/components/common/ServiceDisabledCard';
 
 export default function EventsPage() {
     const { t, isAmharic } = useLanguage();
+    const { isServiceEnabled } = useServices();
+
+    if (!isServiceEnabled('events')) {
+        return (
+            <ServiceDisabledCard
+                serviceId="events"
+                serviceName={isAmharic ? "የዝግጅት እቅድ እና ዲኮር" : "Event Planning & Decor"}
+            />
+        );
+    }
     const [selectedType, setSelectedType] = useState<string>('all');
     const [packages, setPackages] = useState<EventPackage[]>([]);
     const [loading, setLoading] = useState(true);

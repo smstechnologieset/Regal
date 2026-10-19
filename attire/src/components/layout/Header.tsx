@@ -40,6 +40,7 @@ import { useApp } from "@/context/AppContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { useServices } from "@/context/ServicesContext";
 import NotificationBell from "@/components/notifications/NotificationBell";
 
 export default function Header() {
@@ -73,39 +74,69 @@ export default function Header() {
   const isMainPage = pathname === "/";
   const isAdminPage = pathname.startsWith("/admin");
 
-  // The 5 Premier Services for main navigation
-  const servicesList = [
+  const { isServiceEnabled } = useServices();
+
+  // All Premier Services for navigation, dynamically filtered by Admin Toggles
+  const allServicesList = [
     {
+      id: "attire",
       name: t.services.attireTitle,
       href: "/attire",
       icon: Shirt,
       description: t.services.attireTagline,
     },
     {
-      name: t.services.eventsTitle,
-      href: "/events",
-      icon: Calendar,
-      description: t.services.eventsTagline,
+      id: "skincare",
+      name: t.services.skincareTitle,
+      href: "/skincare",
+      icon: Droplets,
+      description: t.services.skincareTagline,
     },
     {
-      name: t.services.bridalTitle,
-      href: "/bridal",
-      icon: Heart,
-      description: t.services.bridalTagline,
+      id: "toys",
+      name: t.services.toysTitle,
+      href: "/toys",
+      icon: Smile,
+      description: t.services.toysTagline,
     },
     {
+      id: "journals",
+      name: t.services.journalsTitle,
+      href: "/journals",
+      icon: BookOpen,
+      description: t.services.journalsTagline,
+    },
+    {
+      id: "catering",
       name: t.services.cateringTitle,
       href: "/catering",
       icon: UtensilsCrossed,
       description: t.services.cateringTagline,
     },
     {
+      id: "gifts",
       name: t.services.giftsTitle,
       href: "/gifts",
       icon: Gift,
       description: t.services.giftsTagline,
     },
+    {
+      id: "bridal",
+      name: t.services.bridalTitle,
+      href: "/bridal",
+      icon: Heart,
+      description: t.services.bridalTagline,
+    },
+    {
+      id: "events",
+      name: t.services.eventsTitle,
+      href: "/events",
+      icon: Calendar,
+      description: t.services.eventsTagline,
+    },
   ];
+
+  const servicesList = allServicesList.filter((s) => isServiceEnabled(s.id));
 
 
 

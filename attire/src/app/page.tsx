@@ -34,11 +34,13 @@ import {
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useLanguage } from "@/context/LanguageContext";
+import { useServices } from "@/context/ServicesContext";
 
 export default function RegalLandingPage() {
   const { t, isAmharic } = useLanguage();
+  const { isServiceEnabled } = useServices();
 
-  // All 5 Premier Regal Services
+  // All Premier Regal Services
   const premierServices = [
     {
       id: "attire",
@@ -52,26 +54,37 @@ export default function RegalLandingPage() {
       badge: isAmharic ? "አልባሳት" : "Attire",
     },
     {
-      id: "events",
-      title: t.services.eventsTitle,
-      tagline: t.services.eventsTagline,
-      description: t.services.eventsDesc,
-      icon: PartyPopper,
+      id: "skincare",
+      title: t.services.skincareTitle,
+      tagline: t.services.skincareTagline,
+      description: t.services.skincareDesc,
+      icon: Droplets,
       image:
-        "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop",
-      href: "/events",
-      badge: isAmharic ? "ዝግጅቶች" : "Events",
+        "https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=600&fit=crop",
+      href: "/skincare",
+      badge: isAmharic ? "ቆዳ እንክብካቤ" : "Skincare",
     },
     {
-      id: "bridal",
-      title: t.services.bridalTitle,
-      tagline: t.services.bridalTagline,
-      description: t.services.bridalDesc,
-      icon: Heart,
+      id: "toys",
+      title: t.services.toysTitle,
+      tagline: t.services.toysTagline,
+      description: t.services.toysDesc,
+      icon: Smile,
       image:
-        "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop",
-      href: "/bridal",
-      badge: isAmharic ? "የሰርግ አገልግሎት" : "Bridal",
+        "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&h=600&fit=crop",
+      href: "/toys",
+      badge: isAmharic ? "አሻንጉሊቶች" : "Toys",
+    },
+    {
+      id: "journals",
+      title: t.services.journalsTitle,
+      tagline: t.services.journalsTagline,
+      description: t.services.journalsDesc,
+      icon: BookOpen,
+      image:
+        "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=600&fit=crop",
+      href: "/journals",
+      badge: isAmharic ? "ማስታወሻዎች" : "Journals",
     },
     {
       id: "catering",
@@ -91,14 +104,39 @@ export default function RegalLandingPage() {
       description: t.services.giftsDesc,
       icon: Gift,
       image:
-        "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=600&fit=crop",
+        "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=800&h=600&fit=crop",
       href: "/gifts",
-      badge: isAmharic ? "ስጦታዎች" : "Gifts & Packages",
+      badge: isAmharic ? "ስጦታዎች" : "Gift Packages",
+    },
+    {
+      id: "bridal",
+      title: t.services.bridalTitle,
+      tagline: t.services.bridalTagline,
+      description: t.services.bridalDesc,
+      icon: Heart,
+      image:
+        "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop",
+      href: "/bridal",
+      badge: isAmharic ? "የሰርግ አገልግሎት" : "Bridal",
+    },
+    {
+      id: "events",
+      title: t.services.eventsTitle,
+      tagline: t.services.eventsTagline,
+      description: t.services.eventsDesc,
+      icon: PartyPopper,
+      image:
+        "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop",
+      href: "/events",
+      badge: isAmharic ? "ዝግጅቶች" : "Events",
     },
   ];
 
-  // The 5 Pillars of Pure Living
-  const purityPillars = [
+  // Dynamically filtered services based on Admin Toggles
+  const activePremierServices = premierServices.filter((s) => isServiceEnabled(s.id));
+
+  // The Pillars of Pure Living (dynamically linked to active dedicated stores)
+  const allPillars = [
     {
       id: "attire",
       title: t.pillars.pillar1Title,
@@ -111,10 +149,10 @@ export default function RegalLandingPage() {
       title: t.pillars.pillar2Title,
       description: t.pillars.pillar2Desc,
       icon: Droplets,
-      href: "/attire/products?category=skincare",
+      href: "/skincare",
     },
     {
-      id: "food",
+      id: "catering",
       title: t.pillars.pillar3Title,
       description: t.pillars.pillar3Desc,
       icon: Leaf,
@@ -125,16 +163,18 @@ export default function RegalLandingPage() {
       title: t.pillars.pillar4Title,
       description: t.pillars.pillar4Desc,
       icon: Smile,
-      href: "/attire/products?category=toys",
+      href: "/toys",
     },
     {
       id: "journals",
       title: t.pillars.pillar5Title,
       description: t.pillars.pillar5Desc,
       icon: BookOpen,
-      href: "/gifts",
+      href: "/journals",
     },
   ];
+
+  const purityPillars = allPillars.filter((p) => isServiceEnabled(p.id));
 
   // Stats
   const stats = [
@@ -266,18 +306,15 @@ export default function RegalLandingPage() {
             </p>
           </div>
 
-          {/* 5 Services Grid (3 on top row, 2 centered on bottom) */}
+          {/* Active Premier Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {premierServices.map((service, idx) => {
+            {activePremierServices.map((service) => {
               const Icon = service.icon;
-              const isBottomRow = idx >= 3;
               return (
                 <Link
                   key={service.id}
                   href={service.href}
-                  className={`group relative overflow-hidden rounded-2xl border border-[#E0D6C8] bg-white shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 flex flex-col ${
-                    isBottomRow && idx === 3 ? "lg:col-span-1 lg:col-start-1" : ""
-                  } ${isBottomRow && idx === 4 ? "lg:col-span-1" : ""}`}
+                  className="group relative overflow-hidden rounded-2xl border border-[#E0D6C8] bg-white shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 flex flex-col"
                 >
                   <div className="aspect-[16/11] relative overflow-hidden bg-[#F4EFEA]">
                     <Image

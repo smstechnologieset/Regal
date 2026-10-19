@@ -29,12 +29,14 @@ export default function AdminMessagesClient() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [serviceFilter, setServiceFilter] = useState('all');
 
     useEffect(() => {
         async function fetchConversations() {
             try {
                 const params = new URLSearchParams();
                 if (statusFilter !== 'all') params.set('status', statusFilter);
+                if (serviceFilter !== 'all') params.set('service', serviceFilter);
                 
                 const response = await fetch(`/api/admin/conversations?${params.toString()}`);
                 
@@ -51,22 +53,27 @@ export default function AdminMessagesClient() {
         }
 
         fetchConversations();
-    }, [statusFilter]);
+    }, [statusFilter, serviceFilter]);
 
     const filteredConversations = conversations.filter(conv => {
         const matchesSearch = !search ||
             conv.subject?.toLowerCase().includes(search.toLowerCase()) ||
             conv.profiles?.full_name?.toLowerCase().includes(search.toLowerCase());
         const matchesStatus = statusFilter === 'all' || conv.status === statusFilter;
-        return matchesSearch && matchesStatus;
+        const matchesService = serviceFilter === 'all' || conv.service_type === serviceFilter;
+        return matchesSearch && matchesStatus && matchesService;
     });
 
     const getServiceLabel = (type: string) => {
         const labels: Record<string, string> = {
             attire: 'Attire',
-            events: 'Events',
-            bridal: 'Bridal',
+            skincare: '🌸 Skincare',
+            toys: '🧸 Toys',
+            journals: '📖 Journals',
             catering: 'Catering',
+            gifts: 'Gifts',
+            bridal: 'Bridal',
+            events: 'Events',
             general: 'General',
         };
         return labels[type] || type;
@@ -76,7 +83,7 @@ export default function AdminMessagesClient() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-2xl font-bold text-primary">Messages</h1>
-                <p className="text-slate-600">Manage customer conversations</p>
+                <p className="text-slate-600">Manage customer conversations across all services</p>
             </div>
 
             {/* Filters */}
@@ -93,9 +100,25 @@ export default function AdminMessagesClient() {
                         />
                     </div>
                     <select
+                        value={serviceFilter}
+                        onChange={(e) => setServiceFilter(e.target.value)}
+                        className="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none bg-white text-sm"
+                    >
+                        <option value="all">All Services</option>
+                        <option value="attire">Attire</option>
+                        <option value="skincare">🌸 Skincare</option>
+                        <option value="toys">🧸 Toys</option>
+                        <option value="journals">📖 Journals</option>
+                        <option value="catering">Catering</option>
+                        <option value="gifts">Gifts</option>
+                        <option value="bridal">Bridal</option>
+                        <option value="events">Events</option>
+                        <option value="general">General</option>
+                    </select>
+                    <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+                        className="px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none bg-white text-sm"
                     >
                         <option value="all">All Status</option>
                         <option value="open">Open</option>

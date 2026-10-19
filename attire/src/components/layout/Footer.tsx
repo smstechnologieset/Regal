@@ -13,6 +13,7 @@ import Image from "next/image";
 import { Instagram, Facebook, Twitter, Youtube } from "lucide-react";
 import NewsletterForm from "./NewsletterForm";
 import { useLanguage } from "@/context/LanguageContext";
+import { useServices } from "@/context/ServicesContext";
 
 const socialLinks = [
   { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
@@ -23,16 +24,22 @@ const socialLinks = [
 
 export default function Footer() {
   const { t, isAmharic } = useLanguage();
+  const { isServiceEnabled } = useServices();
   const currentYear = new Date().getFullYear();
 
+  const allServices = [
+    { id: "attire", label: t.footer.serviceAttire, href: "/attire" },
+    { id: "skincare", label: t.footer.serviceSkincare, href: "/skincare" },
+    { id: "toys", label: t.footer.serviceToys, href: "/toys" },
+    { id: "journals", label: t.footer.serviceJournals, href: "/journals" },
+    { id: "catering", label: t.footer.serviceCatering, href: "/catering" },
+    { id: "gifts", label: t.footer.serviceGifts, href: "/gifts" },
+    { id: "bridal", label: t.footer.serviceBridal, href: "/bridal" },
+    { id: "events", label: t.footer.serviceEvents, href: "/events" },
+  ];
+
   const columns = {
-    services: [
-      { label: t.footer.serviceAttire, href: "/attire" },
-      { label: t.footer.serviceEvents, href: "/events" },
-      { label: t.footer.serviceBridal, href: "/bridal" },
-      { label: t.footer.serviceCatering, href: "/catering" },
-      { label: t.footer.serviceGifts, href: "/gifts" },
-    ],
+    services: allServices.filter((s) => isServiceEnabled(s.id)),
     philosophy: [
       { label: t.footer.linkStory, href: "/about" },
       { label: t.footer.linkPurity, href: "/about#purity" },

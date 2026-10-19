@@ -26,12 +26,17 @@ import {
     UtensilsCrossed,
     LogOut,
     Home,
-    Gift
+    Gift,
+    SlidersHorizontal,
+    Droplets,
+    Smile,
+    BookOpen
 } from 'lucide-react';
 import { useAuth, Profile } from '@/context/AuthContext';
 
 const navItems = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    { name: 'Service Controls', href: '/admin/services', icon: SlidersHorizontal },
     { name: 'Catalog', href: '/admin/catalog', icon: ShoppingBag },
     { name: 'Categories', href: '/admin/catalog/categories', icon: LayoutDashboard },
     { name: 'Users', href: '/admin/users', icon: Users },
@@ -42,10 +47,13 @@ const navItems = [
         children: [
             { name: 'All Orders', href: '/admin/orders' },
             { name: 'Attire', href: '/admin/orders?service=attire', icon: ShoppingBag },
-            { name: 'Events', href: '/admin/orders?service=events', icon: Calendar },
-            { name: 'Bridal', href: '/admin/orders?service=bridal', icon: Heart },
+            { name: 'Skincare', href: '/admin/orders?service=skincare', icon: Droplets },
+            { name: 'Toys', href: '/admin/orders?service=toys', icon: Smile },
+            { name: 'Journals', href: '/admin/orders?service=journals', icon: BookOpen },
             { name: 'Catering', href: '/admin/orders?service=catering', icon: UtensilsCrossed },
             { name: 'Gifts', href: '/admin/orders?service=gifts', icon: Gift },
+            { name: 'Bridal', href: '/admin/orders?service=bridal', icon: Heart },
+            { name: 'Events', href: '/admin/orders?service=events', icon: Calendar },
         ]
     },
     { name: 'Messages', href: '/admin/messages', icon: MessageSquare },

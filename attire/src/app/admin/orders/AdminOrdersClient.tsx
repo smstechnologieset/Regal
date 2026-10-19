@@ -27,6 +27,9 @@ import {
   Square,
   X,
   Loader2,
+  Droplets,
+  Smile,
+  BookOpen,
 } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import PreOrderManager from "@/components/admin/orders/PreOrderManager";
@@ -188,6 +191,12 @@ export default function AdminOrdersClient() {
     switch (type) {
       case "attire":
         return <ShoppingBag size={16} />;
+      case "skincare":
+        return <Droplets size={16} />;
+      case "toys":
+        return <Smile size={16} />;
+      case "journals":
+        return <BookOpen size={16} />;
       case "events":
         return <Calendar size={16} />;
       case "bridal":
@@ -286,10 +295,13 @@ export default function AdminOrdersClient() {
               >
                 <option value="all">All Services</option>
                 <option value="attire">Attire</option>
-                <option value="events">Events</option>
-                <option value="bridal">Bridal</option>
+                <option value="skincare">🌸 Skincare</option>
+                <option value="toys">🧸 Toys</option>
+                <option value="journals">📖 Journals</option>
                 <option value="catering">Catering</option>
                 <option value="gifts">Gifts</option>
+                <option value="bridal">Bridal</option>
+                <option value="events">Events</option>
               </select>
               <select
                 value={statusFilter}

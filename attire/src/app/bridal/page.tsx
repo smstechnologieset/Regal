@@ -6,9 +6,21 @@ import Image from "next/image";
 import { Sparkles, Calendar, ArrowRight, Heart, Scissors } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { useLanguage } from "@/context/LanguageContext";
+import { useServices } from "@/context/ServicesContext";
+import ServiceDisabledCard from "@/components/common/ServiceDisabledCard";
 
 export default function BridalPage() {
   const { t, isAmharic } = useLanguage();
+  const { isServiceEnabled } = useServices();
+
+  if (!isServiceEnabled('bridal')) {
+    return (
+      <ServiceDisabledCard
+        serviceId="bridal"
+        serviceName={isAmharic ? "የሙሽራ አገልግሎቶች" : "Bridal Services"}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FDFBF7]">

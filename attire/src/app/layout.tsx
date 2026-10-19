@@ -16,6 +16,7 @@ import { SocketProvider } from "@/context/SocketContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { ServicesProvider } from "@/context/ServicesContext";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
@@ -67,27 +68,29 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <LanguageProvider>
-          <AppProvider>
-            <AuthProvider>
-              <SocketProvider>
-                <NotificationProvider>
-                  <WishlistProvider>
-                    <CartProvider>
-                      <LoadingWrapper>
-                        <Header />
-                        <main className="flex-1">{children}</main>
-                        <Footer />
-                        <CartDrawer />
-                        <ToastContainer />
-                        <ScrollToTop />
-                        <AIAssistant />
-                      </LoadingWrapper>
-                    </CartProvider>
-                  </WishlistProvider>
-                </NotificationProvider>
-              </SocketProvider>
-            </AuthProvider>
-          </AppProvider>
+          <ServicesProvider>
+            <AppProvider>
+              <AuthProvider>
+                <SocketProvider>
+                  <NotificationProvider>
+                    <WishlistProvider>
+                      <CartProvider>
+                        <LoadingWrapper>
+                          <Header />
+                          <main className="flex-1">{children}</main>
+                          <Footer />
+                          <CartDrawer />
+                          <ToastContainer />
+                          <ScrollToTop />
+                          <AIAssistant />
+                        </LoadingWrapper>
+                      </CartProvider>
+                    </WishlistProvider>
+                  </NotificationProvider>
+                </SocketProvider>
+              </AuthProvider>
+            </AppProvider>
+          </ServicesProvider>
         </LanguageProvider>
       </body>
     </html>

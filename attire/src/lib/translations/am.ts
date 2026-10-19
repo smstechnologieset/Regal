@@ -67,7 +67,19 @@ export const am: TranslationKey = {
     giftsTitle: "የተመረጡ የስጦታ ጥቅሎች",
     giftsTagline: "ትርጉም ያለው እና አሳቢነት የተሞላበት ስጦታ",
     giftsDesc:
-      "ለልዩ አጋጣሚዎች የተዘጋጁ የስጦታ ሳጥኖች፣ እውነተኛ መጫወቻዎች እና የሕይወት ማስታወሻዎች።",
+      "ለልዩ አጋጣሚዎች በጥንቃቄ የተዘጋጁ የስጦታ ሳጥኖች እና እሽጎች።",
+    skincareTitle: "ንጹህ የቆዳ እና የሰውነት እንክብካቤ",
+    skincareTagline: "ከተፈጥሮ የተገኘ ያልተበረዘ እንክብካቤ",
+    skincareDesc:
+      "ከንጹህ እፅዋት ንጥረነገሮች የተዘጋጀ፤ ጎጂ ኬሚካሎችን ያስወግዳል፤ ለስሱ ቆዳ እና ለሚያድጉ ቤተሰቦች አስተማማኝ ነው።",
+    toysTitle: "ትሁት እና እውነተኛ የልጆች አሻንጉሊቶች",
+    toysTagline: "የተፈጥሮ የልጅነት ውበት እና ክብር",
+    toysDesc:
+      "ያለተጋነነ ውበት ሙሉ ሽፋን ያላቸው ክላሲክ ልብሶችን የሚለብሱ፤ ጤናማ ራስን መቀበልን የሚያዳብሩ አሻንጉሊቶች።",
+    journalsTitle: "አዕምሮን የሚያንጹ ማስታወሻዎች",
+    journalsTagline: "በዓላማ ለመኖር እና ለማሰላሰል",
+    journalsDesc:
+      "ልማዶችን ለመከታተል፣ ድርጊቶችዎን ከግል እሴቶችዎ ጋር ለማስማማት እና ውስጣዊ ሰላምን ለማዳበር የተነደፉ።",
   },
   pillars: {
     tagline: "አምስቱ የሬጋል ምሰሶዎች",
@@ -134,6 +146,9 @@ export const am: TranslationKey = {
     colPhilosophy: "ፍልስፍና እና ኑሮ",
     colSupport: "ድጋፍ እና እንክብካቤ",
     serviceAttire: "የአልባሳት መደብር",
+    serviceSkincare: "ንጹህ የቆዳ እንክብካቤ",
+    serviceToys: "እውነተኛ አሻንጉሊቶች",
+    serviceJournals: "የአዕምሮ ማስታወሻዎች",
     serviceEvents: "የዝግጅት እቅድ",
     serviceBridal: "የሰርግ አገልግሎቶች",
     serviceCatering: "ጤናማ ምግብ ዝግጅት",

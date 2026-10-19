@@ -13,6 +13,7 @@ import { useApp } from '@/context/AppContext';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { getSupabaseClient } from '@/lib/supabase/client';
+import ServiceToggleManager from '@/components/admin/services/ServiceToggleManager';
 
 export default function AdminSettingsPage() {
     const { profile, user, updateProfile } = useAuth();
@@ -256,6 +257,9 @@ export default function AdminSettingsPage() {
                     </div>
                 </form>
             </div>
+
+            {/* Service Controls / Toggles */}
+            <ServiceToggleManager />
 
             {/* Account Info */}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
