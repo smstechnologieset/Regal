@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
         const { data, error: dbError } = await supabase
             .from('categories')
             .select('*')
+            .not('id', 'in', '("skincare","toys","journals")')
             .order('name', { ascending: true });
 
         if (dbError) throw dbError;

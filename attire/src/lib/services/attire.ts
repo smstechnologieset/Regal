@@ -4,6 +4,36 @@ import { Product, Category, FilterOptions, SortOption, PaginatedResponse, Produc
 import { ALL_STOREFRONT_SEED_PRODUCTS } from '@/lib/data/seedStorefrontProducts';
 
 /**
+ * Helpers to synchronize admin local storage overrides
+ */
+export function applyLocalOverrides(products: Product[]): Product[] {
+    if (typeof window === 'undefined' || !products || products.length === 0) return products;
+    try {
+        const raw = localStorage.getItem('regal_storefront_overrides');
+        if (!raw) return products;
+        const overrides = JSON.parse(raw);
+        return products.map(p => (overrides[p.id] ? { ...p, ...overrides[p.id] } : p));
+    } catch {
+        return products;
+    }
+}
+
+export function applyLocalOverride(product: Product | null): Product | null {
+    if (!product || typeof window === 'undefined') return product;
+    try {
+        const raw = localStorage.getItem('regal_storefront_overrides');
+        if (!raw) return product;
+        const overrides = JSON.parse(raw);
+        if (overrides[product.id]) {
+            return { ...product, ...overrides[product.id] };
+        }
+    } catch {
+        return product;
+    }
+    return product;
+}
+
+/**
  * Fetch products from the database with filtering, sorting, and pagination.
  */
 export async function getProducts(
@@ -43,7 +73,7 @@ export async function getProducts(
             const result = await q;
             if (result.error) throw result.error;
             return result;
-        }, 2, 400, 8000, signal);
+        }, 3, 500, 15000, signal);
 
         const total = count || 0;
         const totalPages = Math.ceil(total / pageSize);
@@ -64,8 +94,8 @@ export async function getProducts(
             reviewCount: item.review_count as number,
             popularity: item.popularity as number,
             createdAt: item.created_at as string,
-            inStock: item.in_stock as boolean,
-            stockCount: item.stock_count as number,
+            inStock: ((Number(item.stock_count) || 0) > 0) ? (item.in_stock !== false) : false,
+            stockCount: Number(item.stock_count) || 0,
             estimatedRestockDate: item.estimated_restock_date as string | undefined,
             allowPreorder: item.allow_preorder as boolean | undefined,
             preorderCount: item.preorder_count as number | undefined,
@@ -78,41 +108,62 @@ export async function getProducts(
             );
         }
 
-        // Seamless fallback to curated seed catalog if Supabase has not yet been populated
+        // Seamless fallback to curated seed catalog if Supabase returned 0 rows
         if (finalData.length === 0 && options.category && ['skincare', 'toys', 'journals'].includes(options.category)) {
             let seeds = ALL_STOREFRONT_SEED_PRODUCTS.filter(p => p.category === options.category);
-            if (options.subcategory) seeds = seeds.filter(p => p.subcategory === options.subcategory);
-            if (options.inStock !== undefined) seeds = seeds.filter(p => p.inStock === options.inStock);
-            if (options.badges && options.badges.length > 0) seeds = seeds.filter(p => options.badges!.some(b => p.badges.includes(b)));
-            if (options.priceRange) seeds = seeds.filter(p => p.price >= options.priceRange!.min && p.price <= options.priceRange!.max);
+            if (options.subcategory && options.subcategory !== 'all') {
+                seeds = seeds.filter(p => p.subcategory === options.subcategory);
+            }
+            if (options.inStock !== undefined) {
+                seeds = seeds.filter(p => p.inStock === options.inStock);
+            }
+            if (options.badges && options.badges.length > 0) {
+                seeds = seeds.filter(p => options.badges!.some(b => p.badges.includes(b)));
+            }
+            if (options.priceRange) {
+                seeds = seeds.filter(p => p.price >= options.priceRange!.min && p.price <= options.priceRange!.max);
+            }
 
+            const mergedSeeds = applyLocalOverrides(seeds);
             return {
-                data: seeds,
-                total: seeds.length,
+                data: mergedSeeds,
+                total: mergedSeeds.length,
                 page,
                 pageSize,
-                totalPages: Math.max(1, Math.ceil(seeds.length / pageSize)),
+                totalPages: Math.max(1, Math.ceil(mergedSeeds.length / pageSize)),
             };
         }
 
+        const mergedData = applyLocalOverrides(finalData);
         return {
-            data: finalData,
+            data: mergedData,
             total,
             page,
             pageSize,
             totalPages,
         };
     } catch (error: any) {
-        if (isAbortError(error, signal)) {
-            console.log('[attireService] getProducts aborted');
+        console.warn('[attireService] getProducts error or timeout:', error?.message || error);
+
+        // If caller explicitly aborted their own signal (component unmounted), rethrow
+        if (signal?.aborted) {
             throw error;
-        } else {
-            console.error('Error fetching products:', getErrorMessage(error));
         }
 
+        // Otherwise provide fallback for storefront services so customer never gets empty screen
         if (options.category && ['skincare', 'toys', 'journals'].includes(options.category)) {
-            const seeds = ALL_STOREFRONT_SEED_PRODUCTS.filter(p => p.category === options.category);
-            return { data: seeds, total: seeds.length, page, pageSize, totalPages: 1 };
+            let seeds = ALL_STOREFRONT_SEED_PRODUCTS.filter(p => p.category === options.category);
+            if (options.subcategory && options.subcategory !== 'all') {
+                seeds = seeds.filter(p => p.subcategory === options.subcategory);
+            }
+            const mergedSeeds = applyLocalOverrides(seeds);
+            return {
+                data: mergedSeeds,
+                total: mergedSeeds.length,
+                page,
+                pageSize,
+                totalPages: Math.max(1, Math.ceil(mergedSeeds.length / pageSize)),
+            };
         }
 
         return { data: [], total: 0, page, pageSize, totalPages: 0 };
@@ -135,12 +186,12 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
 
         if (!data) {
             const seed = ALL_STOREFRONT_SEED_PRODUCTS.find(p => p.id === id);
-            if (seed) return seed;
+            if (seed) return applyLocalOverride(seed);
             return null;
         }
 
         const p = data as any;
-        return {
+        const mappedProduct: Product = {
             id: p.id,
             name: p.name,
             description: p.description,
@@ -156,13 +207,14 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
             reviewCount: p.review_count,
             popularity: p.popularity,
             createdAt: p.created_at,
-            inStock: p.in_stock,
-            stockCount: p.stock_count,
+            inStock: ((Number(p.stock_count) || 0) > 0) ? (p.in_stock !== false) : false,
+            stockCount: Number(p.stock_count) || 0,
             estimatedRestockDate: p.estimated_restock_date,
             allowPreorder: p.allow_preorder,
             preorderCount: p.preorder_count,
             estimatedDeliveryDays: p.estimated_delivery_days,
         };
+        return applyLocalOverride(mappedProduct);
     } catch (error: any) {
         if (isAbortError(error, signal)) {
             console.log('[attireService] getProductById aborted');
@@ -171,7 +223,7 @@ export async function getProductById(id: string, signal?: AbortSignal): Promise<
         }
 
         const seed = ALL_STOREFRONT_SEED_PRODUCTS.find(p => p.id === id);
-        if (seed) return seed;
+        if (seed) return applyLocalOverride(seed);
         return null;
     }
 }
@@ -303,8 +355,9 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
             }
             allPreorders = false;
 
-            const { data: product } = await supabase.from('products').select('stock_count, in_stock, name').eq('id', item.productId).single();
-            if (!product || !product.in_stock || product.stock_count < item.quantity) {
+            const { data: product } = await supabase.from('products').select('stock_count, in_stock, name').eq('id', item.productId).maybeSingle();
+            const productRecord = product || ALL_STOREFRONT_SEED_PRODUCTS.find(p => p.id === item.productId);
+            if (!productRecord || !productRecord.in_stock || ((productRecord.stock_count ?? 0) < item.quantity)) {
                 console.error(`Insufficient stock for ${item.productId}`);
                 return { orderId: '', conversationId: '', success: false };
             }
@@ -353,7 +406,7 @@ export async function createOrder(orderData: Record<string, unknown>): Promise<{
             service_type: 'attire',
             subject: displaySubject,
             status: 'open',
-        }).select().single();
+        }).select().maybeSingle();
 
         if (conversation) {
             const orderTypeMsg = hasPreorders ? (allPreorders ? 'New pre-order' : 'New order with pre-orders') : 'New order';

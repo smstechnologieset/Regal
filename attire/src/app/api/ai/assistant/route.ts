@@ -8,25 +8,32 @@ const HF_TOKEN = process.env.HUGGINGFACE_API_KEY;
 
 const SYSTEM_PROMPT = `
 You are REGAL Assistant, a helpful AI guide for the REGAL website. 
-REGAL provides Modest Attire, Event Planning, Wholesome Catering, Bridal Services, and Curated Gifts.
+REGAL restores dignity, health, and natural living through our curated pillars:
+1. Pure Skincare & Body Care (/skincare) - raw botanicals, unrefined shea butter, chemical-free radiant skin oils
+2. Grounded Childhood Toys (/toys) - modest linen heirloom dolls, wholesome montessori play
+3. Mindful Journals & Reflection Tools (/journals) - linen-bound gratitude, prayer, and intentional life planners
+4. Modest Attire (/attire) - elegant, modest, breathable natural textiles
+5. Wholesome Catering (/catering/menu) - 100% additive-free gourmet food & dining
+6. Curated Gifts (/gifts) - thoughtful gift packages
+
+NOTE ABOUT BRIDAL & EVENT PLANNING:
+Bridal Services and Event Planning are currently pausing new bookings as we curate new offerings. If a visitor asks about them, politely let them know that these services are currently curating new collections, and encourage them to explore our active collections above.
 
 RULES:
 - Short responses (1-2 sentences).
 - Only REGAL topics.
 - IMPORTANT: Always format links as clickable markdown: [Label](URL)
 - Never show raw URLs like /catering - always wrap them in markdown links
-- Make link labels clear and actionable (e.g., "View Catering Menu" instead of just "Menu")
+- Make link labels clear and actionable (e.g., "Explore Pure Skincare" instead of just "Skincare")
 
 LINKS (use these in markdown format):
 - Home: /
-- Shopping Attire: /attire
-- Event Planning: /events
-- Custom Events: /events/custom
+- Pure Skincare: /skincare
+- Grounded Toys: /toys
+- Mindful Journals: /journals
+- Modest Attire: /attire
 - Catering Menu: /catering/menu
 - Catering Quote: /catering/quote
-- Bridal Collection: /bridal/gallery
-- Bridal Appointments: /bridal/appointments
-- Bridal Accessories: /bridal/accessories
 - Gift Packages: /gifts
 - Our Story: /about
 - Contact Us: /contact
@@ -43,12 +50,35 @@ function generateSmartFallback(input: string): { reply: string; links: { label: 
     const isAmharic = /[\u1200-\u137F]/.test(input);
 
     if (isAmharic) {
-        if (q.includes('ሰርግ') || q.includes('ቀሚስ') || q.includes('ሙሽራ')) {
+        if (q.includes('ቆዳ') || q.includes('ስኪንኬር') || q.includes('ቅባት') || q.includes('ክሬም') || q.includes('ሺያ')) {
             return {
-                reply: 'የሬጋል የሰርግ ማዕከል የተመረጡ የሰርግ ቀሚሶችን፣ የልኬት ስራዎችን እና የውበት አገልግሎቶችን ያቀርባል። [የሰርግ ቀሚሶችን ይመልከቱ](/bridal/gallery) ወይም [የልኬት ቀጠሮ ይያዙ](/bridal/appointments)።',
+                reply: 'የሬጋል ንጹህ የቆዳ እና የሰውነት እንክብካቤ ከተፈጥሯዊ ንጥረነገሮች የተዘጋጀ ከኬሚካል ነፃ እንክብካቤ ነው። [የቆዳ እንክብካቤ ስብስቦችን ይመልከቱ](/skincare)።',
                 links: [
-                    { label: 'የሰርግ ቀሚሶች', url: '/bridal/gallery' },
-                    { label: 'ቀጠሮ ይያዙ', url: '/bridal/appointments' },
+                    { label: 'የቆዳ እንክብካቤ ምርቶች', url: '/skincare' },
+                ]
+            };
+        }
+        if (q.includes('አሻንጉሊት') || q.includes('መጫወቻ') || q.includes('የልጆች') || q.includes('ቶይ')) {
+            return {
+                reply: 'የሬጋል የልጆች መጫወቻዎች እና ጨዋ አሻንጉሊቶች እውነተኛ የልጅነት ውበትን የሚያንጸባርቁ ናቸው። [የልጆች መጫወቻዎችን ይመልከቱ](/toys)።',
+                links: [
+                    { label: 'የልጆች መጫወቻዎች', url: '/toys' },
+                ]
+            };
+        }
+        if (q.includes('ማስታወሻ') || q.includes('ደብተር') || q.includes('ጆርናል') || q.includes('እቅድ')) {
+            return {
+                reply: 'የማስታወሻ ደብተሮቻችን እና የህይወት እቅድ ማስታወሻዎች ለዕለታዊ አስተውሎት የተዘጋጁ ናቸው። [ማስታወሻ ደብተሮችን ይመልከቱ](/journals)።',
+                links: [
+                    { label: 'ማስታወሻ ደብተሮች', url: '/journals' },
+                ]
+            };
+        }
+        if (q.includes('ልብስ') || q.includes('አልባሳት') || q.includes('ፋሽን') || q.includes('ቀሚስ')) {
+            return {
+                reply: 'ሬጋል ከተፈጥሯዊ ጨርቆች የተሰሩ ክላሲክ እና ጨዋነት ያላቸው አለባበሶችን ያቀርባል። [የአልባሳት ስብስቦችን ያስሱ](/attire)።',
+                links: [
+                    { label: 'አልባሳትን ያስሱ', url: '/attire' },
                 ]
             };
         }
@@ -61,28 +91,21 @@ function generateSmartFallback(input: string): { reply: string; links: { label: 
                 ]
             };
         }
-        if (q.includes('ዝግጅት') || q.includes('ኢቨንት') || q.includes('በዓል')) {
-            return {
-                reply: 'ከቤተሰብ ስብሰባዎች እስከ ታላላቅ ክብረ በዓላት ድረስ የተሟላ የዝግጅት እቅድ እናዘጋጃለን። [የዝግጅት ጥቅሎችን ይመልከቱ](/events) ወይም [ብጁ ዝግጅት ያቅዱ](/events/custom)።',
-                links: [
-                    { label: 'የዝግጅት ጥቅሎች', url: '/events' },
-                    { label: 'ብጁ ዝግጅት ማቀድ', url: '/events/custom' },
-                ]
-            };
-        }
-        if (q.includes('ልብስ') || q.includes('አልባሳት') || q.includes('ፋሽን')) {
-            return {
-                reply: 'ሬጋል ከተፈጥሯዊ ጨርቆች የተሰሩ ክላሲክ እና ጨዋነት ያላቸው አለባበሶችን ያቀርባል። [የአልባሳት ስብስቦችን ያስሱ](/attire)።',
-                links: [
-                    { label: 'አልባሳትን ያስሱ', url: '/attire' },
-                ]
-            };
-        }
         if (q.includes('ስጦታ') || q.includes('ጥቅል') || q.includes('ጊፍት')) {
             return {
                 reply: 'ለሚወዷቸው ሰዎች የተዘጋጁ የተመረጡ የስጦታ ጥቅሎችን እና ማስታወሻዎችን ያግኙ። [የስጦታ ጥቅሎችን ይመልከቱ](/gifts)።',
                 links: [
                     { label: 'የስጦታ ጥቅሎች', url: '/gifts' },
+                ]
+            };
+        }
+        if (q.includes('ሰርግ') || q.includes('ሙሽራ') || q.includes('ዝግጅት') || q.includes('ኢቨንት')) {
+            return {
+                reply: 'የሰርግ እና የዝግጅት እቅድ አገልግሎቶቻችን አዳዲስ ስብስቦችን እያዘጋጁ በመሆናቸው ለጊዜው አዲስ ትዕዛዝ አቁመዋል። ሌሎች ንቁ ስብስቦቻችንን መመልከት ይችላሉ፡ [የቆዳ እንክብካቤ](/skincare)፣ [አልባሳት](/attire)፣ [መጫወቻዎች](/toys) እና [ምግብ ዝግጅት](/catering/menu)።',
+                links: [
+                    { label: 'የቆዳ እንክብካቤ', url: '/skincare' },
+                    { label: 'አልባሳት', url: '/attire' },
+                    { label: 'የምግብ ሜኑ', url: '/catering/menu' },
                 ]
             };
         }
@@ -96,23 +119,50 @@ function generateSmartFallback(input: string): { reply: string; links: { label: 
             };
         }
         return {
-            reply: 'እንኳን ወደ ሬጋል ረዳት በደህና መጡ! በአልባሳት፣ በሰርግ አገልግሎቶች፣ በዝግጅት እቅድ፣ በምግብ ዝግጅት እና በስጦታዎች ዙሪያ ላግዝዎት እችላለሁ። [ስለ ሬጋል የበለጠ ያንብቡ](/about)።',
+            reply: 'እንኳን ወደ ሬጋል ረዳት በደህና መጡ! በቆዳ እንክብካቤ፣ በልጆች መጫወቻዎች፣ በማስታወሻ ደብተሮች፣ በአልባሳት፣ በምግብ ዝግጅት እና በስጦታዎች ዙሪያ ላግዝዎት እችላለሁ። [ስለ ሬጋል የበለጠ ያንብቡ](/about)።',
             links: [
+                { label: 'የቆዳ እንክብካቤ', url: '/skincare' },
                 { label: 'አልባሳት', url: '/attire' },
-                { label: 'የሰርግ አገልግሎቶች', url: '/bridal' },
-                { label: 'አግኙን', url: '/contact' },
+                { label: 'የልጆች መጫወቻዎች', url: '/toys' },
+                { label: 'ማስታወሻ ደብተሮች', url: '/journals' },
             ]
         };
     }
 
     // English Intent Matching
-    if (q.includes('bridal') || q.includes('wedding') || q.includes('gown') || q.includes('dress') || q.includes('bride')) {
+    if (q.includes('skin') || q.includes('skincare') || q.includes('shea') || q.includes('oil') || q.includes('butter') || q.includes('cream') || q.includes('balm') || q.includes('body care')) {
         return {
-            reply: 'Regal offers complete bridal solutions including luxury modest gowns for rent or purchase, fittings, beauty, and styling. [Browse Bridal Gowns](/bridal/gallery) or [Book an Appointment](/bridal/appointments).',
+            reply: 'Regal Pure Skincare is formulated with raw unrefined botanicals and clean ingredients safe for sensitive skin and families. [Explore Pure Skincare](/skincare).',
             links: [
-                { label: 'Bridal Gowns', url: '/bridal/gallery' },
-                { label: 'Book Appointment', url: '/bridal/appointments' },
-                { label: 'Bridal Accessories', url: '/bridal/accessories' },
+                { label: 'Pure Skincare', url: '/skincare' },
+            ]
+        };
+    }
+
+    if (q.includes('toy') || q.includes('doll') || q.includes('toys') || q.includes('dolls') || q.includes('childhood') || q.includes('montessori')) {
+        return {
+            reply: 'Our Grounded Childhood Toys feature modest heirloom dolls and natural wooden Montessori play sets preserving the innocence of childhood. [Browse Grounded Toys](/toys).',
+            links: [
+                { label: 'Grounded Toys', url: '/toys' },
+            ]
+        };
+    }
+
+    if (q.includes('journal') || q.includes('journals') || q.includes('reflection') || q.includes('notebook') || q.includes('planner') || q.includes('mindful')) {
+        return {
+            reply: 'Discover our linen-bound Mindful Journals, gratitude logs, and guided reflection tools for intentional daily living. [Explore Mindful Journals](/journals).',
+            links: [
+                { label: 'Mindful Journals', url: '/journals' },
+            ]
+        };
+    }
+
+    if (q.includes('attire') || q.includes('cloth') || q.includes('wear') || q.includes('modest') || q.includes('skirt') || q.includes('shirt') || q.includes('dress')) {
+        return {
+            reply: 'Regal Attire features dignified, full-coverage silhouettes crafted with breathable natural textiles. [Explore Attire Collection](/attire) or [Check Size Guide](/size-guide).',
+            links: [
+                { label: 'Shop Attire', url: '/attire' },
+                { label: 'Size Guide', url: '/size-guide' },
             ]
         };
     }
@@ -127,27 +177,19 @@ function generateSmartFallback(input: string): { reply: string; links: { label: 
         };
     }
 
-    if (q.includes('event') || q.includes('party') || q.includes('ceremony') || q.includes('celebrat') || q.includes('birthday')) {
+    if (q.includes('bridal') || q.includes('wedding') || q.includes('event') || q.includes('party')) {
         return {
-            reply: 'From intimate family dinners to grand galas, we coordinate every detail of your special event. [Browse Event Packages](/events) or [Plan a Custom Event](/events/custom).',
+            reply: 'Our Bridal and Event Planning services are currently pausing new bookings as we curate new offerings. We warmly invite you to explore our active collections: [Pure Skincare](/skincare), [Grounded Toys](/toys), [Mindful Journals](/journals), [Modest Attire](/attire), and [Wholesome Catering](/catering/menu).',
             links: [
-                { label: 'Event Packages', url: '/events' },
-                { label: 'Custom Event Planning', url: '/events/custom' },
+                { label: 'Pure Skincare', url: '/skincare' },
+                { label: 'Grounded Toys', url: '/toys' },
+                { label: 'Mindful Journals', url: '/journals' },
+                { label: 'Modest Attire', url: '/attire' },
             ]
         };
     }
 
-    if (q.includes('attire') || q.includes('cloth') || q.includes('wear') || q.includes('modest') || q.includes('skirt') || q.includes('shirt')) {
-        return {
-            reply: 'Regal Attire features dignified, full-coverage silhouettes crafted with breathable natural textiles. [Explore Attire Collection](/attire) or [Check Size Guide](/size-guide).',
-            links: [
-                { label: 'Shop Attire', url: '/attire' },
-                { label: 'Size Guide', url: '/size-guide' },
-            ]
-        };
-    }
-
-    if (q.includes('gift') || q.includes('package') || q.includes('hamper') || q.includes('present') || q.includes('toy') || q.includes('journal')) {
+    if (q.includes('gift') || q.includes('package') || q.includes('hamper') || q.includes('present')) {
         return {
             reply: 'Explore our thoughtfully curated gift packages, grounded realistic dolls, and reflective guided journals. [Browse Gift Packages](/gifts).',
             links: [
@@ -177,7 +219,7 @@ function generateSmartFallback(input: string): { reply: string; links: { label: 
 
     if (q.includes('about') || q.includes('story') || q.includes('purity') || q.includes('who are you') || q.includes('what is regal')) {
         return {
-            reply: 'Regal is dedicated to restoring dignity, health, and natural living through uncompromised apparel, additive-free food, and pure essentials. [Read Our Story](/about).',
+            reply: 'Regal is dedicated to restoring dignity, health, and natural living through uncompromised apparel, additive-free food, pure skincare, grounded toys, and guided journals. [Read Our Story](/about).',
             links: [
                 { label: 'Our Story', url: '/about' },
                 { label: 'Contact Us', url: '/contact' },
@@ -185,15 +227,15 @@ function generateSmartFallback(input: string): { reply: string; links: { label: 
         };
     }
 
-    // Default polite introduction
+    // Default polite introduction with active services
     return {
-        reply: 'Welcome to Regal! I can guide you through our Modest Attire, Event Planning, Wholesome Catering, Bridal Services, and Curated Gifts. How can I assist you today? [Explore All Services](/).',
+        reply: 'Welcome to Regal! I can guide you through our Pure Skincare, Grounded Childhood Toys, Mindful Journals, Modest Attire, Wholesome Catering, and Curated Gifts. How can I assist you today? [Explore All Collections](/).',
         links: [
-            { label: 'Attire Store', url: '/attire' },
-            { label: 'Bridal Services', url: '/bridal' },
-            { label: 'Event Planning', url: '/events' },
-            { label: 'Catering', url: '/catering' },
-            { label: 'Gift Packages', url: '/gifts' },
+            { label: 'Pure Skincare', url: '/skincare' },
+            { label: 'Grounded Toys', url: '/toys' },
+            { label: 'Mindful Journals', url: '/journals' },
+            { label: 'Modest Attire', url: '/attire' },
+            { label: 'Catering', url: '/catering/menu' },
         ]
     };
 }

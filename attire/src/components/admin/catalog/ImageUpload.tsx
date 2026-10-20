@@ -4,7 +4,7 @@ import React, { useState, useRef } from "react";
 import { Upload, X, Loader2, Image as ImageIcon, Trash2 } from "lucide-react";
 
 interface ImageUploadProps {
-  bucket: "attire" | "events" | "bridal" | "catering" | "gifts";
+  bucket: "attire" | "events" | "bridal" | "catering" | "gifts" | "skincare" | "toys" | "journals" | string;
   value?: string;
   onChange: (url: string) => void;
   className?: string;

@@ -295,9 +295,9 @@ export default function AdminOrdersClient() {
               >
                 <option value="all">All Services</option>
                 <option value="attire">Attire</option>
-                <option value="skincare">🌸 Skincare</option>
-                <option value="toys">🧸 Toys</option>
-                <option value="journals">📖 Journals</option>
+                <option value="skincare"> Skincare</option>
+                <option value="toys"> Toys</option>
+                <option value="journals">Journals</option>
                 <option value="catering">Catering</option>
                 <option value="gifts">Gifts</option>
                 <option value="bridal">Bridal</option>

@@ -21,7 +21,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         const inputId = id || generatedId;
 
         return (
-            <div className="w-full">
+            <div className="w-full min-w-0">
                 {label && (
                     <label
                         htmlFor={inputId}
@@ -30,7 +30,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         {label}
                     </label>
                 )}
-                <div className="relative">
+                <div className="relative w-full min-w-0">
                     {leftIcon && (
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                             {leftIcon}
@@ -40,7 +40,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         ref={ref}
                         id={inputId}
                         className={cn(
-                            'w-full px-4 py-2.5 text-sm bg-white border rounded-lg transition-all duration-200',
+                            'w-full min-w-0 px-4 py-2.5 text-sm bg-white border rounded-lg transition-all duration-200',
                             'placeholder:text-slate-400',
                             'focus:outline-none focus:ring-2 focus:ring-offset-0',
                             leftIcon && 'pl-10',

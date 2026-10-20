@@ -210,6 +210,16 @@ export async function PATCH(
         const payload = pick(body, ALLOWED_FIELDS.product);
         const supabase = createAdminClient();
 
+        // Enforce inventory consistency for all services (attire, skincare, toys, journals)
+        if (payload.stock_count !== undefined) {
+            const stock = Number(payload.stock_count) || 0;
+            if (stock > 0) {
+                payload.in_stock = payload.in_stock !== undefined ? Boolean(payload.in_stock) : true;
+            } else {
+                payload.in_stock = false;
+            }
+        }
+
         // Get current product state before update
         const { data: currentProduct } = await supabase
             .from('products')

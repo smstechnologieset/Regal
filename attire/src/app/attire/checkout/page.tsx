@@ -255,38 +255,38 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-slate-50 w-full max-w-full overflow-x-hidden">
+      <div className="w-full max-w-5xl mx-auto px-3.5 sm:px-6 py-5 sm:py-8 min-w-0">
         {/* Back button */}
         <Link
           href="/attire/cart"
-          className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-primary mb-6"
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-slate-600 hover:text-primary mb-3 sm:mb-5 transition-colors"
         >
           <ChevronLeft size={16} />
           Back to Cart
         </Link>
 
-        <h1 className="text-2xl md:text-3xl font-bold text-primary mb-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary mb-5 sm:mb-8 font-serif">
           Checkout
         </h1>
 
-        <form onSubmit={handleSubmit}>
-          <div className="grid lg:grid-cols-3 gap-8">
+        <form onSubmit={handleSubmit} className="w-full max-w-full min-w-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-8 w-full max-w-full min-w-0">
             {/* Checkout Form */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="w-full min-w-0 max-w-full lg:col-span-2 space-y-4 sm:space-y-6">
               {/* Shipping Information */}
-              <div className="bg-white rounded-xl p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
-                    <Truck size={20} className="text-slate-600" />
+              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs w-full max-w-full min-w-0">
+                <div className="flex items-center gap-3 mb-5 sm:mb-6">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-slate-100 rounded-full flex items-center justify-center shrink-0">
+                    <Truck size={18} className="text-slate-600" />
                   </div>
-                  <h2 className="text-lg font-semibold text-primary">
+                  <h2 className="text-base sm:text-lg font-semibold text-primary font-serif">
                     Shipping Information
                   </h2>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 w-full min-w-0">
+                  <div className="md:col-span-2 w-full min-w-0">
                     <Input
                       label="Full Name"
                       name="fullName"
@@ -296,25 +296,29 @@ export default function CheckoutPage() {
                       placeholder="John Doe"
                     />
                   </div>
-                  <Input
-                    label="Email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    error={errors.email}
-                    placeholder="john@example.com"
-                  />
-                  <Input
-                    label="Phone"
-                    name="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    error={errors.phone}
-                    placeholder="+251 900 000 000"
-                  />
-                  <div className="md:col-span-2">
+                  <div className="w-full min-w-0">
+                    <Input
+                      label="Email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      error={errors.email}
+                      placeholder="john@example.com"
+                    />
+                  </div>
+                  <div className="w-full min-w-0">
+                    <Input
+                      label="Phone"
+                      name="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      error={errors.phone}
+                      placeholder="+251 900 000 000"
+                    />
+                  </div>
+                  <div className="md:col-span-2 w-full min-w-0">
                     <Input
                       label="Street Address"
                       name="address"
@@ -324,31 +328,37 @@ export default function CheckoutPage() {
                       placeholder="123 Main St, Apt 4"
                     />
                   </div>
-                  <Input
-                    label="City"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    error={errors.city}
-                    placeholder="New York"
-                  />
-                  <Input
-                    label="State / Province"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleChange}
-                    error={errors.state}
-                    placeholder="NY"
-                  />
-                  <Input
-                    label="ZIP / Postal Code"
-                    name="zipCode"
-                    value={formData.zipCode}
-                    onChange={handleChange}
-                    error={errors.zipCode}
-                    placeholder="10001"
-                  />
-                  <div>
+                  <div className="w-full min-w-0">
+                    <Input
+                      label="City"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleChange}
+                      error={errors.city}
+                      placeholder="Addis Ababa"
+                    />
+                  </div>
+                  <div className="w-full min-w-0">
+                    <Input
+                      label="State / Province"
+                      name="state"
+                      value={formData.state}
+                      onChange={handleChange}
+                      error={errors.state}
+                      placeholder="Addis Ababa"
+                    />
+                  </div>
+                  <div className="w-full min-w-0">
+                    <Input
+                      label="ZIP / Postal Code"
+                      name="zipCode"
+                      value={formData.zipCode}
+                      onChange={handleChange}
+                      error={errors.zipCode}
+                      placeholder="1000"
+                    />
+                  </div>
+                  <div className="w-full min-w-0">
                     <label className="block text-sm font-medium text-slate-700 mb-1.5">
                       Country
                     </label>
@@ -356,7 +366,7 @@ export default function CheckoutPage() {
                       name="country"
                       value={formData.country}
                       onChange={handleChange}
-                      className="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                      className="w-full min-w-0 px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
                     >
                       <option value="Ethiopia">Ethiopia</option>
                       <option value="United States">United States</option>
@@ -368,22 +378,22 @@ export default function CheckoutPage() {
               </div>
 
               {/* Payment Method */}
-              <div className="bg-white rounded-xl p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
-                    <CreditCard size={20} className="text-slate-600" />
+              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs w-full max-w-full min-w-0">
+                <div className="flex items-center gap-3 mb-5 sm:mb-6">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-slate-100 rounded-full flex items-center justify-center shrink-0">
+                    <CreditCard size={18} className="text-slate-600" />
                   </div>
-                  <h2 className="text-lg font-semibold text-primary">
+                  <h2 className="text-base sm:text-lg font-semibold text-primary font-serif">
                     Payment Method
                   </h2>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3 w-full min-w-0">
                   {/* Cash on Delivery */}
                   <label
-                    className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-colors ${
+                    className={`flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 border-2 rounded-xl cursor-pointer transition-colors w-full min-w-0 ${
                       paymentMethod === "cod"
-                        ? "border-primary bg-slate-50"
+                        ? "border-primary bg-slate-50/80"
                         : "border-slate-200 hover:border-slate-300"
                     }`}
                   >
@@ -393,34 +403,34 @@ export default function CheckoutPage() {
                       value="cod"
                       checked={paymentMethod === "cod"}
                       onChange={() => setPaymentMethod("cod")}
-                      className="w-5 h-5 text-primary"
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0 accent-[#4A5D4E]"
                     />
-                    <Banknote size={24} className="text-slate-600" />
-                    <div className="flex-1">
-                      <span className="font-medium text-primary">
+                    <Banknote size={22} className="text-slate-600 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <span className="font-medium text-primary text-sm sm:text-base block truncate">
                         Cash on Delivery
                       </span>
-                      <p className="text-sm text-slate-500">
+                      <p className="text-xs sm:text-sm text-slate-500 truncate sm:whitespace-normal">
                         Pay when you receive your order
                       </p>
                     </div>
                   </label>
 
                   {/* Credit Card (Disabled - UI Only) */}
-                  <label className="flex items-center gap-4 p-4 border-2 border-slate-200 rounded-xl opacity-50 cursor-not-allowed">
+                  <label className="flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 border-2 border-slate-200 rounded-xl opacity-50 cursor-not-allowed w-full min-w-0">
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="card"
                       disabled
-                      className="w-5 h-5"
+                      className="w-4 h-4 sm:w-5 sm:h-5 shrink-0"
                     />
-                    <CreditCard size={24} className="text-slate-400" />
-                    <div className="flex-1">
-                      <span className="font-medium text-slate-500">
+                    <CreditCard size={22} className="text-slate-400 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <span className="font-medium text-slate-500 text-sm sm:text-base block truncate">
                         Credit / Debit Card
                       </span>
-                      <p className="text-sm text-slate-400">Coming soon</p>
+                      <p className="text-xs sm:text-sm text-slate-400 truncate">Coming soon</p>
                     </div>
                   </label>
                 </div>
@@ -428,20 +438,20 @@ export default function CheckoutPage() {
             </div>
 
             {/* Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl p-6 sticky top-24">
-                <h2 className="text-lg font-semibold text-primary mb-4">
+            <div className="w-full min-w-0 max-w-full lg:col-span-1">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs w-full min-w-0 lg:sticky lg:top-24">
+                <h2 className="text-base sm:text-lg font-semibold text-primary mb-4 font-serif">
                   Order Summary
                 </h2>
 
                 {/* Items preview */}
-                <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
+                <div className="space-y-3 mb-4 max-h-64 overflow-y-auto pr-1 w-full min-w-0">
                   {items.map((item) => (
                     <div
                       key={`${item.product.id}-${item.selectedSize}-${item.selectedColor.name}`}
-                      className="flex gap-3"
+                      className="flex items-center gap-3 w-full min-w-0"
                     >
-                      <div className="w-16 h-20 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
+                      <div className="w-14 h-16 sm:w-16 sm:h-20 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-100">
                         <Image
                           src={item.product.images[0]}
                           alt={item.product.name}
@@ -452,14 +462,17 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-primary truncate">
+                        <p className="text-sm font-medium text-primary truncate" title={item.product.name}>
                           {item.product.name}
                         </p>
-                        <p className="text-xs text-slate-500">
+                        <p
+                          className="text-xs text-slate-500 truncate"
+                          title={`${item.selectedSize} / ${item.selectedColor.name} × ${item.quantity}`}
+                        >
                           {item.selectedSize} / {item.selectedColor.name} ×{" "}
                           {item.quantity}
                         </p>
-                        <p className="text-sm font-medium text-primary mt-1">
+                        <p className="text-sm font-medium text-primary mt-0.5">
                           {formatPrice(item.product.price * item.quantity)}
                         </p>
                       </div>
@@ -469,42 +482,42 @@ export default function CheckoutPage() {
 
                 {/* Pre-Order Notice */}
                 {hasPreOrderItems(items) && (
-                  <div className="mb-4">
+                  <div className="mb-4 w-full min-w-0">
                     <PreOrderNotice items={items} />
                   </div>
                 )}
 
-                <div className="space-y-3 py-4 border-y border-slate-200">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Subtotal</span>
-                    <span className="font-medium">{formatPrice(subtotal)}</span>
+                <div className="space-y-2.5 py-4 border-y border-slate-200 w-full min-w-0">
+                  <div className="flex justify-between items-center text-sm gap-2">
+                    <span className="text-slate-600 shrink-0">Subtotal</span>
+                    <span className="font-medium text-right truncate">{formatPrice(subtotal)}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Shipping</span>
-                    <span className="font-medium">
+                  <div className="flex justify-between items-center text-sm gap-2">
+                    <span className="text-slate-600 shrink-0">Shipping</span>
+                    <span className="font-medium text-right shrink-0">
                       {shipping === 0 ? "FREE" : formatPrice(shipping)}
                     </span>
                   </div>
 
                   {appliedPromo && (
-                    <div className="flex justify-between text-sm text-emerald-600 font-medium">
-                      <div className="flex items-center gap-1">
-                        <Tag size={12} />
-                        <span>Discount ({appliedPromo.code})</span>
+                    <div className="flex justify-between items-center text-sm text-emerald-600 font-medium gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0 truncate">
+                        <Tag size={12} className="shrink-0" />
+                        <span className="truncate">Discount ({appliedPromo.code})</span>
                       </div>
-                      <span>-{formatPrice(appliedPromo.discountAmount)}</span>
+                      <span className="shrink-0">-{formatPrice(appliedPromo.discountAmount)}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Promo Code Input */}
                 {!appliedPromo ? (
-                  <div className="py-4 border-b border-slate-200">
-                    <div className="flex gap-2">
+                  <div className="py-3.5 border-b border-slate-200 w-full min-w-0">
+                    <div className="flex gap-2 w-full min-w-0">
                       <input
                         type="text"
-                        placeholder="Promo code"
-                        className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary uppercase font-medium"
+                        placeholder="PROMO CODE"
+                        className="flex-1 min-w-0 px-3 py-2 text-xs sm:text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary uppercase font-medium tracking-wider"
                         value={promoCodeInput}
                         onChange={(e) =>
                           setPromoCodeInput(e.target.value.toUpperCase())
@@ -518,6 +531,7 @@ export default function CheckoutPage() {
                         type="button"
                         variant="outline"
                         size="sm"
+                        className="shrink-0 px-3"
                         onClick={handleApplyPromoCode}
                         isLoading={isApplyingPromo}
                         disabled={!promoCodeInput.trim()}
@@ -527,20 +541,21 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="py-4 border-b border-slate-200">
-                    <div className="flex items-center justify-between px-3 py-2 bg-emerald-50 border border-emerald-100 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-emerald-500 text-white rounded-full flex items-center justify-center">
-                          <Tag size={12} />
+                  <div className="py-3.5 border-b border-slate-200 w-full min-w-0">
+                    <div className="flex items-center justify-between px-3 py-2 bg-emerald-50 border border-emerald-100 rounded-lg w-full min-w-0">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-5 h-5 bg-emerald-500 text-white rounded-full flex items-center justify-center shrink-0">
+                          <Tag size={11} />
                         </div>
-                        <span className="text-sm font-bold text-emerald-700">
+                        <span className="text-sm font-bold text-emerald-700 truncate">
                           {appliedPromo.code}
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={handleRemovePromo}
-                        className="text-emerald-700 hover:text-emerald-900 transition-colors"
+                        className="text-emerald-700 hover:text-emerald-900 transition-colors p-1 shrink-0"
+                        aria-label="Remove promo code"
                       >
                         <X size={16} />
                       </button>
@@ -548,11 +563,11 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                <div className="flex justify-between pt-4 mb-6">
-                  <span className="text-lg font-semibold text-primary">
+                <div className="flex justify-between items-center pt-4 mb-5 gap-2 w-full min-w-0">
+                  <span className="text-base sm:text-lg font-semibold text-primary shrink-0">
                     Total
                   </span>
-                  <span className="text-lg font-bold text-primary">
+                  <span className="text-lg sm:text-xl font-bold text-primary text-right truncate">
                     {formatPrice(total)}
                   </span>
                 </div>
@@ -563,6 +578,7 @@ export default function CheckoutPage() {
                   fullWidth
                   size="lg"
                   variant="secondary"
+                  className="w-full min-w-0"
                   isLoading={isSubmitting}
                 >
                   Place Order
@@ -570,7 +586,7 @@ export default function CheckoutPage() {
 
                 {/* Security note */}
                 <div className="flex items-center justify-center gap-2 mt-4 text-xs text-slate-500">
-                  <Lock size={14} />
+                  <Lock size={14} className="shrink-0" />
                   <span>Secure checkout</span>
                 </div>
               </div>

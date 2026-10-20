@@ -10,22 +10,8 @@ import { Product, CartItem, PreOrderStatus } from '@/types';
  * Requirements: 1.1, 1.2
  */
 export function isEligibleForPreOrder(product: Product): boolean {
-  const eligible = (
-    (product.stockCount === 0 || product.stockCount === undefined) &&
-    product.allowPreorder === true
-  );
-  
-  // Debug logging
-  console.log('Pre-order eligibility check:', {
-    productId: product.id,
-    productName: product.name,
-    stockCount: product.stockCount,
-    allowPreorder: product.allowPreorder,
-    inStock: product.inStock,
-    eligible
-  });
-  
-  return eligible;
+  const isOutOfStock = !product.inStock || (product.stockCount ?? 0) <= 0;
+  return isOutOfStock && product.allowPreorder === true;
 }
 
 /**

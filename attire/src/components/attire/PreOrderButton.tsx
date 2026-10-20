@@ -39,33 +39,47 @@ export default function PreOrderButton({
   }
 
   const handlePreOrder = () => {
-    if (!selectedSize || !selectedColor) {
-      addToast("Please select size and color", "warning");
+    const hasSizes = (product.sizes?.length ?? 0) > 0;
+    const hasColors = (product.colors?.length ?? 0) > 0;
+
+    if (hasSizes && !selectedSize) {
+      addToast("Please select a size", "warning");
+      return;
+    }
+    if (hasColors && !selectedColor) {
+      addToast("Please select a color", "warning");
       return;
     }
 
+    const size = selectedSize || product.sizes?.[0] || "Standard";
+    const color = selectedColor || product.colors?.[0] || { name: "Default", hex: "#000000" };
+
     // Add to cart with pre-order flag
-    addToCart(product, selectedSize, selectedColor, quantity, true);
+    addToCart(product, size, color, quantity, true);
     addToast(`${product.name} added to cart as pre-order!`, "success");
     toggleCart();
   };
+
+  const hasSizes = (product.sizes?.length ?? 0) > 0;
+  const hasColors = (product.colors?.length ?? 0) > 0;
+  const canOrder = (!hasSizes || selectedSize) && (!hasColors || selectedColor);
 
   return (
     <div className={fullWidth ? "w-full space-y-3" : "space-y-3"}>
       <button
         onClick={handlePreOrder}
-        disabled={disabled || !selectedSize || !selectedColor}
-        className="w-full bg-amber-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+        disabled={disabled || !canOrder}
+        className="w-full bg-[#C5A059] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#B38F4B] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-sm"
       >
-        Pre-Order Now
+        Pre-Order Now (ቅድመ-ይዘዙ)
       </button>
 
       {estimatedDelivery && (
         <p className="text-sm text-gray-600 text-center">{estimatedDelivery}</p>
       )}
 
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-        <p className="text-xs text-amber-800">
+      <div className="bg-[#C5A059]/10 border border-[#C5A059]/30 rounded-lg p-3">
+        <p className="text-xs text-[#2B2D2F]">
           <strong>Pre-Order:</strong> This item is currently out of stock. Place
           your order now and we'll ship it as soon as it's available.
         </p>

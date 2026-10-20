@@ -19,10 +19,17 @@ export async function GET(request: NextRequest) {
 
     try {
         const supabase = createAdminClient();
-        const { data, error: dbError } = await supabase
-            .from('products')
-            .select('*')
-            .order('created_at', { ascending: false });
+        const serviceParam = request.nextUrl.searchParams.get('service') || request.nextUrl.searchParams.get('category');
+
+        let query = supabase.from('products').select('*');
+        if (serviceParam && ['skincare', 'toys', 'journals'].includes(serviceParam)) {
+            query = query.eq('category', serviceParam);
+        } else {
+            // For attire, exclude products belonging to other standalone services
+            query = query.not('category', 'in', '("skincare","toys","journals")');
+        }
+
+        const { data, error: dbError } = await query.order('created_at', { ascending: false });
 
         if (dbError) throw dbError;
         return NextResponse.json({ products: data || [] });
@@ -41,6 +48,16 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const payload = pick(body, ALLOWED_FIELDS.product);
         const supabase = createAdminClient();
+
+        // Enforce inventory consistency
+        if (payload.stock_count !== undefined) {
+            const stock = Number(payload.stock_count) || 0;
+            if (stock > 0) {
+                payload.in_stock = payload.in_stock !== undefined ? Boolean(payload.in_stock) : true;
+            } else {
+                payload.in_stock = false;
+            }
+        }
 
         const { data, error: dbError } = await supabase
             .from('products')

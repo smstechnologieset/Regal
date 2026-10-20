@@ -46,13 +46,14 @@ export default function SizeSelector({
                     return (
                         <button
                             key={size}
+                            type="button"
                             onClick={() => !isOutOfStock && onSelect(size)}
                             disabled={isOutOfStock}
                             className={cn(
-                                'min-w-[48px] h-11 px-3 rounded-lg border text-sm font-medium transition-all',
+                                'min-w-[44px] h-10 sm:h-11 px-3 rounded-lg border text-xs sm:text-sm font-medium transition-all max-w-full cursor-pointer',
                                 isSelected
-                                    ? 'bg-primary text-white border-primary'
-                                    : 'bg-white text-slate-700 border-slate-300 hover:border-primary',
+                                    ? 'bg-[#4A5D4E] text-white border-[#4A5D4E]'
+                                    : 'bg-white text-slate-700 border-slate-300 hover:border-[#4A5D4E]',
                                 isOutOfStock && 'opacity-40 cursor-not-allowed line-through'
                             )}
                         >

@@ -108,8 +108,18 @@ export default function AttireManager() {
       const pData = await pRes.json();
       const cData = await cRes.json();
 
-      setProducts(pData.products || []);
-      setCategories(cData.categories || []);
+      const nonAttireServices = ["skincare", "toys", "journals"];
+      const rawProducts: Product[] = pData.products || [];
+      const attireOnlyProducts = rawProducts.filter(
+        (p) => !nonAttireServices.includes(p.category || "")
+      );
+      const rawCategories: Category[] = cData.categories || [];
+      const attireOnlyCategories = rawCategories.filter(
+        (c) => !nonAttireServices.includes(c.id)
+      );
+
+      setProducts(attireOnlyProducts);
+      setCategories(attireOnlyCategories);
     } catch (error) {
       console.error("Error fetching attire data:", error);
       showApiError(error, "Failed to fetch catalog data");

@@ -40,42 +40,45 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
     };
 
     return (
-        <div className="flex flex-col-reverse lg:flex-row gap-4">
+        <div className="flex flex-col-reverse lg:flex-row gap-3 sm:gap-4 w-full max-w-full min-w-0">
             {/* Thumbnails */}
-            <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto lg:max-h-[600px] pb-2 lg:pb-0 lg:pr-2">
-                {images.map((image, index) => (
-                    <button
-                        key={index}
-                        onClick={() => setSelectedIndex(index)}
-                        className={cn(
-                            'flex-shrink-0 w-16 h-20 lg:w-20 lg:h-24 rounded-lg overflow-hidden border-2 transition-all',
-                            selectedIndex === index
-                                ? 'border-primary'
-                                : 'border-transparent hover:border-slate-300'
-                        )}
-                    >
-                        <Image
-                            src={image}
-                            alt={`${productName} - View ${index + 1}`}
-                            width={80}
-                            height={96}
-                            unoptimized
-                            className="w-full h-full object-cover"
-                        />
-                    </button>
-                ))}
-            </div>
+            {images.length > 1 && (
+                <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-y-auto lg:max-h-[600px] py-1 lg:py-0 lg:pr-2 w-full max-w-full min-w-0 scrollbar-hide">
+                    {images.map((image, index) => (
+                        <button
+                            key={index}
+                            type="button"
+                            onClick={() => setSelectedIndex(index)}
+                            className={cn(
+                                'shrink-0 w-14 h-16 sm:w-16 sm:h-20 lg:w-20 lg:h-24 rounded-xl overflow-hidden border-2 transition-all cursor-pointer relative',
+                                selectedIndex === index
+                                    ? 'border-[#4A5D4E] ring-2 ring-[#4A5D4E]/30 scale-102'
+                                    : 'border-slate-200 hover:border-slate-400 opacity-60 hover:opacity-100'
+                            )}
+                        >
+                            <Image
+                                src={image}
+                                alt={`${productName} - View ${index + 1}`}
+                                width={80}
+                                height={96}
+                                unoptimized
+                                className="w-full h-full object-cover"
+                            />
+                        </button>
+                    ))}
+                </div>
+            )}
 
             {/* Main image */}
-            <div className="flex-1 relative">
+            <div className="flex-1 relative w-full max-w-full min-w-0">
                 <div
-                    className="relative aspect-[3/4] rounded-xl overflow-hidden bg-slate-100 cursor-zoom-in"
+                    className="relative aspect-[4/5] sm:aspect-[3/4] rounded-2xl overflow-hidden bg-slate-100 cursor-zoom-in w-full max-w-full"
                     onMouseEnter={() => setIsZoomed(true)}
                     onMouseLeave={() => setIsZoomed(false)}
                     onMouseMove={handleMouseMove}
                 >
                     <Image
-                        src={images[selectedIndex]}
+                        src={images[selectedIndex] || images[0] || ''}
                         alt={`${productName} - Main view`}
                         fill
                         priority
@@ -99,26 +102,36 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                 {images.length > 1 && (
                     <>
                         <button
-                            onClick={goToPrevious}
-                            className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/90 rounded-full shadow-lg hover:bg-white transition-colors"
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                goToPrevious();
+                            }}
+                            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-slate-800 shadow-md flex items-center justify-center transition-all cursor-pointer z-10 hover:scale-105 active:scale-95"
                             aria-label="Previous image"
                         >
-                            <ChevronLeft size={20} />
+                            <ChevronLeft size={18} />
                         </button>
                         <button
-                            onClick={goToNext}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/90 rounded-full shadow-lg hover:bg-white transition-colors"
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                goToNext();
+                            }}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-slate-800 shadow-md flex items-center justify-center transition-all cursor-pointer z-10 hover:scale-105 active:scale-95"
                             aria-label="Next image"
                         >
-                            <ChevronRight size={20} />
+                            <ChevronRight size={18} />
                         </button>
                     </>
                 )}
 
                 {/* Image counter */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/60 text-white text-sm rounded-full">
-                    {selectedIndex + 1} / {images.length}
-                </div>
+                {images.length > 1 && (
+                    <div className="absolute bottom-3 right-3 px-2.5 py-0.5 bg-black/60 text-white text-[10px] sm:text-xs font-semibold rounded-full backdrop-blur-xs">
+                        {selectedIndex + 1} / {images.length}
+                    </div>
+                )}
             </div>
         </div>
     );

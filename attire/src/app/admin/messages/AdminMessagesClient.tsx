@@ -67,9 +67,9 @@ export default function AdminMessagesClient() {
     const getServiceLabel = (type: string) => {
         const labels: Record<string, string> = {
             attire: 'Attire',
-            skincare: '🌸 Skincare',
-            toys: '🧸 Toys',
-            journals: '📖 Journals',
+            skincare: ' Skincare',
+            toys: ' Toys',
+            journals: 'Journals',
             catering: 'Catering',
             gifts: 'Gifts',
             bridal: 'Bridal',
@@ -106,9 +106,9 @@ export default function AdminMessagesClient() {
                     >
                         <option value="all">All Services</option>
                         <option value="attire">Attire</option>
-                        <option value="skincare">🌸 Skincare</option>
-                        <option value="toys">🧸 Toys</option>
-                        <option value="journals">📖 Journals</option>
+                        <option value="skincare"> Skincare</option>
+                        <option value="toys"> Toys</option>
+                        <option value="journals">Journals</option>
                         <option value="catering">Catering</option>
                         <option value="gifts">Gifts</option>
                         <option value="bridal">Bridal</option>

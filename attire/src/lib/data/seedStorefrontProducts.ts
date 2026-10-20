@@ -2,9 +2,9 @@
  * Seed Storefront Products for Regal
  *
  * Provides realistic, beautifully curated initial items for:
- * - 🌸 Pure Skincare & Body Care
- * - 🧸 Grounded Childhood Toys
- * - 📖 Mindful Journals & Reflection Tools
+ * -  Pure Skincare & Body Care
+ * -  Grounded Childhood Toys
+ * - Mindful Journals & Reflection Tools
  */
 
 import { Product } from '@/types';
@@ -21,7 +21,11 @@ export const SEED_SKINCARE_PRODUCTS: Product[] = [
     subcategory: 'raw-butters',
     sizes: ['100ml / 3.4 oz', '250ml / 8.5 oz'],
     colors: [{ name: 'Ivory Gold', hex: '#F3EAD8' }],
-    images: ['https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=800&h=800&fit=crop',
+    ],
     badges: ['bestseller', 'new'],
     rating: 5.0,
     reviewCount: 38,
@@ -41,7 +45,11 @@ export const SEED_SKINCARE_PRODUCTS: Product[] = [
     subcategory: 'face-oils',
     sizes: ['30ml / 1.0 fl oz', '50ml / 1.7 fl oz'],
     colors: [{ name: 'Amber Gold', hex: '#E8B86D' }],
-    images: ['https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&h=800&fit=crop',
+    ],
     badges: ['new'],
     rating: 4.9,
     reviewCount: 24,
@@ -61,7 +69,10 @@ export const SEED_SKINCARE_PRODUCTS: Product[] = [
     subcategory: 'soaps',
     sizes: ['120g Bar'],
     colors: [{ name: 'Oatmeal Cream', hex: '#EBE3D5' }],
-    images: ['https://images.unsplash.com/photo-1607006314187-57ef9f27ee85?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1607006314187-57ef9f27ee85?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=800&h=800&fit=crop',
+    ],
     badges: ['bestseller'],
     rating: 4.8,
     reviewCount: 42,
@@ -82,7 +93,10 @@ export const SEED_SKINCARE_PRODUCTS: Product[] = [
     subcategory: 'balms',
     sizes: ['75ml Jar'],
     colors: [{ name: 'Linen Herbal', hex: '#E2D7C3' }],
-    images: ['https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=800&h=800&fit=crop',
+    ],
     badges: ['limited'],
     rating: 4.9,
     reviewCount: 19,
@@ -90,7 +104,7 @@ export const SEED_SKINCARE_PRODUCTS: Product[] = [
     createdAt: new Date().toISOString(),
     inStock: false,
     stockCount: 0,
-    allowPreorder: true,
+    allowPreorder: false,
     estimatedRestockDate: new Date(Date.now() + 14 * 86400000).toISOString(),
     estimatedDeliveryDays: 10,
     preorderCount: 8,
@@ -105,7 +119,10 @@ export const SEED_SKINCARE_PRODUCTS: Product[] = [
     subcategory: 'mother-baby',
     sizes: ['100ml Tin'],
     colors: [{ name: 'Soft Linen', hex: '#FDFBF7' }],
-    images: ['https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=800&fit=crop',
+    ],
     badges: ['bestseller'],
     rating: 5.0,
     reviewCount: 29,
@@ -132,7 +149,11 @@ export const SEED_TOYS_PRODUCTS: Product[] = [
       { name: 'Olive & Sage', hex: '#4A5D4E' },
       { name: 'Warm Terra', hex: '#C5A059' },
     ],
-    images: ['https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1558877385-81a1c7e67d72?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=800&h=800&fit=crop',
+    ],
     badges: ['bestseller', 'new'],
     rating: 5.0,
     reviewCount: 27,
@@ -155,7 +176,10 @@ export const SEED_TOYS_PRODUCTS: Product[] = [
       { name: 'Dusty Rose', hex: '#D4A5A5' },
       { name: 'Warm Cream', hex: '#F5F0E6' },
     ],
-    images: ['https://images.unsplash.com/photo-1558877385-81a1c7e67d72?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1558877385-81a1c7e67d72?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&h=800&fit=crop',
+    ],
     badges: ['bestseller'],
     rating: 4.9,
     reviewCount: 19,
@@ -175,7 +199,10 @@ export const SEED_TOYS_PRODUCTS: Product[] = [
     subcategory: 'doll-clothing',
     sizes: ['Universal 14-16 inch Fit'],
     colors: [{ name: 'Botanical Meadow', hex: '#7E9084' }],
-    images: ['https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1558877385-81a1c7e67d72?w=800&h=800&fit=crop',
+    ],
     badges: ['new'],
     rating: 4.8,
     reviewCount: 14,
@@ -196,7 +223,10 @@ export const SEED_TOYS_PRODUCTS: Product[] = [
     subcategory: 'wooden-toys',
     sizes: ['7-Piece Wood Set'],
     colors: [{ name: 'Natural Beechwood', hex: '#D6C0A4' }],
-    images: ['https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=800&h=800&fit=crop',
+    ],
     badges: ['limited'],
     rating: 4.9,
     reviewCount: 31,
@@ -219,7 +249,10 @@ export const SEED_TOYS_PRODUCTS: Product[] = [
     subcategory: 'keepsakes',
     sizes: ['18 x 10 x 8 inches'],
     colors: [{ name: 'Honey Wood', hex: '#C89D68' }],
-    images: ['https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=800&h=800&fit=crop',
+    ],
     badges: ['new'],
     rating: 5.0,
     reviewCount: 11,
@@ -246,7 +279,11 @@ export const SEED_JOURNALS_PRODUCTS: Product[] = [
       { name: 'Olive Linen', hex: '#4A5D4E' },
       { name: 'Oatmeal Linen', hex: '#E8E2D5' },
     ],
-    images: ['https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1517842645767-c639042777db?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&h=800&fit=crop',
+    ],
     badges: ['bestseller', 'new'],
     rating: 5.0,
     reviewCount: 45,
@@ -266,7 +303,10 @@ export const SEED_JOURNALS_PRODUCTS: Product[] = [
     subcategory: 'habit-trackers',
     sizes: ['B5 Wirebound (160 Pages)'],
     colors: [{ name: 'Warm Slate', hex: '#2B2D2F' }],
-    images: ['https://images.unsplash.com/photo-1517842645767-c639042777db?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1517842645767-c639042777db?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=800&fit=crop',
+    ],
     badges: ['bestseller'],
     rating: 4.8,
     reviewCount: 32,
@@ -289,7 +329,10 @@ export const SEED_JOURNALS_PRODUCTS: Product[] = [
       { name: 'Rose Linen', hex: '#C79A95' },
       { name: 'Sage Cloth', hex: '#8DA394' },
     ],
-    images: ['https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=800&fit=crop',
+    ],
     badges: ['new'],
     rating: 4.9,
     reviewCount: 18,
@@ -313,7 +356,10 @@ export const SEED_JOURNALS_PRODUCTS: Product[] = [
       { name: 'Cognac Brown', hex: '#7A3E26' },
       { name: 'Charcoal Black', hex: '#232425' },
     ],
-    images: ['https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1517842645767-c639042777db?w=800&h=800&fit=crop',
+    ],
     badges: ['limited'],
     rating: 5.0,
     reviewCount: 14,
@@ -336,7 +382,10 @@ export const SEED_JOURNALS_PRODUCTS: Product[] = [
     subcategory: 'daily-journals',
     sizes: ['Standard A5 (180 Pages)'],
     colors: [{ name: 'Warm Cream', hex: '#FDFBF7' }],
-    images: ['https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&h=800&fit=crop'],
+    images: [
+      'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=800&fit=crop',
+    ],
     badges: ['bestseller'],
     rating: 4.7,
     reviewCount: 22,

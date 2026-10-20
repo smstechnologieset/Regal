@@ -4,9 +4,9 @@
  * ServiceCatalogManager Component
  *
  * Dedicated admin catalog manager for Regal's new services:
- * - 🌸 Pure Skincare & Body Care
- * - 🧸 Grounded Childhood Toys
- * - 📖 Mindful Journals & Reflection Tools
+ * -  Pure Skincare & Body Care
+ * -  Grounded Childhood Toys
+ * - Mindful Journals & Reflection Tools
  *
  * Provides complete CRUD, stock control, pre-order management, and image configuration.
  */
@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { Product } from '@/types';
 import { useApp } from '@/context/AppContext';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, cn } from '@/lib/utils';
 import ImageUpload from './ImageUpload';
 
 interface SubcategoryOption {
@@ -83,28 +83,89 @@ export default function ServiceCatalogManager({
 
   const [sizeInput, setSizeInput] = useState('');
 
+  // Normalization helper to bridge snake_case API with camelCase Product type
+  const normalizeProduct = (p: any): Product => {
+    const rawStock = p.stock_count !== undefined ? Number(p.stock_count) : (p.stockCount !== undefined ? Number(p.stockCount) : 0);
+    const stock = isNaN(rawStock) ? 0 : rawStock;
+    const rawInStock = p.in_stock !== undefined ? Boolean(p.in_stock) : (p.inStock !== undefined ? Boolean(p.inStock) : stock > 0);
+    const inStock = stock > 0 ? rawInStock : false;
+
+    return {
+      id: p.id,
+      name: p.name || '',
+      description: p.description || '',
+      price: Number(p.price) || 0,
+      originalPrice: p.original_price != null ? Number(p.original_price) : (p.originalPrice != null ? Number(p.originalPrice) : undefined),
+      category: p.category || serviceId,
+      subcategory: p.subcategory || '',
+      sizes: Array.isArray(p.sizes) ? p.sizes : [],
+      colors: Array.isArray(p.colors) ? p.colors : [],
+      images: Array.isArray(p.images) && p.images.length > 0 ? p.images : ['https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=800&fit=crop'],
+      badges: Array.isArray(p.badges) ? p.badges : [],
+      rating: Number(p.rating) || 5.0,
+      reviewCount: Number(p.review_count ?? p.reviewCount) || 0,
+      popularity: Number(p.popularity) || 50,
+      createdAt: p.created_at || p.createdAt || new Date().toISOString(),
+      inStock,
+      stockCount: stock,
+      allowPreorder: p.allow_preorder !== undefined ? Boolean(p.allow_preorder) : (p.allowPreorder !== undefined ? Boolean(p.allowPreorder) : true),
+      estimatedRestockDate: p.estimated_restock_date || p.estimatedRestockDate || undefined,
+      preorderCount: Number(p.preorder_count ?? p.preorderCount) || 0,
+      estimatedDeliveryDays: Number(p.estimated_delivery_days ?? p.estimatedDeliveryDays) || 14,
+    };
+  };
+
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/catalog/attire/products');
+      const res = await fetch(`/api/admin/catalog/attire/products?service=${serviceId}`);
+      let serverProducts: Product[] = [];
       if (res.ok) {
         const data = await res.json();
-        const serverProducts = (data.products || []).filter(
-          (p: any) => p.category === serviceId
-        );
-
-        if (serverProducts.length > 0) {
-          setProducts(serverProducts);
-        } else {
-          // Fallback to initial seeds
-          setProducts(initialSeedProducts);
-        }
-      } else {
-        setProducts(initialSeedProducts);
+        serverProducts = (data.products || [])
+          .filter((p: any) => p.category === serviceId)
+          .map(normalizeProduct);
       }
+
+      let baseList = serverProducts.length > 0
+        ? serverProducts
+        : initialSeedProducts.map(normalizeProduct);
+
+      // Merge local storage overrides if any exist
+      if (typeof window !== 'undefined') {
+        try {
+          const raw = localStorage.getItem('regal_storefront_overrides');
+          if (raw) {
+            const overrides = JSON.parse(raw);
+            baseList = baseList.map((p) => {
+              if (overrides[p.id]) {
+                return normalizeProduct({ ...p, ...overrides[p.id] });
+              }
+              return p;
+            });
+          }
+        } catch (e) {}
+      }
+
+      setProducts(baseList);
     } catch (err) {
       console.warn(`Error fetching ${serviceId} products, using seeds:`, err);
-      setProducts(initialSeedProducts);
+      let baseList = initialSeedProducts.map(normalizeProduct);
+      if (typeof window !== 'undefined') {
+        try {
+          const raw = localStorage.getItem('regal_storefront_overrides');
+          if (raw) {
+            const overrides = JSON.parse(raw);
+            baseList = baseList.map((p) => {
+              if (overrides[p.id]) {
+                return normalizeProduct({ ...p, ...overrides[p.id] });
+              }
+              return p;
+            });
+          }
+        } catch (e) {}
+      }
+      setProducts(baseList);
     } finally {
       setLoading(false);
     }
@@ -117,22 +178,24 @@ export default function ServiceCatalogManager({
   const handleOpenModal = (product?: Product) => {
     if (product) {
       setEditingProduct(product);
+      const stock = product.stockCount ?? (product as any).stock_count ?? 0;
+      const rawInStock = product.inStock ?? (product as any).in_stock ?? (stock > 0);
       setFormData({
         name: product.name,
         description: product.description || '',
         price: product.price.toString(),
-        original_price: product.originalPrice?.toString() || '',
+        original_price: (product.originalPrice ?? (product as any).original_price)?.toString() || '',
         subcategory: product.subcategory || subcategories[0]?.id || '',
         sizes: product.sizes || [],
-        in_stock: product.inStock,
-        stock_count: product.stockCount?.toString() || '0',
+        in_stock: stock > 0 ? rawInStock : false,
+        stock_count: stock.toString(),
         images: product.images || [],
         badges: product.badges || [],
-        allow_preorder: product.allowPreorder ?? true,
-        estimated_restock_date: product.estimatedRestockDate
-          ? new Date(product.estimatedRestockDate).toISOString().split('T')[0]
+        allow_preorder: product.allowPreorder ?? (product as any).allow_preorder ?? true,
+        estimated_restock_date: (product.estimatedRestockDate || (product as any).estimated_restock_date)
+          ? new Date(product.estimatedRestockDate || (product as any).estimated_restock_date).toISOString().split('T')[0]
           : '',
-        estimated_delivery_days: product.estimatedDeliveryDays?.toString() || '14',
+        estimated_delivery_days: (product.estimatedDeliveryDays ?? (product as any).estimated_delivery_days)?.toString() || '14',
       });
       setSizeInput((product.sizes || []).join(', '));
     } else {
@@ -179,6 +242,10 @@ export default function ServiceCatalogManager({
         .map((s) => s.trim())
         .filter(Boolean);
 
+      const stockNum = parseInt(formData.stock_count) || 0;
+      // Auto-sync in_stock: if stock count > 0, the item is in stock!
+      const effectiveInStock = stockNum > 0 ? (formData.in_stock ?? true) : false;
+
       const payload = {
         name: formData.name,
         description: formData.description,
@@ -190,8 +257,8 @@ export default function ServiceCatalogManager({
         colors: [{ name: 'Standard', hex: '#4A5D4E' }],
         images: formData.images.length > 0 ? formData.images : ['https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=800&fit=crop'],
         badges: formData.badges,
-        in_stock: formData.in_stock,
-        stock_count: parseInt(formData.stock_count) || 0,
+        in_stock: effectiveInStock,
+        stock_count: stockNum,
         allow_preorder: formData.allow_preorder,
         estimated_restock_date: formData.estimated_restock_date
           ? new Date(formData.estimated_restock_date).toISOString()
@@ -214,26 +281,42 @@ export default function ServiceCatalogManager({
         body: JSON.stringify(payload),
       });
 
-      // Optimistically update local list
+      // Optimistically update local list with normalized product
+      let savedProduct: Product;
       if (editingProduct) {
+        savedProduct = normalizeProduct({
+          ...editingProduct,
+          ...payload,
+          inStock: effectiveInStock,
+          stockCount: stockNum,
+        });
         setProducts((prev) =>
-          prev.map((p) =>
-            p.id === editingProduct.id ? ({ ...p, ...payload, inStock: payload.in_stock } as any) : p
-          )
+          prev.map((p) => (p.id === editingProduct.id ? savedProduct : p))
         );
         addToast(`${formData.name} updated successfully`, 'success');
       } else {
-        const newProductItem: any = {
+        savedProduct = normalizeProduct({
           ...payload,
-          id: payload.id,
-          inStock: payload.in_stock,
+          inStock: effectiveInStock,
+          stockCount: stockNum,
           createdAt: new Date().toISOString(),
           rating: 5.0,
           reviewCount: 0,
           popularity: 50,
-        };
-        setProducts((prev) => [newProductItem, ...prev]);
+        });
+        setProducts((prev) => [savedProduct, ...prev]);
         addToast(`${formData.name} created successfully`, 'success');
+      }
+
+      // Persist to local storage overrides immediately
+      if (typeof window !== 'undefined') {
+        try {
+          const raw = localStorage.getItem('regal_storefront_overrides');
+          const overrides = raw ? JSON.parse(raw) : {};
+          overrides[savedProduct.id] = savedProduct;
+          localStorage.setItem('regal_storefront_overrides', JSON.stringify(overrides));
+          window.dispatchEvent(new CustomEvent('regal_products_updated', { detail: savedProduct }));
+        } catch (e) {}
       }
 
       setIsModalOpen(false);
@@ -253,6 +336,15 @@ export default function ServiceCatalogManager({
     try {
       // Optimistic delete
       setProducts((prev) => prev.filter((p) => p.id !== id));
+      if (typeof window !== 'undefined') {
+        try {
+          const raw = localStorage.getItem('regal_storefront_overrides');
+          const overrides = raw ? JSON.parse(raw) : {};
+          delete overrides[id];
+          localStorage.setItem('regal_storefront_overrides', JSON.stringify(overrides));
+          window.dispatchEvent(new CustomEvent('regal_products_updated', { detail: { id, deleted: true } }));
+        } catch (e) {}
+      }
       addToast(`Deleted ${name}`, 'success');
 
       await fetch(`/api/admin/catalog/attire/products/${id}`, {
@@ -358,97 +450,139 @@ export default function ServiceCatalogManager({
           <p className="text-xs text-slate-500 mt-1">Adjust filters or create a new item.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs sm:text-sm">
-              <thead>
-                <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-500 text-xs font-semibold uppercase tracking-wider">
-                  <th className="py-3 px-4">Item</th>
-                  <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4">Price</th>
-                  <th className="py-3 px-4">Stock</th>
-                  <th className="py-3 px-4">Pre-Order</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredProducts.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl overflow-hidden relative bg-slate-100 shrink-0">
-                          <Image
-                            src={p.images?.[0] || 'https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=800&fit=crop'}
-                            alt={p.name}
-                            fill
-                            unoptimized
-                            className="object-cover"
-                          />
-                        </div>
-                        <div>
-                          <p className="font-bold text-slate-900">{p.name}</p>
-                          <p className="text-xs text-slate-400 line-clamp-1">{p.description}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-semibold text-xs">
-                        {p.subcategory || serviceId}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {filteredProducts.map((p) => {
+            const hasStock = p.inStock && (p.stockCount ?? 0) > 0;
+            return (
+              <div
+                key={p.id}
+                className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden group shadow-xs hover:shadow-md transition-all flex flex-col"
+              >
+                {/* Image Container */}
+                <div className="aspect-square bg-slate-100 relative overflow-hidden">
+                  {p.images?.[0] ? (
+                    <img
+                      src={p.images[0]}
+                      alt={p.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                      <ShoppingBag size={40} />
+                    </div>
+                  )}
+
+                  {/* Action Buttons on Hover */}
+                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                    <button
+                      onClick={() => handleOpenModal(p)}
+                      className="p-2 bg-white/95 rounded-xl shadow-sm text-slate-700 hover:text-emerald-700 hover:bg-white transition-all cursor-pointer"
+                      title="Edit Product"
+                    >
+                      <Edit2 size={15} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(p.id, p.name)}
+                      className="p-2 bg-white/95 rounded-xl shadow-sm text-slate-700 hover:text-rose-600 hover:bg-white transition-all cursor-pointer"
+                      title="Delete Product"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+
+                  {/* Badges on Top Left */}
+                  <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+                    {p.badges?.includes('new') && (
+                      <span className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+                        NEW
                       </span>
-                    </td>
-                    <td className="py-3 px-4 font-bold text-slate-900">
-                      {formatPrice(p.price)}
-                    </td>
-                    <td className="py-3 px-4">
-                      {p.inStock ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">
-                          In Stock ({p.stockCount ?? 10})
+                    )}
+                    {p.badges?.includes('bestseller') && (
+                      <span className="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+                        BEST SELLER
+                      </span>
+                    )}
+                    {p.originalPrice && p.originalPrice > p.price && (
+                      <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+                        SALE
+                      </span>
+                    )}
+                    {p.allowPreorder && (
+                      <span className="bg-[#C5A059] text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+                        PRE-ORDER
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Out of Stock Overlay */}
+                  {!hasStock && (
+                    <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px] flex items-center justify-center z-10 pointer-events-none">
+                      <span className="bg-white/95 text-slate-900 text-[11px] font-bold px-3 py-1 rounded-full shadow-md uppercase tracking-wider">
+                        {p.allowPreorder ? 'Pre-Order Available' : 'Out of Stock'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Details */}
+                <div className="p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-start mb-1 gap-2">
+                      <h3 className="font-semibold text-slate-900 truncate flex-1 text-sm" title={p.name}>
+                        {p.name}
+                      </h3>
+                      <div className="flex flex-col items-end shrink-0">
+                        <span className="font-bold text-slate-900 text-sm">
+                          {formatPrice(p.price)}
                         </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-xs font-semibold">
-                          Out of Stock
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
-                      {p.allowPreorder ? (
-                        <div className="text-xs">
-                          <span className="font-semibold text-[#8C6D28] bg-[#C5A059]/15 px-2 py-0.5 rounded-md">
-                            Active
+                        {p.originalPrice && p.originalPrice > p.price && (
+                          <span className="text-[10px] text-slate-400 line-through">
+                            {formatPrice(p.originalPrice)}
                           </span>
-                          {p.estimatedRestockDate && (
-                            <span className="block text-[11px] text-slate-400 mt-0.5">
-                              Restock: {new Date(p.estimatedRestockDate).toLocaleDateString()}
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-xs text-slate-400">Disabled</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="inline-flex items-center gap-1.5">
-                        <button
-                          onClick={() => handleOpenModal(p)}
-                          className="p-1.5 rounded-lg text-slate-600 hover:text-primary hover:bg-slate-100 transition-colors"
-                          title="Edit"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p.id, p.name)}
-                          className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        )}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                    <p className="text-xs text-slate-500 mb-2 truncate capitalize">
+                      {subcategories.find((s) => s.id === p.subcategory)?.name || p.subcategory || serviceTitle}
+                    </p>
+                    {p.sizes && p.sizes.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {p.sizes.map((sz) => (
+                          <span key={sz} className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">
+                            {sz}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                    <span
+                      className={cn(
+                        'font-semibold px-2 py-0.5 rounded-full text-[10px]',
+                        hasStock
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : 'bg-rose-50 text-rose-700 border border-rose-200'
+                      )}
+                    >
+                      {hasStock ? `Stock: ${p.stockCount}` : `Out of Stock (${p.stockCount ?? 0})`}
+                    </span>
+
+                    <span
+                      className={cn(
+                        'text-[10px] font-semibold px-2 py-0.5 rounded-md',
+                        p.allowPreorder
+                          ? 'bg-[#C5A059]/15 text-[#8C6D28] border border-[#C5A059]/30'
+                          : 'text-slate-400 bg-slate-100'
+                      )}
+                    >
+                      {p.allowPreorder ? 'Pre-Order: ON' : 'Pre-Order: OFF'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -569,7 +703,14 @@ export default function ServiceCatalogManager({
                     <input
                       type="checkbox"
                       checked={formData.in_stock}
-                      onChange={(e) => setFormData({ ...formData, in_stock: e.target.checked })}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setFormData((prev) => ({
+                          ...prev,
+                          in_stock: checked,
+                          stock_count: checked && (parseInt(prev.stock_count) || 0) <= 0 ? '10' : (!checked ? '0' : prev.stock_count),
+                        }));
+                      }}
                       className="sr-only peer"
                     />
                     <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4A5D4E]" />
@@ -581,8 +722,17 @@ export default function ServiceCatalogManager({
                     <label className="block text-xs font-medium text-slate-700 mb-1">Stock Count</label>
                     <input
                       type="number"
+                      min="0"
                       value={formData.stock_count}
-                      onChange={(e) => setFormData({ ...formData, stock_count: e.target.value })}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const num = parseInt(val) || 0;
+                        setFormData((prev) => ({
+                          ...prev,
+                          stock_count: val,
+                          in_stock: num > 0 ? true : (num === 0 ? false : prev.in_stock),
+                        }));
+                      }}
                       className="w-full px-3 py-2 text-sm bg-white border border-slate-200 rounded-xl"
                     />
                   </div>
@@ -644,35 +794,81 @@ export default function ServiceCatalogManager({
               </div>
 
               {/* Product Images */}
-              <div>
+              <div className="space-y-2">
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Product Image URLs
+                  Product Images (Local Upload or URL)
                 </label>
-                <div className="space-y-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {formData.images.map((url, index) => (
+                    <ImageUpload
+                      key={index}
+                      bucket={serviceId}
+                      value={url}
+                      onChange={(newUrl: string) => {
+                        const newImages = [...formData.images];
+                        if (newUrl) {
+                          newImages[index] = newUrl;
+                        } else {
+                          newImages.splice(index, 1);
+                        }
+                        setFormData({ ...formData, images: newImages });
+                      }}
+                    />
+                  ))}
+                  {formData.images.length < 6 && (
+                    <ImageUpload
+                      bucket={serviceId}
+                      onChange={(newUrl) => {
+                        if (newUrl) {
+                          setFormData({
+                            ...formData,
+                            images: [...formData.images, newUrl],
+                          });
+                        }
+                      }}
+                    />
+                  )}
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Upload directly from your device or paste an image URL below. Max 6 images. First image is the thumbnail.
+                </p>
+                <div className="flex gap-2 pt-1">
                   <input
                     type="url"
-                    placeholder="https://images.unsplash.com/photo-..."
-                    value={formData.images[0] || ''}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setFormData({
-                        ...formData,
-                        images: val ? [val] : [],
-                      });
+                    placeholder="Or paste an image URL (https://...)"
+                    className="flex-1 px-3.5 py-2 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#4A5D4E]/20 focus:border-[#4A5D4E] text-xs sm:text-sm bg-white"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const input = e.target as HTMLInputElement;
+                        const url = input.value.trim();
+                        if (url && formData.images.length < 6) {
+                          setFormData({
+                            ...formData,
+                            images: [...formData.images, url],
+                          });
+                          input.value = '';
+                        }
+                      }
                     }}
-                    className="w-full px-3.5 py-2 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#4A5D4E] outline-none"
                   />
-                  {formData.images[0] && (
-                    <div className="w-16 h-16 rounded-xl overflow-hidden relative border border-slate-200">
-                      <Image
-                        src={formData.images[0]}
-                        alt="Preview"
-                        fill
-                        unoptimized
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      const input = (e.currentTarget.previousElementSibling as HTMLInputElement);
+                      const url = input?.value?.trim();
+                      if (url && formData.images.length < 6) {
+                        setFormData({
+                          ...formData,
+                          images: [...formData.images, url],
+                        });
+                        input.value = '';
+                      }
+                    }}
+                    className="px-3.5 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors font-medium border border-slate-200 text-xs sm:text-sm cursor-pointer"
+                  >
+                    Add URL
+                  </button>
                 </div>
               </div>
 

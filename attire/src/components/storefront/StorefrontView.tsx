@@ -4,9 +4,9 @@
  * StorefrontView Component
  *
  * Universal high-end storefront engine for Regal's specialized services:
- * - 🌸 Pure Skincare & Body Care (/skincare)
- * - 🧸 Grounded Childhood Toys (/toys)
- * - 📖 Mindful Journals & Reflection Tools (/journals)
+ * -  Pure Skincare & Body Care (/skincare)
+ * -  Grounded Childhood Toys (/toys)
+ * - Mindful Journals & Reflection Tools (/journals)
  *
  * Features:
  * - Editorial hero with client manifesto and authenticity badges
@@ -30,9 +30,13 @@ import {
   Truck,
   Heart,
   Calendar,
+  Clock,
   X,
   Check,
   Eye,
+  ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Product } from '@/types';
 import { getProducts } from '@/lib/services/attire';
@@ -42,6 +46,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useServices } from '@/context/ServicesContext';
 import ServiceDisabledCard from '@/components/common/ServiceDisabledCard';
 import ProductCard from '@/components/product/ProductCard';
+import { ALL_STOREFRONT_SEED_PRODUCTS } from '@/lib/data/seedStorefrontProducts';
 import { formatPrice } from '@/lib/utils';
 
 export interface SubcategoryFilter {
@@ -68,6 +73,19 @@ interface StorefrontViewProps {
   purityBadges: PurityBadgeItem[];
 }
 
+// Synchronize admin overrides instantaneously across storefront
+function applyStorefrontOverrides(prods: Product[]): Product[] {
+  if (typeof window === 'undefined' || !prods || prods.length === 0) return prods;
+  try {
+    const raw = localStorage.getItem('regal_storefront_overrides');
+    if (!raw) return prods;
+    const overrides: Record<string, any> = JSON.parse(raw);
+    return prods.map((p) => (overrides[p.id] ? { ...p, ...overrides[p.id] } : p));
+  } catch {
+    return prods;
+  }
+}
+
 export default function StorefrontView({
   serviceId,
   title,
@@ -85,8 +103,11 @@ export default function StorefrontView({
   const { addToCart, toggleCart } = useCart();
   const { addToast } = useApp();
 
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Initialize with seed data + any admin local storage overrides for zero flicker
+  const [products, setProducts] = useState<Product[]>(() =>
+    applyStorefrontOverrides(ALL_STOREFRONT_SEED_PRODUCTS.filter((p) => p.category === serviceId))
+  );
+  const [loading, setLoading] = useState(false);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all');
   const [stockFilter, setStockFilter] = useState<'all' | 'in_stock' | 'preorder'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'price-asc' | 'price-desc' | 'popularity'>('popularity');
@@ -94,9 +115,39 @@ export default function StorefrontView({
 
   // Quick View Modal
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<any>(null);
   const [quantity, setQuantity] = useState(1);
+
+  // Helper stock classification
+  const isItemInStock = (p: Product) => Boolean(p.inStock && (p.stockCount ?? 0) > 0);
+  const isItemPreorder = (p: Product) => !isItemInStock(p) && Boolean(p.allowPreorder);
+  const isItemOutOfStock = (p: Product) => !isItemInStock(p) && !p.allowPreorder;
+
+  // Real-time listener for admin catalog updates
+  useEffect(() => {
+    const handleSync = () => {
+      setProducts((current) => applyStorefrontOverrides([...current]));
+      if (quickViewProduct) {
+        try {
+          const raw = localStorage.getItem('regal_storefront_overrides');
+          if (raw) {
+            const overrides = JSON.parse(raw);
+            if (overrides[quickViewProduct.id]) {
+              setQuickViewProduct((prev) => (prev ? { ...prev, ...overrides[prev.id] } : null));
+            }
+          }
+        } catch {}
+      }
+    };
+    window.addEventListener('regal_products_updated', handleSync);
+    window.addEventListener('storage', handleSync);
+    return () => {
+      window.removeEventListener('regal_products_updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
+  }, [quickViewProduct]);
 
   // Check if service is disabled
   if (!isServiceEnabled(serviceId)) {
@@ -114,11 +165,28 @@ export default function StorefrontView({
         }
 
         const res = await getProducts(filterOpts, sortBy, 1, 50);
+        const serverData = res?.data || [];
         if (isCurrent) {
-          setProducts(res.data || []);
+          if (serverData.length > 0) {
+            setProducts(applyStorefrontOverrides(serverData));
+          } else {
+            // Curated fallback
+            let seeds = ALL_STOREFRONT_SEED_PRODUCTS.filter((p) => p.category === serviceId);
+            if (selectedSubcategory !== 'all') {
+              seeds = seeds.filter((p) => p.subcategory === selectedSubcategory);
+            }
+            setProducts(applyStorefrontOverrides(seeds));
+          }
         }
       } catch (err) {
-        console.error(`Error loading ${serviceId} products:`, err);
+        console.warn(`[StorefrontView] Network issue for ${serviceId}, retaining catalog seeds:`, err);
+        if (isCurrent) {
+          let seeds = ALL_STOREFRONT_SEED_PRODUCTS.filter((p) => p.category === serviceId);
+          if (selectedSubcategory !== 'all') {
+            seeds = seeds.filter((p) => p.subcategory === selectedSubcategory);
+          }
+          setProducts(applyStorefrontOverrides(seeds));
+        }
       } finally {
         if (isCurrent) setLoading(false);
       }
@@ -139,8 +207,8 @@ export default function StorefrontView({
         if (!matchName && !matchDesc) return false;
       }
 
-      if (stockFilter === 'in_stock' && !p.inStock) return false;
-      if (stockFilter === 'preorder' && (!p.allowPreorder || p.inStock)) return false;
+      if (stockFilter === 'in_stock' && !isItemInStock(p)) return false;
+      if (stockFilter === 'preorder' && !isItemPreorder(p)) return false;
 
       return true;
     });
@@ -148,35 +216,45 @@ export default function StorefrontView({
 
   const handleOpenQuickView = (product: Product) => {
     setQuickViewProduct(product);
+    setActiveImageIdx(0);
     setSelectedSize(product.sizes?.[0] || '');
     setSelectedColor(product.colors?.[0] || null);
     setQuantity(1);
   };
 
   const handleAddToCart = (product: Product) => {
+    if (isItemOutOfStock(product)) {
+      addToast(
+        isAmharic ? 'ይህ እቃ በአሁኑ ጊዜ አልቋል' : 'This product is currently out of stock',
+        'error'
+      );
+      return;
+    }
     const size = product.sizes?.[0] || 'Standard';
     const color = product.colors?.[0] || { name: 'Default', hex: '#000000' };
-    const isPreorder = !product.inStock && !!product.allowPreorder;
+    const isPreorder = isItemPreorder(product);
 
     addToCart(product, size, color, 1, isPreorder);
     addToast(
-      isAmharic ? `${product.name} ወደ ቅርጫት ታክሏል` : `Added ${product.name} to cart`,
+      isPreorder
+        ? (isAmharic ? `${product.name} ለቅድመ-ትዕዛዝ ታክሏል` : `Added ${product.name} to pre-orders`)
+        : (isAmharic ? `${product.name} ወደ ቅርጫት ታክሏል` : `Added ${product.name} to cart`),
       'success'
     );
     toggleCart();
   };
 
   const handleModalAddToCart = () => {
-    if (!quickViewProduct) return;
+    if (!quickViewProduct || isItemOutOfStock(quickViewProduct)) return;
     const size = selectedSize || quickViewProduct.sizes?.[0] || 'Standard';
     const color = selectedColor || quickViewProduct.colors?.[0] || { name: 'Default', hex: '#000000' };
-    const isPreorder = !quickViewProduct.inStock && !!quickViewProduct.allowPreorder;
+    const isPreorder = isItemPreorder(quickViewProduct);
 
     addToCart(quickViewProduct, size, color, quantity, isPreorder);
     addToast(
-      isAmharic
-        ? `${quickViewProduct.name} ወደ ቅርጫት ታክሏል`
-        : `Added ${quickViewProduct.name} (${quantity}) to cart`,
+      isPreorder
+        ? (isAmharic ? `${quickViewProduct.name} ለቅድመ-ትዕዛዝ ታክሏል` : `Added ${quickViewProduct.name} to pre-orders`)
+        : (isAmharic ? `${quickViewProduct.name} ወደ ቅርጫት ታክሏል` : `Added ${quickViewProduct.name} (${quantity}) to cart`),
       'success'
     );
     setQuickViewProduct(null);
@@ -355,7 +433,8 @@ export default function StorefrontView({
               {filteredProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="group relative bg-white rounded-2xl border border-[#E0D6C8] overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col"
+                  onClick={() => handleOpenQuickView(product)}
+                  className="group relative bg-white rounded-2xl border border-[#E0D6C8] hover:border-[#4A5D4E]/40 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
                 >
                   {/* Image Container */}
                   <div className="aspect-[4/5] relative overflow-hidden bg-[#F4EFEA]">
@@ -368,7 +447,7 @@ export default function StorefrontView({
                     />
 
                     {/* Badges */}
-                    <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+                    <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10 pointer-events-none">
                       {product.badges?.map((badge) => (
                         <span
                           key={badge}
@@ -377,17 +456,30 @@ export default function StorefrontView({
                           {badge}
                         </span>
                       ))}
-                      {!product.inStock && product.allowPreorder && (
+                      {isItemPreorder(product) && (
                         <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#C5A059] text-white shadow-2xs">
                           {isAmharic ? 'ቅድመ-ትዕዛዝ' : 'Pre-Order'}
                         </span>
                       )}
                     </div>
 
+                    {/* Out of Stock Overlay when Pre-Order is OFF */}
+                    {isItemOutOfStock(product) && (
+                      <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] flex items-center justify-center z-10 pointer-events-none">
+                        <span className="px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-900 text-white shadow-md">
+                          {isAmharic ? 'ያለቀ' : 'Out of Stock'}
+                        </span>
+                      </div>
+                    )}
+
                     {/* Quick View Button */}
                     <button
-                      onClick={() => handleOpenQuickView(product)}
-                      className="absolute bottom-3 right-3 p-2 rounded-full bg-white/90 hover:bg-white text-slate-800 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenQuickView(product);
+                      }}
+                      className="absolute bottom-3 right-3 p-2 rounded-full bg-white/90 hover:bg-white text-slate-800 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity shadow-sm cursor-pointer z-10"
                       title="Quick View"
                     >
                       <Eye size={16} />
@@ -420,25 +512,41 @@ export default function StorefrontView({
                         )}
                       </div>
 
-                      <button
-                        onClick={() => handleAddToCart(product)}
-                        className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                          !product.inStock && product.allowPreorder
-                            ? 'bg-[#C5A059] hover:bg-[#b08b45] text-white'
-                            : 'bg-[#4A5D4E] hover:bg-[#3d4d40] text-white'
-                        }`}
-                      >
-                        <ShoppingBag size={14} />
-                        <span>
-                          {!product.inStock && product.allowPreorder
-                            ? isAmharic
-                              ? 'ቅድመ-ይዘዙ'
-                              : 'Pre-Order'
-                            : isAmharic
-                            ? 'ይግዙ'
-                            : 'Add'}
-                        </span>
-                      </button>
+                      {isItemInStock(product) ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(product);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#4A5D4E] hover:bg-[#3d4d40] text-white transition-all shadow-2xs cursor-pointer"
+                        >
+                          <ShoppingBag size={14} />
+                          <span>{isAmharic ? 'ይግዙ' : 'Add'}</span>
+                        </button>
+                      ) : isItemPreorder(product) ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(product);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#C5A059] hover:bg-[#b08b45] text-white transition-all shadow-2xs cursor-pointer"
+                        >
+                          <Clock size={14} />
+                          <span>{isAmharic ? 'ቅድመ-ይዘዙ' : 'Pre-Order'}</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
+                        >
+                          <X size={14} />
+                          <span>{isAmharic ? 'ያለቀ' : 'Out of Stock'}</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -451,30 +559,95 @@ export default function StorefrontView({
       {/* Quick View Modal */}
       {quickViewProduct && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fade-in"
           onClick={() => setQuickViewProduct(null)}
         >
           <div
-            className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 relative shadow-2xl"
+            className="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto p-4 sm:p-8 relative shadow-2xl flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => setQuickViewProduct(null)}
-              className="absolute top-5 right-5 p-2 rounded-full hover:bg-slate-100 text-slate-500"
-            >
-              <X size={20} />
-            </button>
+            {/* Sticky / Always-Visible Close Button for Mobile & Desktop */}
+            <div className="sticky top-0 z-50 flex justify-end -mt-1 -mr-1 mb-2 pointer-events-none">
+              <button
+                type="button"
+                onClick={() => setQuickViewProduct(null)}
+                className="pointer-events-auto w-10 h-10 rounded-full bg-white/95 hover:bg-white text-slate-700 hover:text-black shadow-md border border-slate-200 flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95"
+                aria-label="Close modal"
+              >
+                <X size={20} className="stroke-[2.5]" />
+              </button>
+            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Product Image */}
-              <div className="aspect-[4/5] relative rounded-2xl overflow-hidden bg-slate-100">
-                <Image
-                  src={quickViewProduct.images[0] || ''}
-                  alt={quickViewProduct.name}
-                  fill
-                  unoptimized
-                  className="object-cover"
-                />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+              {/* Product Image Gallery with multi-photo switcher */}
+              <div className="flex flex-col gap-3">
+                <div className="aspect-[4/5] relative rounded-2xl overflow-hidden bg-slate-100 group">
+                  <Image
+                    src={quickViewProduct.images[activeImageIdx] || quickViewProduct.images[0] || ''}
+                    alt={quickViewProduct.name}
+                    fill
+                    unoptimized
+                    className="object-cover transition-all duration-300"
+                  />
+
+                  {/* Previous / Next buttons if multiple images */}
+                  {quickViewProduct.images.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveImageIdx((prev) => (prev > 0 ? prev - 1 : quickViewProduct.images.length - 1));
+                        }}
+                        className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-slate-800 shadow-md flex items-center justify-center transition-all cursor-pointer opacity-95 sm:opacity-0 group-hover:opacity-100"
+                        aria-label="Previous photo"
+                      >
+                        <ChevronLeft size={18} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveImageIdx((prev) => (prev < quickViewProduct.images.length - 1 ? prev + 1 : 0));
+                        }}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-slate-800 shadow-md flex items-center justify-center transition-all cursor-pointer opacity-95 sm:opacity-0 group-hover:opacity-100"
+                        aria-label="Next photo"
+                      >
+                        <ChevronRight size={18} />
+                      </button>
+                      {/* Photo counter badge */}
+                      <span className="absolute bottom-2.5 right-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-black/60 text-white backdrop-blur-xs">
+                        {activeImageIdx + 1} / {quickViewProduct.images.length}
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                {/* Multiple Photos Thumbnail Strip */}
+                {quickViewProduct.images.length > 1 && (
+                  <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                    {quickViewProduct.images.map((imgUrl, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setActiveImageIdx(idx)}
+                        className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden relative shrink-0 border-2 transition-all cursor-pointer ${
+                          activeImageIdx === idx
+                            ? 'border-[#4A5D4E] ring-2 ring-[#4A5D4E]/30 scale-102'
+                            : 'border-slate-200 opacity-60 hover:opacity-100 hover:border-slate-400'
+                        }`}
+                      >
+                        <Image
+                          src={imgUrl}
+                          alt={`${quickViewProduct.name} - ${idx + 1}`}
+                          fill
+                          unoptimized
+                          className="object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Product Info */}
@@ -493,17 +666,36 @@ export default function StorefrontView({
                     {quickViewProduct.description}
                   </p>
 
-                  {/* Pre-order notification badge */}
-                  {!quickViewProduct.inStock && quickViewProduct.allowPreorder && (
-                    <div className="bg-[#C5A059]/10 border border-[#C5A059]/30 rounded-xl p-3 mb-4 text-xs text-[#8C6D28]">
-                      <span className="font-bold">
-                        {isAmharic ? 'የቅድመ-ትዕዛዝ ማስታወሻ፡' : 'Pre-Order Item:'}
-                      </span>{' '}
-                      {isAmharic
-                        ? 'ይህ እቃ በአሁኑ ጊዜ በመዘጋጀት ላይ ሲሆን በቅርቡ ይደርሰዎታል።'
-                        : `Estimated delivery in ${quickViewProduct.estimatedDeliveryDays || 14} days.`}
-                    </div>
-                  )}
+                  {/* Stock status indicator */}
+                  <div className="mb-4">
+                    {isItemInStock(quickViewProduct) ? (
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
+                        <ShieldCheck size={14} />
+                        <span>
+                          {isAmharic
+                            ? `በመጋዘን ውስጥ አለ (${quickViewProduct.stockCount})`
+                            : `In Stock (${quickViewProduct.stockCount} available)`}
+                        </span>
+                      </div>
+                    ) : isItemPreorder(quickViewProduct) ? (
+                      <div className="bg-[#C5A059]/10 border border-[#C5A059]/30 rounded-xl p-3 text-xs text-[#8C6D28]">
+                        <div className="flex items-center gap-1.5 font-bold mb-1">
+                          <Clock size={14} />
+                          <span>{isAmharic ? 'ለቅድመ-ትዕዛዝ ዝግጁ ነው' : 'Available for Pre-Order'}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-600">
+                          {isAmharic
+                            ? 'ይህ እቃ በአሁኑ ጊዜ በመጋዘን ያበቃ ሲሆን አስቀድመው በማዘዝ በቀጥታ ማግኘት ይችላሉ።'
+                            : `Estimated delivery in ${quickViewProduct.estimatedDeliveryDays || 14} days.`}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-semibold border border-rose-200">
+                        <X size={14} />
+                        <span>{isAmharic ? 'ይህ እቃ በአሁኑ ጊዜ አልቋል' : 'Currently Out of Stock'}</span>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Size options */}
                   {quickViewProduct.sizes && quickViewProduct.sizes.length > 0 && (
@@ -532,37 +724,63 @@ export default function StorefrontView({
 
                 {/* Add to cart CTA */}
                 <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
-                  <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden">
-                    <button
-                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      className="px-3 py-2 text-slate-600 hover:bg-slate-100"
-                    >
-                      -
-                    </button>
-                    <span className="px-3 py-2 text-xs font-bold">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity((q) => q + 1)}
-                      className="px-3 py-2 text-slate-600 hover:bg-slate-100"
-                    >
-                      +
-                    </button>
-                  </div>
+                  {!isItemOutOfStock(quickViewProduct) && (
+                    <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden">
+                      <button
+                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                        className="px-3 py-2 text-slate-600 hover:bg-slate-100 cursor-pointer"
+                      >
+                        -
+                      </button>
+                      <span className="px-3 py-2 text-xs font-bold">{quantity}</span>
+                      <button
+                        onClick={() => setQuantity((q) => q + 1)}
+                        className="px-3 py-2 text-slate-600 hover:bg-slate-100 cursor-pointer"
+                      >
+                        +
+                      </button>
+                    </div>
+                  )}
 
                   <button
                     onClick={handleModalAddToCart}
-                    className="flex-1 py-3 rounded-xl bg-[#4A5D4E] hover:bg-[#3d4d40] text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
+                    disabled={isItemOutOfStock(quickViewProduct)}
+                    className={`flex-1 py-3 rounded-xl font-medium text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md ${
+                      isItemInStock(quickViewProduct)
+                        ? 'bg-[#4A5D4E] hover:bg-[#3d4d40] text-white cursor-pointer'
+                        : isItemPreorder(quickViewProduct)
+                        ? 'bg-[#C5A059] hover:bg-[#b08b45] text-white cursor-pointer'
+                        : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                    }`}
                   >
-                    <ShoppingBag size={16} />
-                    <span>
-                      {!quickViewProduct.inStock && quickViewProduct.allowPreorder
-                        ? isAmharic
-                          ? 'ቅድመ-ትዕዛዝ ያረጋግጡ'
-                          : 'Confirm Pre-Order'
-                        : isAmharic
-                        ? 'ወደ ቅርጫት ጨምር'
-                        : 'Add to Cart'}
-                    </span>
+                    {isItemInStock(quickViewProduct) ? (
+                      <>
+                        <ShoppingBag size={16} />
+                        <span>{isAmharic ? 'ወደ ቅርጫት ጨምር' : 'Add to Cart'}</span>
+                      </>
+                    ) : isItemPreorder(quickViewProduct) ? (
+                      <>
+                        <Clock size={16} />
+                        <span>{isAmharic ? 'ቅድመ-ትዕዛዝ ያረጋግጡ' : 'Confirm Pre-Order'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <X size={16} />
+                        <span>{isAmharic ? 'ያለቀ' : 'Out of Stock'}</span>
+                      </>
+                    )}
                   </button>
+                </div>
+
+                {/* View Full Product Details Link */}
+                <div className="pt-3 text-center">
+                  <Link
+                    href={`/${serviceId}/products/${quickViewProduct.id}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#4A5D4E] hover:text-[#2B2D2F] transition-colors group cursor-pointer"
+                  >
+                    <span>{isAmharic ? 'ሙሉ ዝርዝሮችን ይመልከቱ' : 'View Full Product Details'}</span>
+                    <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </Link>
                 </div>
               </div>
             </div>

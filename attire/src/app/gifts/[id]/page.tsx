@@ -77,11 +77,11 @@ export default function GiftDetailPage({ params }: GiftDetailPageProps) {
                 </div>
             </div>
 
-            <main className="container mx-auto px-4 py-12">
-                <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
+            <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-12 w-full max-w-full overflow-x-hidden">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 w-full max-w-full min-w-0">
                     {/* Left: Image Gallery (Single for now as per schema) */}
-                    <div className="space-y-6">
-                        <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl bg-purple-50">
+                    <div className="space-y-6 w-full max-w-full min-w-0">
+                        <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl bg-purple-50 w-full">
                             {pkg.image ? (
                                 <Image
                                     src={pkg.image}
@@ -99,8 +99,8 @@ export default function GiftDetailPage({ params }: GiftDetailPageProps) {
                             )}
                             
                             {/* Category Badge */}
-                            <div className="absolute top-6 left-6">
-                                <span className="px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-widest text-purple-700 shadow-lg">
+                            <div className="absolute top-4 left-4 sm:top-6 sm:left-6">
+                                <span className="px-3 py-1 sm:px-4 sm:py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest text-purple-700 shadow-lg">
                                     {pkg.category}
                                 </span>
                             </div>
@@ -108,16 +108,16 @@ export default function GiftDetailPage({ params }: GiftDetailPageProps) {
                     </div>
 
                     {/* Right: Info Section */}
-                    <div className="flex flex-col">
-                        <div className="mb-8">
-                            <div className="flex items-center gap-2 text-purple-600 font-bold text-sm mb-4">
-                                <Sparkles size={18} />
+                    <div className="flex flex-col w-full max-w-full min-w-0">
+                        <div className="mb-6 sm:mb-8">
+                            <div className="flex items-center gap-2 text-purple-600 font-bold text-xs sm:text-sm mb-3">
+                                <Sparkles size={16} />
                                 <span className="uppercase tracking-widest">Premium Gift Package</span>
                             </div>
-                            <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-tight">
+                            <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-3 tracking-tight leading-tight break-words">
                                 {pkg.name}
                             </h1>
-                            <div className="text-3xl font-black text-purple-600">
+                            <div className="text-2xl sm:text-3xl font-black text-purple-600">
                                 {formatPrice(pkg.price)}
                             </div>
                         </div>
