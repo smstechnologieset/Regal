@@ -32,34 +32,51 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     const { user } = useAuth();
     const [items, setItems] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const isTableMissingRef = React.useRef(false);
     const supabase = getSupabaseClient();
 
-    // Fetch wishlist from Supabase
+    // Fetch wishlist from Supabase or localStorage
     const fetchWishlist = useCallback(async (userId: string) => {
+        // Pre-fill immediately from local storage for instant UI
+        const savedWishlist = storage.get<Product[]>(WISHLIST_STORAGE_KEY, []);
+        if (savedWishlist.length > 0) {
+            setItems(savedWishlist);
+        }
+
+        if (isTableMissingRef.current) {
+            setIsLoading(false);
+            return;
+        }
+
         setIsLoading(true);
         try {
-            const { data, error } = await supabase
+            const { data, error, status } = await supabase
                 .from('wishlist')
                 .select('product_id')
                 .eq('user_id', userId);
 
             if (error) {
-                const savedWishlist = storage.get<Product[]>(WISHLIST_STORAGE_KEY, []);
-                setItems(savedWishlist);
+                // If table does not exist in Supabase (404 / 42P01), silence and rely on localStorage
+                if (status === 404 || error.code === '42P01' || error.message?.includes('does not exist')) {
+                    isTableMissingRef.current = true;
+                }
+                const fallbackWishlist = storage.get<Product[]>(WISHLIST_STORAGE_KEY, []);
+                setItems(fallbackWishlist);
                 return;
             }
 
             if (data && data.length > 0) {
-                // Fetch product details for each wishlist item
                 const productPromises = data.map((item: { product_id: string }) => getProductById(item.product_id));
                 const products = await Promise.all(productPromises);
-                setItems(products.filter((p): p is Product => p !== null));
-            } else {
+                const validProducts = products.filter((p): p is Product => p !== null);
+                setItems(validProducts);
+                storage.set(WISHLIST_STORAGE_KEY, validProducts);
+            } else if (savedWishlist.length === 0) {
                 setItems([]);
             }
-        } catch (error) {
-            const savedWishlist = storage.get<Product[]>(WISHLIST_STORAGE_KEY, []);
-            setItems(savedWishlist);
+        } catch {
+            const fallbackWishlist = storage.get<Product[]>(WISHLIST_STORAGE_KEY, []);
+            setItems(fallbackWishlist);
         } finally {
             setIsLoading(false);
         }
@@ -77,12 +94,12 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         }
     }, [user, fetchWishlist]);
 
-    // Save to localStorage for guests
+    // Save to localStorage whenever items change and initial load is complete (works for all users)
     useEffect(() => {
-        if (!user && !isLoading) {
+        if (!isLoading) {
             storage.set(WISHLIST_STORAGE_KEY, items);
         }
-    }, [items, user, isLoading]);
+    }, [items, isLoading]);
 
     const addToWishlist = useCallback(async (product: Product) => {
         // Optimistic update
@@ -91,16 +108,17 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
             return [...prev, product];
         });
 
-        if (user) {
+        if (user && !isTableMissingRef.current) {
             try {
-                const { error } = await supabase
+                const { error, status } = await supabase
                     .from('wishlist')
                     .insert({ user_id: user.id, product_id: product.id });
 
-                if (error && error.code !== '23505') throw error; // Ignore unique constraint violation
-            } catch (error) {
-                console.error('Error adding to wishlist in DB:', error);
-                // Revert on error?
+                if (status === 404 || error?.code === '42P01') {
+                    isTableMissingRef.current = true;
+                }
+            } catch {
+                isTableMissingRef.current = true;
             }
         }
     }, [user, supabase]);
@@ -109,17 +127,19 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         // Optimistic update
         setItems(prev => prev.filter(item => item.id !== productId));
 
-        if (user) {
+        if (user && !isTableMissingRef.current) {
             try {
-                const { error } = await supabase
+                const { error, status } = await supabase
                     .from('wishlist')
                     .delete()
                     .eq('user_id', user.id)
                     .eq('product_id', productId);
 
-                if (error) throw error;
-            } catch (error) {
-                console.error('Error removing from wishlist in DB:', error);
+                if (status === 404 || error?.code === '42P01') {
+                    isTableMissingRef.current = true;
+                }
+            } catch {
+                isTableMissingRef.current = true;
             }
         }
     }, [user, supabase]);
@@ -130,16 +150,18 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
     const clearWishlist = useCallback(async () => {
         setItems([]);
-        if (user) {
+        if (user && !isTableMissingRef.current) {
             try {
-                const { error } = await supabase
+                const { error, status } = await supabase
                     .from('wishlist')
                     .delete()
                     .eq('user_id', user.id);
 
-                if (error) throw error;
-            } catch (error) {
-                console.error('Error clearing wishlist in DB:', error);
+                if (status === 404 || error?.code === '42P01') {
+                    isTableMissingRef.current = true;
+                }
+            } catch {
+                isTableMissingRef.current = true;
             }
         }
     }, [user, supabase]);

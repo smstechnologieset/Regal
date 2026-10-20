@@ -37,7 +37,7 @@ export const en = {
     headline: "Curated. Crafted. Crowned.",
     amharicTagline: "የተመረጠ። በጥበብ የተሰራ። የነገሰ።",
     subheadline:
-      "Restoring dignity, health, and natural living to your home through chemical-free body care, additive-free foods, modest attire, grounded toys, and guided journals.",
+      "Uncompromising Quality. Flawless Execution. Elite Catering & Tailored Elegance.",
     primaryCta: "Explore Collections",
     secondaryCta: "Our Purity Standard",
   },

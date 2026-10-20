@@ -60,7 +60,7 @@ export default function RegalLandingPage() {
       description: t.services.skincareDesc,
       icon: Droplets,
       image:
-        "https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=600&fit=crop",
+        "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&h=600&fit=crop",
       href: "/skincare",
       badge: isAmharic ? "ቆዳ እንክብካቤ" : "Skincare",
     },
@@ -448,6 +448,7 @@ export default function RegalLandingPage() {
                     src="/Logo-bg.png"
                     alt="Regal Logo"
                     fill
+                    sizes="(max-width: 640px) 208px, 256px"
                     className="object-contain"
                     priority
                   />
@@ -457,7 +458,10 @@ export default function RegalLandingPage() {
                     REGAL
                   </span>
                   <span className="text-xs uppercase tracking-widest text-[#C5A059] font-semibold block mt-1.5 font-sans">
-                    {isAmharic ? "ክብር • ንጽህና • ውበት" : "Curated • Crafted • Crowned"}
+                    Curated • Crafted • Crowned
+                  </span>
+                  <span className="text-xs sm:text-sm tracking-wider text-[#4A5D4E] font-medium block mt-1 font-serif">
+                    የተመረጠ። በጥበብ የተሰራ። የነገሰ።
                   </span>
                 </div>
               </div>

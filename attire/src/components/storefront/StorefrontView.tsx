@@ -439,7 +439,7 @@ export default function StorefrontView({
                   {/* Image Container */}
                   <div className="aspect-[4/5] relative overflow-hidden bg-[#F4EFEA]">
                     <Image
-                      src={product.images[0] || 'https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=800&fit=crop'}
+                      src={product.images[0] || 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&h=800&fit=crop'}
                       alt={product.name}
                       fill
                       unoptimized

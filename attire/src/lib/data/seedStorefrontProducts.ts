@@ -22,7 +22,7 @@ export const SEED_SKINCARE_PRODUCTS: Product[] = [
     sizes: ['100ml / 3.4 oz', '250ml / 8.5 oz'],
     colors: [{ name: 'Ivory Gold', hex: '#F3EAD8' }],
     images: [
-      'https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&h=800&fit=crop',
       'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&h=800&fit=crop',
       'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=800&h=800&fit=crop',
     ],
@@ -47,7 +47,7 @@ export const SEED_SKINCARE_PRODUCTS: Product[] = [
     colors: [{ name: 'Amber Gold', hex: '#E8B86D' }],
     images: [
       'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&h=800&fit=crop',
       'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&h=800&fit=crop',
     ],
     badges: ['new'],
@@ -121,7 +121,7 @@ export const SEED_SKINCARE_PRODUCTS: Product[] = [
     colors: [{ name: 'Soft Linen', hex: '#FDFBF7' }],
     images: [
       'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&h=800&fit=crop',
-      'https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=800&h=800&fit=crop',
+      'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&h=800&fit=crop',
     ],
     badges: ['bestseller'],
     rating: 5.0,

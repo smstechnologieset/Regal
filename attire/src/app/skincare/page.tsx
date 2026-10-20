@@ -20,7 +20,7 @@ export default function SkincareStorefrontPage() {
       taglineAm="ከተፈጥሮ የተገኘ ያልተበረዘ እንክብካቤ"
       manifesto="Your skin deserves the raw, gentle nourishment of the earth. Formulated with unrefined botanicals and clean ingredients, our body care collection avoids harsh chemicals and synthetic additives, providing gentle, healthy care safe for sensitive skin and growing families."
       manifestoAm="ቆዳዎ የመሬቱን ያልተበረዘ የተፈጥሮ እንክብካቤ ይገባዋል። ከንጹህ እፅዋት ንጥረነገሮች የተዘጋጀው የሰውነት እንክብካቤ ስብስባችን ጎጂ ኬሚካሎችን ያስወግዳል፤ ለስሱ ቆዳ እና ለሚያድጉ ቤተሰቦች አስተማማኝ ነው።"
-      heroImage="https://images.unsplash.com/photo-1608248597359-0091ff62a49f?w=1920&h=1080&fit=crop"
+      heroImage="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1920&h=1080&fit=crop"
       subcategories={[
         { id: 'raw-butters', name: 'Raw Butters', nameAm: 'ያልተበረዙ ቅቤዎች' },
         { id: 'face-oils', name: 'Herbal Face & Body Oils', nameAm: 'የእፅዋት ዘይቶች' },

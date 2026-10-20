@@ -35,7 +35,7 @@ const organo = localFont({
 export const metadata: Metadata = {
   title: "Regal — Curated. Crafted. Crowned. | የተመረጠ። በጥበብ የተሰራ። የነገሰ።",
   description:
-    "Restoring dignity, health, and natural living through chemical-free body care, additive-free foods, modest attire, grounded toys, and guided journals.",
+    "Uncompromising Quality. Flawless Execution. Elite Catering & Tailored Elegance.",
   keywords:
     "pure living, modest attire, organic skincare, natural food, grounded toys, mindful journals, Ethiopia",
   icons: {
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Regal — Curated. Crafted. Crowned.",
-    description: "Restoring dignity, health, and natural living to everyday essentials.",
+    description: "Uncompromising Quality. Flawless Execution. Elite Catering & Tailored Elegance.",
     type: "website",
   },
 };
