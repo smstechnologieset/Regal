@@ -109,7 +109,7 @@ export default function AttireHomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7]">
+    <div className="min-h-screen bg-[#F9F8F6]">
       {/* Hero Slider */}
       <section className="relative h-[65vh] min-h-[500px] overflow-hidden">
         {heroSlides.map((slide, index) => (
@@ -127,21 +127,21 @@ export default function AttireHomePage() {
               className="object-cover"
               priority={index === 0}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#2B2D2F]/85 via-[#2B2D2F]/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0B192C]/90 via-[#0B192C]/50 to-transparent" />
             <div className="absolute inset-0 flex items-center">
               <div className="container mx-auto px-4 sm:px-6">
-                <div className="max-w-xl text-[#FDFBF7]">
-                  <span className="inline-block px-3.5 py-1 rounded-full bg-[#C5A059]/30 text-[#C5A059] font-semibold text-xs uppercase tracking-wider mb-4 border border-[#C5A059]/40">
+                <div className="max-w-xl text-[#F4F1EA]">
+                  <span className="inline-block px-3.5 py-1 rounded-full bg-[#D4AF37]/30 text-[#D4AF37] font-semibold text-xs uppercase tracking-wider mb-4 border border-[#D4AF37]/40">
                     Regal Attire
                   </span>
                   <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold mb-4 tracking-tight leading-tight">
                     {slide.title}
                   </h1>
-                  <p className="text-base sm:text-lg text-[#FDFBF7]/85 mb-8 font-light leading-relaxed">
+                  <p className="text-base sm:text-lg text-[#F4F1EA]/85 mb-8 font-light leading-relaxed">
                     {slide.subtitle}
                   </p>
                   <Link href={slide.link}>
-                    <Button size="lg" className="bg-[#4A5D4E] hover:bg-[#38463B] text-white">
+                    <Button size="lg" className="bg-[#1E3A8A] hover:bg-[#172554] text-white">
                       {slide.cta}
                     </Button>
                   </Link>
@@ -158,7 +158,7 @@ export default function AttireHomePage() {
               key={index}
               onClick={() => setCurrentSlide(index)}
               className={`w-3 h-3 rounded-full transition-all ${
-                index === currentSlide ? 'bg-[#C5A059] w-8' : 'bg-white/50'
+                index === currentSlide ? 'bg-[#D4AF37] w-8' : 'bg-white/50'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
@@ -167,19 +167,19 @@ export default function AttireHomePage() {
       </section>
 
       {/* Features Bar */}
-      <section className="border-y border-[#E0D6C8] bg-white">
+      <section className="border-y border-[#E5DFD7] bg-white">
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <div key={index} className="flex items-center gap-3">
-                  <div className="p-3 rounded-xl bg-[#4A5D4E]/10 text-[#4A5D4E]">
+                  <div className="p-3 rounded-xl bg-[#1E3A8A]/10 text-[#1E3A8A]">
                     <Icon size={24} />
                   </div>
                   <div>
-                    <h4 className="font-serif font-bold text-sm text-[#2B2D2F]">{feature.title}</h4>
-                    <p className="text-xs text-[#2B2D2F]/65">{feature.desc}</p>
+                    <h4 className="font-serif font-bold text-sm text-[#111827]">{feature.title}</h4>
+                    <p className="text-xs text-[#111827]/65">{feature.desc}</p>
                   </div>
                 </div>
               );
@@ -189,26 +189,26 @@ export default function AttireHomePage() {
       </section>
 
       {/* Categories Grid */}
-      <section className="py-16 md:py-20 bg-[#FDFBF7]">
+      <section className="py-16 md:py-20 bg-[#F9F8F6]">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#2B2D2F] mb-3">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#111827] mb-3">
               {t.attirePage.shopByCategory}
             </h2>
-            <div className="w-12 h-0.5 bg-[#C5A059] mx-auto" />
+            <div className="w-12 h-0.5 bg-[#D4AF37] mx-auto" />
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {categoriesLoading ? (
               Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="aspect-[4/5] rounded-2xl bg-[#E0D6C8]/40 animate-pulse" />
+                <div key={i} className="aspect-[4/5] rounded-2xl bg-[#E5DFD7]/40 animate-pulse" />
               ))
             ) : (
               categories.slice(0, 4).map((category) => (
                 <Link
                   key={category.id}
                   href={`/attire/products?category=${category.slug}`}
-                  className="group relative aspect-[4/5] rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all border border-[#E0D6C8]"
+                  className="group relative aspect-[4/5] rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all border border-[#E5DFD7]"
                 >
                   <Image
                     src={category.image || 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&fit=crop'}
@@ -217,10 +217,10 @@ export default function AttireHomePage() {
                     unoptimized
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#2B2D2F]/85 via-[#2B2D2F]/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0B192C]/85 via-[#0B192C]/20 to-transparent" />
                   <div className="absolute bottom-5 left-5 right-5 text-white">
                     <h3 className="text-lg sm:text-xl font-serif font-bold mb-1">{category.name}</h3>
-                    <span className="text-xs text-[#C5A059] font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <span className="text-xs text-[#D4AF37] font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
                       {isAmharic ? 'ይመልከቱ' : 'Explore'} <ArrowRight size={13} />
                     </span>
                   </div>
@@ -232,17 +232,17 @@ export default function AttireHomePage() {
       </section>
 
       {/* New Arrivals */}
-      <section className="py-16 md:py-20 bg-white border-y border-[#E0D6C8]">
+      <section className="py-16 md:py-20 bg-white border-y border-[#E5DFD7]">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-10">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#2B2D2F]">
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#111827]">
                 {t.attirePage.newArrivals}
               </h2>
             </div>
             <Link
               href="/attire/products?filter=new"
-              className="text-xs sm:text-sm font-semibold text-[#4A5D4E] flex items-center gap-1 hover:text-[#C5A059] transition-colors"
+              className="text-xs sm:text-sm font-semibold text-[#1E3A8A] flex items-center gap-1 hover:text-[#D4AF37] transition-colors"
             >
               {t.attirePage.viewAll} <ArrowRight size={14} />
             </Link>
@@ -265,9 +265,9 @@ export default function AttireHomePage() {
       </section>
 
       {/* Promotional Banner */}
-      <section className="py-16 bg-[#FDFBF7]">
+      <section className="py-16 bg-[#F9F8F6]">
         <div className="container mx-auto px-4">
-          <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden shadow-xl border border-[#E0D6C8]">
+          <div className="relative h-64 md:h-80 rounded-3xl overflow-hidden shadow-xl border border-[#E5DFD7]">
             <Image
               src="https://images.unsplash.com/photo-1607082350899-7e105aa886ae?w=1920&h=600&fit=crop"
               alt="Sale Banner"
@@ -275,20 +275,20 @@ export default function AttireHomePage() {
               unoptimized
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#4A5D4E]/95 via-[#4A5D4E]/75 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0B192C]/95 via-[#0B192C]/80 to-transparent" />
             <div className="absolute inset-0 flex items-center">
-              <div className="px-8 sm:px-12 max-w-lg text-[#FDFBF7]">
-                <span className="inline-block px-3 py-1 bg-[#C5A059] text-[#2B2D2F] text-xs font-bold rounded-full mb-3 uppercase tracking-wider">
+              <div className="px-8 sm:px-12 max-w-lg text-[#F4F1EA]">
+                <span className="inline-block px-3 py-1 bg-[#D4AF37] text-[#111827] text-xs font-bold rounded-full mb-3 uppercase tracking-wider">
                   {isAmharic ? 'ልዩ የቅናሽ ወቅት' : 'Limited Offer'}
                 </span>
                 <h2 className="text-2xl sm:text-4xl font-serif font-bold text-white mb-3">
                   {isAmharic ? 'እስከ 30% ቅናሽ' : 'Seasonal Collection'}
                 </h2>
-                <p className="text-[#FDFBF7]/85 mb-6 text-sm leading-relaxed">
+                <p className="text-[#F4F1EA]/85 mb-6 text-sm leading-relaxed">
                   {isAmharic ? 'በተመረጡ ክላሲክ አልባሳት ላይ ልዩ ቅናሽ ያግኙ' : 'Pure, modest essentials crafted for everyday dignity.'}
                 </p>
                 <Link href="/attire/products?sale=true">
-                  <Button className="bg-[#C5A059] hover:bg-[#AF8B45] text-[#2B2D2F] font-bold">
+                  <Button className="bg-[#D4AF37] hover:bg-[#B4942E] text-[#111827] font-bold">
                     {t.attirePage.onSale}
                   </Button>
                 </Link>
@@ -299,15 +299,15 @@ export default function AttireHomePage() {
       </section>
 
       {/* Bestsellers */}
-      <section className="py-16 md:py-20 bg-white border-t border-[#E0D6C8]">
+      <section className="py-16 md:py-20 bg-white border-t border-[#E5DFD7]">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-10">
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#2B2D2F]">
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#111827]">
               {t.attirePage.bestsellers}
             </h2>
             <Link
               href="/attire/products?sort=popularity"
-              className="text-xs sm:text-sm font-semibold text-[#4A5D4E] flex items-center gap-1 hover:text-[#C5A059] transition-colors"
+              className="text-xs sm:text-sm font-semibold text-[#1E3A8A] flex items-center gap-1 hover:text-[#D4AF37] transition-colors"
             >
               {t.attirePage.viewAll} <ArrowRight size={14} />
             </Link>

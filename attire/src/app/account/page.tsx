@@ -206,7 +206,7 @@ export default function AccountPage() {
 
       {/* Profile Completion */}
       {(!profile?.phone || !profile?.avatar_url) && (
-        <div className="bg-gradient-to-r from-rose-50 to-purple-50 rounded-2xl border border-rose-100 p-6">
+        <div className="bg-gradient-to-r from-[#1E3A8A]/5 to-[#D4AF37]/10 rounded-2xl border border-[#D4AF37]/30 p-6">
           <h3 className="font-semibold text-primary mb-2">
             Complete Your Profile
           </h3>

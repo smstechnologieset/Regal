@@ -118,7 +118,7 @@ export const SEED_SKINCARE_PRODUCTS: Product[] = [
     category: 'skincare',
     subcategory: 'mother-baby',
     sizes: ['100ml Tin'],
-    colors: [{ name: 'Soft Linen', hex: '#FDFBF7' }],
+    colors: [{ name: 'Warm Linen', hex: '#F9F8F6' }],
     images: [
       'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&h=800&fit=crop',
       'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&h=800&fit=crop',
@@ -146,8 +146,8 @@ export const SEED_TOYS_PRODUCTS: Product[] = [
     subcategory: 'modest-dolls',
     sizes: ['16-inch Handcrafted Doll'],
     colors: [
-      { name: 'Olive & Sage', hex: '#4A5D4E' },
-      { name: 'Warm Terra', hex: '#C5A059' },
+      { name: 'Royal Blue', hex: '#1E3A8A' },
+      { name: 'Regal Gold', hex: '#D4AF37' },
     ],
     images: [
       'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&h=800&fit=crop',
@@ -276,7 +276,7 @@ export const SEED_JOURNALS_PRODUCTS: Product[] = [
     subcategory: 'daily-journals',
     sizes: ['A5 Hardcover (240 Pages)'],
     colors: [
-      { name: 'Olive Linen', hex: '#4A5D4E' },
+      { name: 'Royal Navy', hex: '#1E3A8A' },
       { name: 'Oatmeal Linen', hex: '#E8E2D5' },
     ],
     images: [
@@ -302,7 +302,7 @@ export const SEED_JOURNALS_PRODUCTS: Product[] = [
     category: 'journals',
     subcategory: 'habit-trackers',
     sizes: ['B5 Wirebound (160 Pages)'],
-    colors: [{ name: 'Warm Slate', hex: '#2B2D2F' }],
+    colors: [{ name: 'Deep Ink', hex: '#111827' }],
     images: [
       'https://images.unsplash.com/photo-1517842645767-c639042777db?w=800&h=800&fit=crop',
       'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=800&fit=crop',
@@ -381,7 +381,7 @@ export const SEED_JOURNALS_PRODUCTS: Product[] = [
     category: 'journals',
     subcategory: 'daily-journals',
     sizes: ['Standard A5 (180 Pages)'],
-    colors: [{ name: 'Warm Cream', hex: '#FDFBF7' }],
+    colors: [{ name: 'Warm Linen', hex: '#F9F8F6' }],
     images: [
       'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&h=800&fit=crop',
       'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&h=800&fit=crop',

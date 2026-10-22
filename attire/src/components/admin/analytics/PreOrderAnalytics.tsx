@@ -160,8 +160,8 @@ export default function PreOrderAnalytics() {
         {/* Products with Pre-Orders */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Package className="text-purple-600" size={20} />
+            <div className="w-10 h-10 bg-[#1E3A8A]/10 rounded-lg flex items-center justify-center">
+              <Package className="text-[#1E3A8A]" size={20} />
             </div>
             <div>
               <p className="text-sm text-slate-600">Products</p>

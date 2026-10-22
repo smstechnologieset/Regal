@@ -123,49 +123,49 @@ export default function OrderModal({ pkg, isOpen, onClose }: OrderModalProps) {
                     </div>
                 ) : (
                     <>
-                        <div className="p-6 border-b border-[#E0D6C8] flex justify-between items-center bg-[#F4EFEA]/80">
+                        <div className="p-6 border-b border-[#E5DFD7] flex justify-between items-center bg-[#F4EFEA]/80">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-[#4A5D4E]/10 text-[#4A5D4E] rounded-xl flex items-center justify-center">
+                                <div className="w-10 h-10 bg-[#1E3A8A]/10 text-[#1E3A8A] rounded-xl flex items-center justify-center">
                                     <Gift size={20} />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold font-serif text-[#2B2D2F]">Complete Your Order</h2>
-                                    <p className="text-xs text-[#2B2D2F]/60">A specialist will contact you shortly</p>
+                                    <h2 className="text-lg font-bold font-serif text-[#111827]">Complete Your Order</h2>
+                                    <p className="text-xs text-[#111827]/60">A specialist will contact you shortly</p>
                                 </div>
                             </div>
-                            <button onClick={onClose} className="p-2 hover:bg-[#E0D6C8]/60 rounded-full transition-colors text-[#2B2D2F]/60">
+                            <button onClick={onClose} className="p-2 hover:bg-[#E5DFD7]/60 rounded-full transition-colors text-[#111827]/60">
                                 <X size={20} />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-6">
                             {/* Summary */}
-                            <div className="p-4 bg-[#F4EFEA]/50 border border-[#E0D6C8] rounded-2xl flex items-center justify-between">
+                            <div className="p-4 bg-[#F4EFEA]/50 border border-[#E5DFD7] rounded-2xl flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                    <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border border-[#E0D6C8]">
+                                    <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border border-[#E5DFD7]">
                                         <img src={pkg.image || ''} alt={pkg.name} className="w-full h-full object-cover" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-[#2B2D2F] text-sm">{pkg.name}</h4>
-                                        <p className="text-xs text-[#2B2D2F]/60">{pkg.category}</p>
+                                        <h4 className="font-bold text-[#111827] text-sm">{pkg.name}</h4>
+                                        <p className="text-xs text-[#111827]/60">{pkg.category}</p>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-xs text-[#2B2D2F]/40 font-medium uppercase tracking-wider">Total</p>
-                                    <p className="text-xl font-black text-[#4A5D4E]">{formatPrice(pkg.price)}</p>
+                                    <p className="text-xs text-[#111827]/40 font-medium uppercase tracking-wider">Total</p>
+                                    <p className="text-xl font-black text-[#1E3A8A]">{formatPrice(pkg.price)}</p>
                                 </div>
                             </div>
 
                             {/* Message/Notes */}
                             <div className="space-y-2">
-                                <label className="text-sm font-bold text-[#2B2D2F] flex items-center gap-2">
+                                <label className="text-sm font-bold text-[#111827] flex items-center gap-2">
                                     <span>Special Requests or Notes</span>
-                                    <span className="text-[10px] bg-[#F4EFEA] text-[#2B2D2F]/50 border border-[#E0D6C8] px-1.5 py-0.5 rounded font-normal uppercase">Optional</span>
+                                    <span className="text-[10px] bg-[#F4EFEA] text-[#111827]/50 border border-[#E5DFD7] px-1.5 py-0.5 rounded font-normal uppercase">Optional</span>
                                 </label>
                                 <textarea
                                     rows={4}
                                     placeholder="Tell us about the recipient, delivery preferences, or any custom additions you'd like..."
-                                    className="w-full px-4 py-3 bg-white border border-[#E0D6C8] rounded-2xl outline-none focus:ring-2 focus:ring-[#4A5D4E]/20 focus:border-[#4A5D4E] transition-all text-sm text-[#2B2D2F]"
+                                    className="w-full px-4 py-3 bg-white border border-[#E5DFD7] rounded-2xl outline-none focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] transition-all text-sm text-[#111827]"
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
                                 />
@@ -177,7 +177,7 @@ export default function OrderModal({ pkg, isOpen, onClose }: OrderModalProps) {
                                     type="submit" 
                                     fullWidth 
                                     size="lg" 
-                                    className="bg-[#4A5D4E] hover:bg-[#3D4D40] text-[#FDFBF7] h-14 text-base rounded-2xl shadow-lg shadow-[#4A5D4E]/20"
+                                    className="bg-[#1E3A8A] hover:bg-[#172554] text-[#F4F1EA] h-14 text-base rounded-2xl shadow-lg shadow-[#1E3A8A]/20"
                                     disabled={submitting}
                                     leftIcon={submitting ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
                                 >

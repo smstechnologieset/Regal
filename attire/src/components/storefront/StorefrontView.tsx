@@ -262,9 +262,9 @@ export default function StorefrontView({
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#2B2D2F]">
+    <div className="min-h-screen bg-[#F9F8F6] text-[#111827]">
       {/* Editorial Hero Banner */}
-      <section className="relative min-h-[58vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#F4EFEA] via-[#FDFBF7] to-[#FDFBF7] pt-28 pb-16">
+      <section className="relative min-h-[58vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#F4EFEA] via-[#F9F8F6] to-[#F9F8F6] pt-28 pb-16">
         <div className="absolute inset-0 z-0">
           <Image
             src={heroImage}
@@ -274,23 +274,23 @@ export default function StorefrontView({
             unoptimized
             className="object-cover opacity-15 filter blur-[1px]"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#FDFBF7] via-[#FDFBF7]/85 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#F9F8F6] via-[#F9F8F6]/85 to-transparent" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10 text-center max-w-4xl">
           {/* Top Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#4A5D4E]/10 border border-[#4A5D4E]/20 text-[#4A5D4E] text-xs font-semibold uppercase tracking-wider mb-5">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1E3A8A]/10 border border-[#1E3A8A]/20 text-[#1E3A8A] text-xs font-semibold uppercase tracking-wider mb-5">
             <Sparkles size={14} />
             <span>{isAmharic ? taglineAm : tagline}</span>
           </div>
 
           {/* Headline */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-[#2B2D2F] tracking-tight leading-tight mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-[#111827] tracking-tight leading-tight mb-6">
             {isAmharic ? titleAm : title}
           </h1>
 
           {/* Client Manifesto Statement */}
-          <div className="bg-white/70 backdrop-blur-md border border-[#C5A059]/25 rounded-2xl p-6 sm:p-8 max-w-3xl mx-auto shadow-xs mb-8">
+          <div className="bg-white/70 backdrop-blur-md border border-[#D4AF37]/30 rounded-2xl p-6 sm:p-8 max-w-3xl mx-auto shadow-xs mb-8">
             <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-serif italic">
               &ldquo;{isAmharic ? manifestoAm : manifesto}&rdquo;
             </p>
@@ -301,9 +301,9 @@ export default function StorefrontView({
             {purityBadges.map((badge, idx) => (
               <div
                 key={idx}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#FDFBF7] border border-[#C5A059]/40 text-xs font-semibold text-[#8C6D28] shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#F9F8F6] border border-[#D4AF37]/40 text-xs font-semibold text-[#D4AF37] shadow-2xs"
               >
-                <Check size={13} className="text-[#4A5D4E]" />
+                <Check size={13} className="text-[#1E3A8A]" />
                 <span>{isAmharic ? badge.textAm : badge.text}</span>
               </div>
             ))}
@@ -312,7 +312,7 @@ export default function StorefrontView({
       </section>
 
       {/* Main Catalog Section */}
-      <section className="py-12 bg-[#FDFBF7]">
+      <section className="py-12 bg-[#F9F8F6]">
         <div className="container mx-auto px-4 max-w-7xl">
           {/* Subcategory Filter Pills */}
           <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
@@ -320,8 +320,8 @@ export default function StorefrontView({
               onClick={() => setSelectedSubcategory('all')}
               className={`px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
                 selectedSubcategory === 'all'
-                  ? 'bg-[#4A5D4E] text-white shadow-sm'
-                  : 'bg-white border border-[#E0D6C8] text-slate-700 hover:bg-[#F4EFEA]'
+                  ? 'bg-[#1E3A8A] text-[#F4F1EA] shadow-sm'
+                  : 'bg-white border border-[#E5DFD7] text-slate-700 hover:bg-[#F4EFEA]'
               }`}
             >
               {isAmharic ? 'ሁሉም ስብስቦች' : 'All Collections'}
@@ -332,8 +332,8 @@ export default function StorefrontView({
                 onClick={() => setSelectedSubcategory(sub.id)}
                 className={`px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer ${
                   selectedSubcategory === sub.id
-                    ? 'bg-[#4A5D4E] text-white shadow-sm'
-                    : 'bg-white border border-[#E0D6C8] text-slate-700 hover:bg-[#F4EFEA]'
+                    ? 'bg-[#1E3A8A] text-[#F4F1EA] shadow-sm'
+                    : 'bg-white border border-[#E5DFD7] text-slate-700 hover:bg-[#F4EFEA]'
                 }`}
               >
                 {isAmharic ? sub.nameAm : sub.name}
@@ -342,7 +342,7 @@ export default function StorefrontView({
           </div>
 
           {/* Search, Stock, and Sort Bar */}
-          <div className="bg-white rounded-2xl border border-[#E0D6C8] p-4 mb-10 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="bg-white rounded-2xl border border-[#E5DFD7] p-4 mb-10 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Search */}
             <div className="relative w-full md:w-80">
               <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -351,18 +351,18 @@ export default function StorefrontView({
                 placeholder={isAmharic ? 'በዚህ ስብስብ ውስጥ ፈልግ...' : `Search in ${title}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm bg-[#FDFBF7] border border-[#E0D6C8] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A5D4E]"
+                className="w-full pl-10 pr-4 py-2 text-sm bg-[#F9F8F6] border border-[#E5DFD7] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]"
               />
             </div>
 
             {/* Filters */}
             <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
               {/* Stock Filter */}
-              <div className="flex items-center gap-1 bg-[#FDFBF7] p-1 rounded-xl border border-[#E0D6C8] text-xs">
+              <div className="flex items-center gap-1 bg-[#F9F8F6] p-1 rounded-xl border border-[#E5DFD7] text-xs">
                 <button
                   onClick={() => setStockFilter('all')}
                   className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
-                    stockFilter === 'all' ? 'bg-white text-[#4A5D4E] shadow-2xs' : 'text-slate-600'
+                    stockFilter === 'all' ? 'bg-white text-[#1E3A8A] shadow-2xs' : 'text-slate-600'
                   }`}
                 >
                   {isAmharic ? 'ሁሉም' : 'All'}
@@ -370,7 +370,7 @@ export default function StorefrontView({
                 <button
                   onClick={() => setStockFilter('in_stock')}
                   className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
-                    stockFilter === 'in_stock' ? 'bg-white text-[#4A5D4E] shadow-2xs' : 'text-slate-600'
+                    stockFilter === 'in_stock' ? 'bg-white text-[#1E3A8A] shadow-2xs' : 'text-slate-600'
                   }`}
                 >
                   {isAmharic ? 'ያሉ' : 'In Stock'}
@@ -378,7 +378,7 @@ export default function StorefrontView({
                 <button
                   onClick={() => setStockFilter('preorder')}
                   className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
-                    stockFilter === 'preorder' ? 'bg-white text-[#4A5D4E] shadow-2xs' : 'text-slate-600'
+                    stockFilter === 'preorder' ? 'bg-white text-[#1E3A8A] shadow-2xs' : 'text-slate-600'
                   }`}
                 >
                   {isAmharic ? 'ቅድመ-ትዕዛዝ' : 'Pre-Order'}
@@ -389,7 +389,7 @@ export default function StorefrontView({
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="px-3.5 py-2 text-xs bg-[#FDFBF7] border border-[#E0D6C8] rounded-xl text-slate-700 font-medium focus:outline-none cursor-pointer"
+                className="px-3.5 py-2 text-xs bg-[#F9F8F6] border border-[#E5DFD7] rounded-xl text-slate-700 font-medium focus:outline-none cursor-pointer"
               >
                 <option value="popularity">{isAmharic ? 'በተወዳጅነት' : 'Most Popular'}</option>
                 <option value="newest">{isAmharic ? 'አዳዲስ' : 'Newest'}</option>
@@ -407,7 +407,7 @@ export default function StorefrontView({
               ))}
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-[#E0D6C8] p-12 text-center max-w-md mx-auto shadow-xs">
+            <div className="bg-white rounded-3xl border border-[#E5DFD7] p-12 text-center max-w-md mx-auto shadow-xs">
               <ShoppingBag size={48} className="mx-auto text-slate-300 mb-4" />
               <h3 className="text-lg font-serif font-bold text-slate-800 mb-2">
                 {isAmharic ? 'ምንም እቃዎች አልተገኙም' : 'No Products Found'}
@@ -423,7 +423,7 @@ export default function StorefrontView({
                   setStockFilter('all');
                   setSearchQuery('');
                 }}
-                className="px-5 py-2 rounded-xl bg-[#4A5D4E] text-white text-xs font-semibold"
+                className="px-5 py-2 rounded-xl bg-[#1E3A8A] text-[#F4F1EA] text-xs font-semibold"
               >
                 {isAmharic ? 'ማጣሪያዎችን አጽዳ' : 'Reset Filters'}
               </button>
@@ -434,7 +434,7 @@ export default function StorefrontView({
                 <div
                   key={product.id}
                   onClick={() => handleOpenQuickView(product)}
-                  className="group relative bg-white rounded-2xl border border-[#E0D6C8] hover:border-[#4A5D4E]/40 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
+                  className="group relative bg-white rounded-2xl border border-[#E5DFD7] hover:border-[#1E3A8A]/40 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
                 >
                   {/* Image Container */}
                   <div className="aspect-[4/5] relative overflow-hidden bg-[#F4EFEA]">
@@ -451,13 +451,13 @@ export default function StorefrontView({
                       {product.badges?.map((badge) => (
                         <span
                           key={badge}
-                          className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/90 backdrop-blur-md text-[#4A5D4E] shadow-2xs"
+                          className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/90 backdrop-blur-md text-[#1E3A8A] shadow-2xs"
                         >
                           {badge}
                         </span>
                       ))}
                       {isItemPreorder(product) && (
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#C5A059] text-white shadow-2xs">
+                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#D4AF37] text-[#111827] shadow-2xs font-semibold">
                           {isAmharic ? 'ቅድመ-ትዕዛዝ' : 'Pre-Order'}
                         </span>
                       )}
@@ -489,10 +489,10 @@ export default function StorefrontView({
                   {/* Product Details */}
                   <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
                     <div>
-                      <div className="text-[11px] font-semibold text-[#C5A059] uppercase tracking-wider mb-1">
+                      <div className="text-[11px] font-semibold text-[#D4AF37] uppercase tracking-wider mb-1">
                         {product.subcategory || serviceId}
                       </div>
-                      <h3 className="font-serif font-bold text-base text-[#2B2D2F] group-hover:text-[#4A5D4E] transition-colors line-clamp-1 mb-1.5">
+                      <h3 className="font-serif font-bold text-base text-[#111827] group-hover:text-[#1E3A8A] transition-colors line-clamp-1 mb-1.5">
                         {product.name}
                       </h3>
                       <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-4">
@@ -502,7 +502,7 @@ export default function StorefrontView({
 
                     <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
                       <div>
-                        <div className="font-sans font-bold text-base text-[#2B2D2F]">
+                        <div className="font-sans font-bold text-base text-[#111827]">
                           {formatPrice(product.price)}
                         </div>
                         {product.originalPrice && product.originalPrice > product.price && (
@@ -519,7 +519,7 @@ export default function StorefrontView({
                             e.stopPropagation();
                             handleAddToCart(product);
                           }}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#4A5D4E] hover:bg-[#3d4d40] text-white transition-all shadow-2xs cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#1E3A8A] hover:bg-[#172554] text-[#F4F1EA] transition-all shadow-2xs cursor-pointer"
                         >
                           <ShoppingBag size={14} />
                           <span>{isAmharic ? 'ይግዙ' : 'Add'}</span>
@@ -531,7 +531,7 @@ export default function StorefrontView({
                             e.stopPropagation();
                             handleAddToCart(product);
                           }}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#C5A059] hover:bg-[#b08b45] text-white transition-all shadow-2xs cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#D4AF37] hover:bg-[#B4942E] text-[#111827] transition-all shadow-2xs cursor-pointer"
                         >
                           <Clock size={14} />
                           <span>{isAmharic ? 'ቅድመ-ይዘዙ' : 'Pre-Order'}</span>
@@ -633,7 +633,7 @@ export default function StorefrontView({
                         onClick={() => setActiveImageIdx(idx)}
                         className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden relative shrink-0 border-2 transition-all cursor-pointer ${
                           activeImageIdx === idx
-                            ? 'border-[#4A5D4E] ring-2 ring-[#4A5D4E]/30 scale-102'
+                            ? 'border-[#1E3A8A] ring-2 ring-[#1E3A8A]/30 scale-102'
                             : 'border-slate-200 opacity-60 hover:opacity-100 hover:border-slate-400'
                         }`}
                       >
@@ -653,13 +653,13 @@ export default function StorefrontView({
               {/* Product Info */}
               <div className="flex flex-col justify-between">
                 <div>
-                  <span className="text-xs font-semibold text-[#C5A059] uppercase tracking-wider">
+                  <span className="text-xs font-semibold text-[#D4AF37] uppercase tracking-wider">
                     {quickViewProduct.subcategory}
                   </span>
-                  <h2 className="text-2xl font-serif font-bold text-[#2B2D2F] mt-1 mb-2">
+                  <h2 className="text-2xl font-serif font-bold text-[#111827] mt-1 mb-2">
                     {quickViewProduct.name}
                   </h2>
-                  <div className="text-xl font-bold text-[#4A5D4E] mb-4">
+                  <div className="text-xl font-bold text-[#1E3A8A] mb-4">
                     {formatPrice(quickViewProduct.price)}
                   </div>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
@@ -678,7 +678,7 @@ export default function StorefrontView({
                         </span>
                       </div>
                     ) : isItemPreorder(quickViewProduct) ? (
-                      <div className="bg-[#C5A059]/10 border border-[#C5A059]/30 rounded-xl p-3 text-xs text-[#8C6D28]">
+                      <div className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-xl p-3 text-xs text-[#8C6D28]">
                         <div className="flex items-center gap-1.5 font-bold mb-1">
                           <Clock size={14} />
                           <span>{isAmharic ? 'ለቅድመ-ትዕዛዝ ዝግጁ ነው' : 'Available for Pre-Order'}</span>
@@ -710,7 +710,7 @@ export default function StorefrontView({
                             onClick={() => setSelectedSize(s)}
                             className={`px-3 py-1.5 rounded-lg text-xs font-medium border ${
                               selectedSize === s
-                                ? 'border-[#4A5D4E] bg-[#4A5D4E] text-white'
+                                ? 'border-[#1E3A8A] bg-[#1E3A8A] text-white'
                                 : 'border-slate-200 text-slate-700 hover:border-slate-300'
                             }`}
                           >
@@ -747,9 +747,9 @@ export default function StorefrontView({
                     disabled={isItemOutOfStock(quickViewProduct)}
                     className={`flex-1 py-3 rounded-xl font-medium text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md ${
                       isItemInStock(quickViewProduct)
-                        ? 'bg-[#4A5D4E] hover:bg-[#3d4d40] text-white cursor-pointer'
+                        ? 'bg-[#1E3A8A] hover:bg-[#172554] text-white cursor-pointer'
                         : isItemPreorder(quickViewProduct)
-                        ? 'bg-[#C5A059] hover:bg-[#b08b45] text-white cursor-pointer'
+                        ? 'bg-[#D4AF37] hover:bg-[#B4942E] text-[#111827] font-semibold cursor-pointer'
                         : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
                     }`}
                   >
@@ -776,7 +776,7 @@ export default function StorefrontView({
                 <div className="pt-3 text-center">
                   <Link
                     href={`/${serviceId}/products/${quickViewProduct.id}`}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#4A5D4E] hover:text-[#2B2D2F] transition-colors group cursor-pointer"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1E3A8A] hover:text-[#0B192C] transition-colors group cursor-pointer"
                   >
                     <span>{isAmharic ? 'ሙሉ ዝርዝሮችን ይመልከቱ' : 'View Full Product Details'}</span>
                     <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />

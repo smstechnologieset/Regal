@@ -189,21 +189,21 @@ export default function Header() {
           "z-50 transition-all duration-300 w-full",
           isMainPage ? "fixed top-0 left-0" : "sticky top-0",
           scrolled
-            ? "bg-[#FDFBF7]/90 backdrop-blur-md border-b border-[#E0D6C8] shadow-xs"
+            ? "bg-[#F9F8F6]/90 backdrop-blur-md border-b border-[#E5DFD7] shadow-xs"
             : isMainPage
             ? "bg-transparent border-transparent pt-2"
-            : "bg-[#FDFBF7] border-b border-[#E0D6C8]"
+            : "bg-[#F9F8F6] border-b border-[#E5DFD7]"
         )}
       >
         {/* Attire Free Shipping Notice */}
         {isAttireSection && (
-          <div className="bg-[#4A5D4E] text-[#FDFBF7] text-center py-2 text-xs sm:text-sm border-b border-[#C5A059]/20 font-sans">
+          <div className="bg-[#0B192C] text-[#F4F1EA] text-center py-2 text-xs sm:text-sm border-b border-[#D4AF37]/30 font-sans">
             <p className="px-4">
               ✨{" "}
               {isAmharic
                 ? "ከ 500 ብር በላይ ለሆኑ ትዕዛዞች ነፃ ማድረስ | ኮድ ይጠቀሙ: "
                 : "Free shipping on orders over ETB 500 | Use code: "}
-              <span className="font-bold text-[#C5A059]">SAVE20</span>
+              <span className="font-bold text-[#D4AF37]">SAVE20</span>
             </p>
           </div>
         )}
@@ -216,7 +216,7 @@ export default function Header() {
               {/* Mobile Menu Button */}
               <button
                 onClick={toggleMobileMenu}
-                className="lg:hidden p-2 -ml-2 text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
+                className="lg:hidden p-2 -ml-2 text-[#111827] hover:text-[#1E3A8A] transition-colors"
                 aria-label="Toggle menu"
               >
                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -235,7 +235,7 @@ export default function Header() {
                       >
                         <Link
                           href={`/attire/products?category=${category.slug}`}
-                          className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
+                          className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-[#111827] hover:text-[#1E3A8A] transition-colors"
                         >
                           {category.name}
                           {category.subcategories && (
@@ -249,7 +249,7 @@ export default function Header() {
                         </Link>
                         {category.subcategories && activeDropdown === category.id && (
                           <div
-                            className="absolute top-full left-0 mt-0 w-48 bg-[#FDFBF7] rounded-xl shadow-lg border border-[#E0D6C8] py-2 animate-fade-in"
+                            className="absolute top-full left-0 mt-0 w-48 bg-[#F9F8F6] rounded-xl shadow-lg border border-[#E5DFD7] py-2 animate-fade-in"
                             onMouseEnter={() => handleMouseEnter(category.id)}
                             onMouseLeave={handleMouseLeave}
                           >
@@ -257,7 +257,7 @@ export default function Header() {
                               <Link
                                 key={sub.id}
                                 href={`/attire/products?category=${category.slug}&subcategory=${sub.slug}`}
-                                className="block px-4 py-2 text-sm text-[#2B2D2F]/80 hover:text-[#4A5D4E] hover:bg-[#F4EFEA] transition-colors"
+                                className="block px-4 py-2 text-sm text-[#111827]/80 hover:text-[#1E3A8A] hover:bg-[#F4EFEA] transition-colors"
                               >
                                 {sub.name}
                               </Link>
@@ -268,7 +268,7 @@ export default function Header() {
                     ))}
                     <Link
                       href="/attire/products?sale=true"
-                      className="px-3 py-2 text-sm font-medium text-[#C5A059] hover:text-[#af8b45] transition-colors"
+                      className="px-3 py-2 text-sm font-medium text-[#D4AF37] hover:text-[#B4942E] transition-colors"
                     >
                       {isAmharic ? "ቅናሾች" : "Sale"}
                     </Link>
@@ -281,23 +281,23 @@ export default function Header() {
                       onMouseEnter={() => setIsServicesOpen(true)}
                       onMouseLeave={() => setIsServicesOpen(false)}
                     >
-                      <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors">
+                      <button className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-[#111827] hover:text-[#1E3A8A] transition-colors">
                         <span>{t.nav.services}</span>
                         <ChevronDown
                           size={13}
                           className={`transition-transform duration-200 ${
-                            isServicesOpen ? "rotate-180 text-[#4A5D4E]" : ""
+                            isServicesOpen ? "rotate-180 text-[#1E3A8A]" : ""
                           }`}
                         />
                       </button>
 
                       {isServicesOpen && (
                         <div
-                          className="absolute top-full left-0 mt-0 w-72 bg-[#FDFBF7] rounded-2xl shadow-xl border border-[#E0D6C8] py-2 animate-fade-in"
+                          className="absolute top-full left-0 mt-0 w-72 bg-[#F9F8F6] rounded-2xl shadow-xl border border-[#E5DFD7] py-2 animate-fade-in"
                           onMouseEnter={() => setIsServicesOpen(true)}
                           onMouseLeave={() => setIsServicesOpen(false)}
                         >
-                          <div className="px-4 py-2 border-b border-[#E0D6C8]/60 text-[11px] font-semibold text-[#C5A059] uppercase tracking-wider">
+                          <div className="px-4 py-2 border-b border-[#E5DFD7]/60 text-[11px] font-semibold text-[#D4AF37] uppercase tracking-wider">
                             {t.services.tagline}
                           </div>
                           {servicesList.map((service) => (
@@ -306,14 +306,14 @@ export default function Header() {
                               href={service.href}
                               className="flex items-start gap-3 px-4 py-2.5 text-sm hover:bg-[#F4EFEA] transition-colors group"
                             >
-                              <div className="w-8 h-8 rounded-lg bg-[#4A5D4E]/10 text-[#4A5D4E] group-hover:bg-[#4A5D4E] group-hover:text-[#FDFBF7] transition-colors flex items-center justify-center shrink-0 mt-0.5">
+                              <div className="w-8 h-8 rounded-lg bg-[#1E3A8A]/10 text-[#1E3A8A] group-hover:bg-[#1E3A8A] group-hover:text-[#F4F1EA] transition-colors flex items-center justify-center shrink-0 mt-0.5">
                                 <service.icon size={16} />
                               </div>
                               <div>
-                                <div className="font-serif font-bold text-[#2B2D2F] group-hover:text-[#4A5D4E]">
+                                <div className="font-serif font-bold text-[#111827] group-hover:text-[#1E3A8A]">
                                   {service.name}
                                 </div>
-                                <div className="text-xs text-[#2B2D2F]/60 line-clamp-1">
+                                <div className="text-xs text-[#111827]/60 line-clamp-1">
                                   {service.description}
                                 </div>
                               </div>
@@ -325,13 +325,13 @@ export default function Header() {
 
                     <Link
                       href="/about"
-                      className="px-3 py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
+                      className="px-3 py-2 text-sm font-medium text-[#111827] hover:text-[#1E3A8A] transition-colors"
                     >
                       {t.nav.about}
                     </Link>
                     <Link
                       href="/contact"
-                      className="px-3 py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
+                      className="px-3 py-2 text-sm font-medium text-[#111827] hover:text-[#1E3A8A] transition-colors"
                     >
                       {t.nav.contact}
                     </Link>
@@ -358,11 +358,11 @@ export default function Header() {
                   />
                 </div>
                 <div className="flex flex-col items-start leading-none">
-                  <span className="text-xl sm:text-2xl md:text-3xl font-serif font-extrabold tracking-wider text-[#2B2D2F] group-hover:text-[#4A5D4E] transition-colors">
+                  <span className="text-xl sm:text-2xl md:text-3xl font-serif font-extrabold tracking-wider text-[#111827] group-hover:text-[#1E3A8A] transition-colors">
                     REGAL
                   </span>
                   {isAttireSection && (
-                    <span className="text-[10px] tracking-widest text-[#C5A059] font-medium font-sans uppercase">
+                    <span className="text-[10px] tracking-widest text-[#D4AF37] font-medium font-sans uppercase">
                       Attire
                     </span>
                   )}
@@ -382,17 +382,17 @@ export default function Header() {
                         placeholder={t.nav.searchPlaceholder}
                         value={localSearch}
                         onChange={(e) => setLocalSearch(e.target.value)}
-                        className="w-48 lg:w-64 pl-9 pr-4 py-1.5 text-xs sm:text-sm bg-white border border-[#E0D6C8] rounded-full text-[#2B2D2F] placeholder:text-[#2B2D2F]/40 focus:outline-none focus:border-[#4A5D4E] transition-all"
+                        className="w-48 lg:w-64 pl-9 pr-4 py-1.5 text-xs sm:text-sm bg-white border border-[#E5DFD7] rounded-full text-[#111827] placeholder:text-[#111827]/40 focus:outline-none focus:border-[#1E3A8A] transition-all"
                       />
                       <Search
                         size={15}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-[#2B2D2F]/50"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-[#111827]/50"
                       />
                     </form>
                   </div>
                   <button
                     onClick={() => setIsSearchOpen(true)}
-                    className="md:hidden p-2 text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
+                    className="md:hidden p-2 text-[#111827] hover:text-[#1E3A8A] transition-colors"
                     aria-label="Search"
                   >
                     <Search size={20} />
@@ -404,12 +404,12 @@ export default function Header() {
               {user && (
                 <Link
                   href="/attire/wishlist"
-                  className="hidden sm:flex relative p-2 text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
+                  className="hidden sm:flex relative p-2 text-[#111827] hover:text-[#1E3A8A] transition-colors"
                   aria-label="Wishlist"
                 >
                   <Heart size={20} />
                   {wishlistCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#C5A059] text-[#2B2D2F] text-[10px] font-bold rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#D4AF37] text-[#111827] text-[10px] font-bold rounded-full flex items-center justify-center">
                       {wishlistCount}
                     </span>
                   )}
@@ -428,16 +428,16 @@ export default function Header() {
                 <div className="hidden sm:flex items-center gap-1">
                   <Link
                     href="/account"
-                    className="p-1.5 text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors flex items-center gap-1.5 text-xs sm:text-sm font-medium"
+                    className="p-1.5 text-[#111827] hover:text-[#1E3A8A] transition-colors flex items-center gap-1.5 text-xs sm:text-sm font-medium"
                     aria-label="Account"
                   >
-                    <div className="w-8 h-8 rounded-full bg-[#4A5D4E]/10 text-[#4A5D4E] flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-[#1E3A8A]/10 text-[#1E3A8A] flex items-center justify-center">
                       <User size={16} />
                     </div>
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="p-1.5 text-[#2B2D2F]/60 hover:text-rose-600 transition-colors"
+                    className="p-1.5 text-[#111827]/60 hover:text-rose-600 transition-colors"
                     title={t.nav.signOut}
                   >
                     <LogOut size={18} />
@@ -446,7 +446,7 @@ export default function Header() {
               ) : (
                 <Link
                   href="/login"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#4A5D4E] text-[#4A5D4E] hover:bg-[#4A5D4E] hover:text-[#FDFBF7] transition-all text-xs sm:text-sm font-medium"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#1E3A8A] text-[#1E3A8A] hover:bg-[#1E3A8A] hover:text-[#F4F1EA] transition-all text-xs sm:text-sm font-medium"
                   aria-label="Sign In"
                 >
                   <User size={15} />
@@ -457,12 +457,12 @@ export default function Header() {
               {/* Cart Drawer Toggle (Desktop & Tablet only, hidden on mobile) */}
               <button
                 onClick={toggleCart}
-                className="hidden sm:flex relative p-2 text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors cursor-pointer"
+                className="hidden sm:flex relative p-2 text-[#111827] hover:text-[#1E3A8A] transition-colors cursor-pointer"
                 aria-label="Cart"
               >
                 <ShoppingBag size={20} />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#4A5D4E] text-[#FDFBF7] text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#1E3A8A] text-[#F4F1EA] text-[10px] font-bold rounded-full flex items-center justify-center">
                     {cartCount > 99 ? "99+" : cartCount}
                   </span>
                 )}
@@ -471,7 +471,7 @@ export default function Header() {
               {/* Compact Language Toggle (Far Right) */}
               <button
                 onClick={toggleLocale}
-                className="px-2.5 py-1 rounded-full border border-[#E0D6C8] bg-white/90 hover:bg-[#F4EFEA] text-[#4A5D4E] hover:border-[#4A5D4E] transition-all text-xs font-bold shadow-2xs cursor-pointer min-w-[32px] text-center"
+                className="px-2.5 py-1 rounded-full border border-[#E5DFD7] bg-white/90 hover:bg-[#F4EFEA] text-[#1E3A8A] hover:border-[#1E3A8A] transition-all text-xs font-bold shadow-2xs cursor-pointer min-w-[32px] text-center"
                 title={isAmharic ? "Switch to English" : "ወደ አማርኛ ቀይር"}
               >
                 {isAmharic ? "EN" : "አማ"}
@@ -482,8 +482,8 @@ export default function Header() {
 
         {/* Mobile Search Overlay */}
         {isSearchOpen && (
-          <div className="fixed inset-0 z-50 bg-[#FDFBF7] md:hidden">
-            <div className="p-4 border-b border-[#E0D6C8]">
+          <div className="fixed inset-0 z-50 bg-[#F9F8F6] md:hidden">
+            <div className="p-4 border-b border-[#E5DFD7]">
               <form onSubmit={handleSearch} className="flex items-center gap-2">
                 <div className="flex-1 relative">
                   <input
@@ -492,17 +492,17 @@ export default function Header() {
                     placeholder={t.nav.searchPlaceholder}
                     value={localSearch}
                     onChange={(e) => setLocalSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 text-base bg-white border border-[#E0D6C8] rounded-xl text-[#2B2D2F] focus:outline-none focus:border-[#4A5D4E]"
+                    className="w-full pl-10 pr-4 py-3 text-base bg-white border border-[#E5DFD7] rounded-xl text-[#111827] focus:outline-none focus:border-[#1E3A8A]"
                   />
                   <Search
                     size={20}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#2B2D2F]/50"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[#111827]/50"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsSearchOpen(false)}
-                  className="p-2 text-[#2B2D2F] font-medium"
+                  className="p-2 text-[#111827] font-medium"
                 >
                   {t.common.cancel}
                 </button>
@@ -516,14 +516,14 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="absolute inset-0 bg-[#2B2D2F]/60 backdrop-blur-xs"
+            className="absolute inset-0 bg-[#0B192C]/70 backdrop-blur-xs"
             onClick={closeMobileMenu}
           />
 
-          <div className="absolute top-0 left-0 w-80 max-w-[85vw] h-full bg-[#FDFBF7] shadow-2xl overflow-y-auto animate-slide-in-left flex flex-col justify-between">
+          <div className="absolute top-0 left-0 w-80 max-w-[85vw] h-full bg-[#F9F8F6] shadow-2xl overflow-y-auto animate-slide-in-left flex flex-col justify-between">
             <div>
               {/* Drawer Top Header */}
-              <div className="p-4 border-b border-[#E0D6C8] flex items-center justify-between">
+              <div className="p-4 border-b border-[#E5DFD7] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Image
                     src="/Logo-bg.png"
@@ -532,21 +532,21 @@ export default function Header() {
                     height={36}
                     className="h-8 w-auto object-contain"
                   />
-                  <span className="text-xl font-serif font-bold text-[#2B2D2F]">
+                  <span className="text-xl font-serif font-bold text-[#111827]">
                     REGAL
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={toggleLocale}
-                    className="px-2.5 py-0.5 rounded-full border border-[#E0D6C8] bg-white text-xs font-bold text-[#4A5D4E] cursor-pointer"
+                    className="px-2.5 py-0.5 rounded-full border border-[#E5DFD7] bg-white text-xs font-bold text-[#1E3A8A] cursor-pointer"
                     title={isAmharic ? "Switch to English" : "ወደ አማርኛ ቀይር"}
                   >
                     {isAmharic ? "EN" : "አማ"}
                   </button>
                   <button
                     onClick={closeMobileMenu}
-                    className="p-1.5 text-[#2B2D2F]/70 hover:text-[#2B2D2F] rounded-lg hover:bg-[#F4EFEA] transition-colors"
+                    className="p-1.5 text-[#111827]/70 hover:text-[#111827] rounded-lg hover:bg-[#F4EFEA] transition-colors"
                     aria-label="Close menu"
                   >
                     <X size={20} />
@@ -557,40 +557,40 @@ export default function Header() {
               {/* Navigation Items */}
               <nav className="p-4 space-y-3">
                 {/* Services Collapsible Dropdown */}
-                <div className="border border-[#E0D6C8]/70 rounded-xl overflow-hidden bg-white/60">
+                <div className="border border-[#E5DFD7]/70 rounded-xl overflow-hidden bg-white/60">
                   <button
                     onClick={() => setIsMobileServicesOpen(!isMobileServicesOpen)}
-                    className="flex items-center justify-between w-full p-3 text-sm font-semibold text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors cursor-pointer"
+                    className="flex items-center justify-between w-full p-3 text-sm font-semibold text-[#111827] hover:text-[#1E3A8A] transition-colors cursor-pointer"
                     aria-expanded={isMobileServicesOpen}
                   >
-                    <span className="text-xs font-bold text-[#C5A059] uppercase tracking-wider font-sans">
+                    <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider font-sans">
                       {t.nav.services}
                     </span>
                     <ChevronDown
                       size={16}
-                      className={`transition-transform duration-200 text-[#4A5D4E] ${
+                      className={`transition-transform duration-200 text-[#1E3A8A] ${
                         isMobileServicesOpen ? "rotate-180" : ""
                       }`}
                     />
                   </button>
 
                   {isMobileServicesOpen && (
-                    <div className="px-2 pb-2 space-y-1 border-t border-[#E0D6C8]/40 pt-2 animate-fade-in">
+                    <div className="px-2 pb-2 space-y-1 border-t border-[#E5DFD7]/40 pt-2 animate-fade-in">
                       {servicesList.map((service) => (
                         <Link
                           key={service.name}
                           href={service.href}
                           onClick={closeMobileMenu}
-                          className="flex items-center gap-3 p-2 rounded-lg text-[#2B2D2F] hover:bg-[#F4EFEA] hover:text-[#4A5D4E] transition-colors"
+                          className="flex items-center gap-3 p-2 rounded-lg text-[#111827] hover:bg-[#F4EFEA] hover:text-[#1E3A8A] transition-colors"
                         >
-                          <div className="w-7 h-7 rounded-md bg-[#4A5D4E]/10 text-[#4A5D4E] flex items-center justify-center shrink-0">
+                          <div className="w-7 h-7 rounded-md bg-[#1E3A8A]/10 text-[#1E3A8A] flex items-center justify-center shrink-0">
                             <service.icon size={14} />
                           </div>
                           <div>
                             <div className="font-serif font-bold text-xs">
                               {service.name}
                             </div>
-                            <div className="text-[11px] text-[#2B2D2F]/60 line-clamp-1">
+                            <div className="text-[11px] text-[#111827]/60 line-clamp-1">
                               {service.description}
                             </div>
                           </div>
@@ -601,21 +601,21 @@ export default function Header() {
                 </div>
 
                 {/* Company Links */}
-                <div className="pt-2 border-t border-[#E0D6C8]">
-                  <p className="text-xs font-semibold text-[#C5A059] uppercase tracking-wider mb-2 font-sans">
+                <div className="pt-2 border-t border-[#E5DFD7]">
+                  <p className="text-xs font-semibold text-[#D4AF37] uppercase tracking-wider mb-2 font-sans">
                     {t.footer.colPhilosophy}
                   </p>
                   <Link
                     href="/about"
                     onClick={closeMobileMenu}
-                    className="block py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
+                    className="block py-2 text-sm font-medium text-[#111827] hover:text-[#1E3A8A] transition-colors"
                   >
                     {t.nav.about}
                   </Link>
                   <Link
                     href="/contact"
                     onClick={closeMobileMenu}
-                    className="block py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
+                    className="block py-2 text-sm font-medium text-[#111827] hover:text-[#1E3A8A] transition-colors"
                   >
                     {t.nav.contact}
                   </Link>
@@ -624,16 +624,16 @@ export default function Header() {
             </div>
 
             {/* Drawer Bottom Account Section */}
-            <div className="p-4 border-t border-[#E0D6C8] bg-white">
+            <div className="p-4 border-t border-[#E5DFD7] bg-white">
               {user ? (
                 <div className="space-y-2">
-                  <div className="flex items-center gap-3 pb-3 border-b border-[#E0D6C8]/60">
-                    <div className="w-9 h-9 rounded-full bg-[#4A5D4E]/10 text-[#4A5D4E] flex items-center justify-center font-bold text-sm shrink-0">
+                  <div className="flex items-center gap-3 pb-3 border-b border-[#E5DFD7]/60">
+                    <div className="w-9 h-9 rounded-full bg-[#1E3A8A]/10 text-[#1E3A8A] flex items-center justify-center font-bold text-sm shrink-0">
                       <User size={18} />
                     </div>
                     <div className="overflow-hidden">
-                      <p className="text-[11px] text-[#2B2D2F]/60 font-sans leading-tight">{t.nav.account}</p>
-                      <p className="text-sm font-semibold text-[#2B2D2F] truncate leading-tight mt-0.5">{user.email}</p>
+                      <p className="text-[11px] text-[#111827]/60 font-sans leading-tight">{t.nav.account}</p>
+                      <p className="text-sm font-semibold text-[#111827] truncate leading-tight mt-0.5">{user.email}</p>
                     </div>
                   </div>
 
@@ -643,14 +643,14 @@ export default function Header() {
                       closeMobileMenu();
                       toggleCart();
                     }}
-                    className="flex items-center justify-between w-full py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors cursor-pointer"
+                    className="flex items-center justify-between w-full py-2 text-sm font-medium text-[#111827] hover:text-[#1E3A8A] transition-colors cursor-pointer"
                   >
                     <span className="flex items-center gap-2.5">
-                      <ShoppingBag size={16} className="text-[#4A5D4E]" />
+                      <ShoppingBag size={16} className="text-[#1E3A8A]" />
                       {t.nav.cart || "Cart"}
                     </span>
                     {cartCount > 0 && (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#4A5D4E] text-[#FDFBF7]">
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#1E3A8A] text-[#F4F1EA]">
                         {cartCount > 99 ? "99+" : cartCount}
                       </span>
                     )}
@@ -660,14 +660,14 @@ export default function Header() {
                   <Link
                     href="/attire/wishlist"
                     onClick={closeMobileMenu}
-                    className="flex items-center justify-between py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
+                    className="flex items-center justify-between py-2 text-sm font-medium text-[#111827] hover:text-[#1E3A8A] transition-colors"
                   >
                     <span className="flex items-center gap-2.5">
-                      <Heart size={16} className="text-[#C5A059]" />
+                      <Heart size={16} className="text-[#D4AF37]" />
                       {t.nav.wishlist || "Wishlist"}
                     </span>
                     {wishlistCount > 0 && (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#C5A059] text-[#2B2D2F]">
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#D4AF37] text-[#111827]">
                         {wishlistCount}
                       </span>
                     )}
@@ -677,9 +677,9 @@ export default function Header() {
                   <Link
                     href="/account"
                     onClick={closeMobileMenu}
-                    className="flex items-center gap-2.5 py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors"
+                    className="flex items-center gap-2.5 py-2 text-sm font-medium text-[#111827] hover:text-[#1E3A8A] transition-colors"
                   >
-                    <User size={16} className="text-[#4A5D4E]" />
+                    <User size={16} className="text-[#1E3A8A]" />
                     {t.nav.account}
                   </Link>
 
@@ -703,31 +703,31 @@ export default function Header() {
                       closeMobileMenu();
                       toggleCart();
                     }}
-                    className="flex items-center justify-between w-full py-2 text-sm font-medium text-[#2B2D2F] hover:text-[#4A5D4E] transition-colors cursor-pointer"
+                    className="flex items-center justify-between w-full py-2 text-sm font-medium text-[#111827] hover:text-[#1E3A8A] transition-colors cursor-pointer"
                   >
                     <span className="flex items-center gap-2.5">
-                      <ShoppingBag size={16} className="text-[#4A5D4E]" />
+                      <ShoppingBag size={16} className="text-[#1E3A8A]" />
                       {t.nav.cart || "Cart"}
                     </span>
                     {cartCount > 0 && (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#4A5D4E] text-[#FDFBF7]">
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-[#1E3A8A] text-[#F4F1EA]">
                         {cartCount > 99 ? "99+" : cartCount}
                       </span>
                     )}
                   </button>
 
-                  <div className="flex gap-2 pt-1 border-t border-[#E0D6C8]/60">
+                  <div className="flex gap-2 pt-1 border-t border-[#E5DFD7]/60">
                     <Link
                       href="/login"
                       onClick={closeMobileMenu}
-                      className="flex-1 py-2 text-center text-sm font-medium rounded-lg border border-[#4A5D4E] text-[#4A5D4E]"
+                      className="flex-1 py-2 text-center text-sm font-medium rounded-lg border border-[#1E3A8A] text-[#1E3A8A]"
                     >
                       {t.nav.signIn}
                     </Link>
                     <Link
                       href="/register"
                       onClick={closeMobileMenu}
-                      className="flex-1 py-2 text-center text-sm font-medium rounded-lg bg-[#4A5D4E] text-[#FDFBF7]"
+                      className="flex-1 py-2 text-center text-sm font-medium rounded-lg bg-[#1E3A8A] text-[#F4F1EA]"
                     >
                       {isAmharic ? "ይመዝገቡ" : "Register"}
                     </Link>

@@ -255,18 +255,18 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-[#F9F8F6] w-full max-w-full overflow-x-hidden">
       <div className="w-full max-w-5xl mx-auto px-3.5 sm:px-6 py-5 sm:py-8 min-w-0">
         {/* Back button */}
         <Link
           href="/attire/cart"
-          className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-slate-600 hover:text-primary mb-3 sm:mb-5 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-slate-600 hover:text-[#1E3A8A] mb-3 sm:mb-5 transition-colors"
         >
           <ChevronLeft size={16} />
           Back to Cart
         </Link>
 
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-primary mb-5 sm:mb-8 font-serif">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#111827] mb-5 sm:mb-8 font-serif">
           Checkout
         </h1>
 
@@ -275,12 +275,12 @@ export default function CheckoutPage() {
             {/* Checkout Form */}
             <div className="w-full min-w-0 max-w-full lg:col-span-2 space-y-4 sm:space-y-6">
               {/* Shipping Information */}
-              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs w-full max-w-full min-w-0">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-[#E5DFD7] shadow-xs w-full max-w-full min-w-0">
                 <div className="flex items-center gap-3 mb-5 sm:mb-6">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-slate-100 rounded-full flex items-center justify-center shrink-0">
-                    <Truck size={18} className="text-slate-600" />
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-[#F4EFEA] rounded-full flex items-center justify-center shrink-0">
+                    <Truck size={18} className="text-[#1E3A8A]" />
                   </div>
-                  <h2 className="text-base sm:text-lg font-semibold text-primary font-serif">
+                  <h2 className="text-base sm:text-lg font-semibold text-[#111827] font-serif">
                     Shipping Information
                   </h2>
                 </div>
@@ -366,7 +366,7 @@ export default function CheckoutPage() {
                       name="country"
                       value={formData.country}
                       onChange={handleChange}
-                      className="w-full min-w-0 px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+                      className="w-full min-w-0 px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]"
                     >
                       <option value="Ethiopia">Ethiopia</option>
                       <option value="United States">United States</option>
@@ -378,12 +378,12 @@ export default function CheckoutPage() {
               </div>
 
               {/* Payment Method */}
-              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs w-full max-w-full min-w-0">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-[#E5DFD7] shadow-xs w-full max-w-full min-w-0">
                 <div className="flex items-center gap-3 mb-5 sm:mb-6">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-slate-100 rounded-full flex items-center justify-center shrink-0">
-                    <CreditCard size={18} className="text-slate-600" />
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-[#F4EFEA] rounded-full flex items-center justify-center shrink-0">
+                    <CreditCard size={18} className="text-[#1E3A8A]" />
                   </div>
-                  <h2 className="text-base sm:text-lg font-semibold text-primary font-serif">
+                  <h2 className="text-base sm:text-lg font-semibold text-[#111827] font-serif">
                     Payment Method
                   </h2>
                 </div>
@@ -393,7 +393,7 @@ export default function CheckoutPage() {
                   <label
                     className={`flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 border-2 rounded-xl cursor-pointer transition-colors w-full min-w-0 ${
                       paymentMethod === "cod"
-                        ? "border-primary bg-slate-50/80"
+                        ? "border-[#1E3A8A] bg-[#F4EFEA]/60"
                         : "border-slate-200 hover:border-slate-300"
                     }`}
                   >
@@ -403,11 +403,11 @@ export default function CheckoutPage() {
                       value="cod"
                       checked={paymentMethod === "cod"}
                       onChange={() => setPaymentMethod("cod")}
-                      className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0 accent-[#4A5D4E]"
+                      className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 accent-[#1E3A8A]"
                     />
-                    <Banknote size={22} className="text-slate-600 shrink-0" />
+                    <Banknote size={22} className="text-[#1E3A8A] shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <span className="font-medium text-primary text-sm sm:text-base block truncate">
+                      <span className="font-medium text-[#111827] text-sm sm:text-base block truncate">
                         Cash on Delivery
                       </span>
                       <p className="text-xs sm:text-sm text-slate-500 truncate sm:whitespace-normal">
@@ -439,8 +439,8 @@ export default function CheckoutPage() {
 
             {/* Order Summary */}
             <div className="w-full min-w-0 max-w-full lg:col-span-1">
-              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-xs w-full min-w-0 lg:sticky lg:top-24">
-                <h2 className="text-base sm:text-lg font-semibold text-primary mb-4 font-serif">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-[#E5DFD7] shadow-xs w-full min-w-0 lg:sticky lg:top-24">
+                <h2 className="text-base sm:text-lg font-semibold text-[#111827] mb-4 font-serif">
                   Order Summary
                 </h2>
 
@@ -462,7 +462,7 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-primary truncate" title={item.product.name}>
+                        <p className="text-sm font-medium text-[#111827] truncate" title={item.product.name}>
                           {item.product.name}
                         </p>
                         <p
@@ -472,7 +472,7 @@ export default function CheckoutPage() {
                           {item.selectedSize} / {item.selectedColor.name} ×{" "}
                           {item.quantity}
                         </p>
-                        <p className="text-sm font-medium text-primary mt-0.5">
+                        <p className="text-sm font-medium text-[#1E3A8A] mt-0.5">
                           {formatPrice(item.product.price * item.quantity)}
                         </p>
                       </div>
@@ -487,7 +487,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                <div className="space-y-2.5 py-4 border-y border-slate-200 w-full min-w-0">
+                <div className="space-y-2.5 py-4 border-y border-[#E5DFD7] w-full min-w-0">
                   <div className="flex justify-between items-center text-sm gap-2">
                     <span className="text-slate-600 shrink-0">Subtotal</span>
                     <span className="font-medium text-right truncate">{formatPrice(subtotal)}</span>
@@ -512,12 +512,12 @@ export default function CheckoutPage() {
 
                 {/* Promo Code Input */}
                 {!appliedPromo ? (
-                  <div className="py-3.5 border-b border-slate-200 w-full min-w-0">
+                  <div className="py-3.5 border-b border-[#E5DFD7] w-full min-w-0">
                     <div className="flex gap-2 w-full min-w-0">
                       <input
                         type="text"
                         placeholder="PROMO CODE"
-                        className="flex-1 min-w-0 px-3 py-2 text-xs sm:text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-secondary/20 focus:border-secondary uppercase font-medium tracking-wider"
+                        className="flex-1 min-w-0 px-3 py-2 text-xs sm:text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] uppercase font-medium tracking-wider"
                         value={promoCodeInput}
                         onChange={(e) =>
                           setPromoCodeInput(e.target.value.toUpperCase())

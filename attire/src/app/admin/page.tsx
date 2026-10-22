@@ -110,7 +110,7 @@ export default function AdminDashboard() {
       label: "Total Users",
       value: stats.totalUsers.toLocaleString(),
       icon: Users,
-      color: "bg-purple-500",
+      color: "bg-[#1E3A8A]",
       change: "+5.1%",
     },
     {
@@ -315,10 +315,10 @@ export default function AdminDashboard() {
             </Link>
             <Link
               href="/admin/users"
-              className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-purple-200 hover:bg-purple-50 transition-all"
+              className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-[#1E3A8A]/30 hover:bg-[#1E3A8A]/5 transition-all"
             >
               <div className="flex items-center gap-3">
-                <Users className="text-purple-600" size={20} />
+                <Users className="text-[#1E3A8A]" size={20} />
                 <span className="font-medium text-primary">Manage Users</span>
               </div>
             </Link>

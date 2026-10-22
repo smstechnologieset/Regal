@@ -71,19 +71,19 @@ export default function NewsletterForm() {
             }}
             placeholder={t.newsletter.placeholder}
             suppressHydrationWarning
-            className="w-full px-4 py-3.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/60 focus:outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] transition-all text-sm font-sans"
+            className="w-full px-4 py-3.5 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/60 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all text-sm font-sans"
           />
           <Mail size={18} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/50" />
         </div>
         <button
           type="submit"
           disabled={status === "loading"}
-          className="px-7 py-3.5 bg-[#C5A059] hover:bg-[#b5924b] disabled:opacity-60 text-[#2B2D2F] font-semibold rounded-xl transition-all shadow-sm hover:shadow inline-flex items-center justify-center gap-2 text-sm shrink-0"
+          className="px-7 py-3.5 bg-[#D4AF37] hover:bg-[#B4942E] disabled:opacity-60 text-[#111827] font-semibold rounded-xl transition-all shadow-sm hover:shadow inline-flex items-center justify-center gap-2 text-sm shrink-0"
         >
           {status === "loading" ? (
-            <Loader2 size={16} className="animate-spin text-[#2B2D2F]" />
+            <Loader2 size={16} className="animate-spin text-[#111827]" />
           ) : status === "success" ? (
-            <Check size={16} className="text-[#2B2D2F]" />
+            <Check size={16} className="text-[#111827]" />
           ) : null}
           {t.newsletter.button}
         </button>
@@ -92,7 +92,7 @@ export default function NewsletterForm() {
       {message && (
         <p
           className={`mt-3 text-sm font-medium ${
-            status === "success" ? "text-[#C5A059]" : "text-rose-300"
+            status === "success" ? "text-[#D4AF37]" : "text-rose-300"
           }`}
           role="status"
         >
@@ -105,7 +105,7 @@ export default function NewsletterForm() {
         <span>{t.newsletter.callUsPrompt}</span>
         <a
           href="tel:+251912345678"
-          className="inline-flex items-center gap-1.5 font-semibold text-[#C5A059] hover:text-white transition-colors underline decoration-[#C5A059]/50 hover:decoration-white"
+          className="inline-flex items-center gap-1.5 font-semibold text-[#D4AF37] hover:text-white transition-colors underline decoration-[#D4AF37]/50 hover:decoration-white"
         >
           <Phone size={13} className="shrink-0" />
           <span>{t.newsletter.callUsAction}</span>

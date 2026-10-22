@@ -317,7 +317,7 @@ export default function SizeGuidePage() {
             {/* Bottom CTA */}
             <section className="container mx-auto px-4 mt-12">
                 <div className="bg-slate-900 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_30%,_#179c22_0%,_transparent_25%)] opacity-20" />
+                    <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 30% 30%, #D4AF37 0%, transparent 25%)' }} />
                     <div className="relative z-10">
                         <ShoppingBag size={48} className="text-secondary mx-auto mb-6 opacity-80" />
                         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to find your style?</h2>

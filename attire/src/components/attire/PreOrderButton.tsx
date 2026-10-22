@@ -69,7 +69,7 @@ export default function PreOrderButton({
       <button
         onClick={handlePreOrder}
         disabled={disabled || !canOrder}
-        className="w-full bg-[#C5A059] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#B38F4B] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-sm"
+        className="w-full bg-[#D4AF37] text-[#111827] py-3 px-6 rounded-lg font-bold hover:bg-[#B4942E] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-sm"
       >
         Pre-Order Now (ቅድመ-ይዘዙ)
       </button>
@@ -78,8 +78,8 @@ export default function PreOrderButton({
         <p className="text-sm text-gray-600 text-center">{estimatedDelivery}</p>
       )}
 
-      <div className="bg-[#C5A059]/10 border border-[#C5A059]/30 rounded-lg p-3">
-        <p className="text-xs text-[#2B2D2F]">
+      <div className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-lg p-3">
+        <p className="text-xs text-[#111827]">
           <strong>Pre-Order:</strong> This item is currently out of stock. Place
           your order now and we'll ship it as soon as it's available.
         </p>

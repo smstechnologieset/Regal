@@ -14,7 +14,7 @@ interface EventPackageCardProps {
 
 export default function EventPackageCard({ eventPackage }: EventPackageCardProps) {
     return (
-        <div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-slate-100 flex flex-col h-full">
+        <div className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-[#E5DFD7] flex flex-col h-full">
             {/* Image */}
             <div className="relative aspect-video overflow-hidden">
                 <Image
@@ -28,14 +28,14 @@ export default function EventPackageCard({ eventPackage }: EventPackageCardProps
 
                 {/* Type Badge */}
                 <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-xs font-semibold uppercase tracking-wider text-primary rounded-full">
+                    <span className="px-3 py-1 bg-white/95 backdrop-blur-sm text-xs font-semibold uppercase tracking-wider text-[#1E3A8A] rounded-full border border-[#E5DFD7]">
                         {eventPackage.type}
                     </span>
                 </div>
 
                 {/* Price Tag */}
                 <div className="absolute bottom-4 right-4">
-                    <div className="px-4 py-2 bg-secondary text-white font-bold rounded-lg shadow-lg">
+                    <div className="px-4 py-2 bg-[#1E3A8A] text-[#F4F1EA] font-bold rounded-xl shadow-lg">
                         From {formatPrice(eventPackage.priceStart)}
                     </div>
                 </div>
@@ -43,7 +43,7 @@ export default function EventPackageCard({ eventPackage }: EventPackageCardProps
 
             {/* Content */}
             <div className="p-6 flex-1 flex flex-col">
-                <h3 className="text-xl font-bold text-primary mb-2 group-hover:text-secondary transition-colors">
+                <h3 className="text-xl font-bold font-serif text-[#111827] mb-2 group-hover:text-[#1E3A8A] transition-colors">
                     {eventPackage.title}
                 </h3>
 
@@ -54,7 +54,7 @@ export default function EventPackageCard({ eventPackage }: EventPackageCardProps
                 {/* Capacity */}
                 {eventPackage.capacity && (
                     <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-                        <Users size={16} className="text-rose-500" />
+                        <Users size={16} className="text-[#D4AF37]" />
                         <span>{eventPackage.capacity}</span>
                     </div>
                 )}

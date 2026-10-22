@@ -110,7 +110,7 @@ function AdminSidebar({
                 {/* User Info */}
                 <div className="p-4 border-b border-slate-800 shrink-0">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1E3A8A] to-[#0B192C] border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] font-bold shadow-xs">
                             {profile?.full_name?.charAt(0) || 'A'}
                         </div>
                         <div className="flex-1 min-w-0">

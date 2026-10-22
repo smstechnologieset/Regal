@@ -27,11 +27,11 @@ export default function ServiceDisabledCard({ serviceId, serviceName }: ServiceD
   const storeServices = activeServices.filter((s) => s.isStore || s.id === 'attire');
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center bg-gradient-to-b from-[#F4EFEA] via-[#FDFBF7] to-[#FDFBF7] px-4 py-16">
-      <div className="max-w-2xl w-full bg-white/80 backdrop-blur-md border border-[#C5A059]/25 rounded-3xl p-8 sm:p-12 text-center shadow-xl relative overflow-hidden">
+    <div className="min-h-[80vh] flex items-center justify-center bg-gradient-to-b from-[#F4EFEA] via-[#F9F8F6] to-[#F9F8F6] px-4 py-16">
+      <div className="max-w-2xl w-full bg-white/80 backdrop-blur-md border border-[#D4AF37]/25 rounded-3xl p-8 sm:p-12 text-center shadow-xl relative overflow-hidden">
         {/* Decorative ambient glow */}
-        <div className="absolute -top-20 -right-20 w-56 h-56 bg-[#C5A059]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-20 -left-20 w-56 h-56 bg-[#4A5D4E]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-20 -right-20 w-56 h-56 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-56 h-56 bg-[#1E3A8A]/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Regal Emblem */}
         <div className="mx-auto w-20 h-20 relative mb-6">
@@ -45,13 +45,13 @@ export default function ServiceDisabledCard({ serviceId, serviceName }: ServiceD
         </div>
 
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#C5A059]/15 border border-[#C5A059]/30 text-[#8C6D28] text-xs font-semibold tracking-wider uppercase mb-5">
-          <Sparkles size={14} className="text-[#C5A059]" />
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-semibold tracking-wider uppercase mb-5">
+          <Sparkles size={14} className="text-[#D4AF37]" />
           <span>{isAmharic ? 'ወቅታዊ እረፍት / በመዘጋጀት ላይ' : 'Curating New Offerings'}</span>
         </div>
 
         {/* Headline */}
-        <h1 className="text-2xl sm:text-4xl font-serif font-bold text-[#2B2D2F] mb-4 leading-tight">
+        <h1 className="text-2xl sm:text-4xl font-serif font-bold text-[#111827] mb-4 leading-tight">
           {serviceName ? (
             isAmharic ? (
               `${serviceName} በቅርቡ ይመለሳል`
@@ -76,16 +76,16 @@ export default function ServiceDisabledCard({ serviceId, serviceName }: ServiceD
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-10">
           <Link
             href="/"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#4A5D4E] hover:bg-[#3d4d40] text-[#FDFBF7] font-medium transition-all shadow-md hover:shadow-lg text-sm"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#1E3A8A] hover:bg-[#172554] text-[#F4F1EA] font-medium transition-all shadow-md hover:shadow-lg text-sm"
           >
             <ArrowLeft size={16} />
             <span>{isAmharic ? 'ወደ መነሻ ገጽ ተመለስ' : 'Return to Home'}</span>
           </Link>
           <Link
             href="/attire"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white hover:bg-[#FDFBF7] border border-[#C5A059]/40 text-[#2B2D2F] font-medium transition-all shadow-xs text-sm"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white hover:bg-[#F9F8F6] border border-[#D4AF37]/40 text-[#111827] font-medium transition-all shadow-xs text-sm"
           >
-            <ShoppingBag size={16} className="text-[#C5A059]" />
+            <ShoppingBag size={16} className="text-[#D4AF37]" />
             <span>{isAmharic ? 'የአልባሳት ስብስቦችን ይመልከቱ' : 'Explore Attire Collection'}</span>
           </Link>
         </div>
@@ -100,7 +100,7 @@ export default function ServiceDisabledCard({ serviceId, serviceName }: ServiceD
               <Link
                 key={svc.id}
                 href={svc.href}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#FDFBF7] hover:bg-[#4A5D4E]/10 border border-slate-200/80 text-xs font-medium text-[#2B2D2F] transition-colors"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#F9F8F6] hover:bg-[#1E3A8A]/10 border border-slate-200/80 text-xs font-medium text-[#111827] transition-colors"
               >
                 <span>{isAmharic ? svc.nameAm : svc.defaultName}</span>
               </Link>

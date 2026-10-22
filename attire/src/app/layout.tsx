@@ -64,7 +64,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${organo.variable} font-sans min-h-screen flex flex-col bg-[#FDFBF7] text-[#2B2D2F]`}
+        className={`${organo.variable} font-sans min-h-screen flex flex-col bg-[#F9F8F6] text-[#111827]`}
         suppressHydrationWarning
       >
         <LanguageProvider>

@@ -300,7 +300,7 @@ export default function AdminUsersPage() {
                   return (
                     <tr
                       key={u.id}
-                      className={`hover:bg-[#FDFBF7] transition-colors ${
+                      className={`hover:bg-[#F9F8F6] transition-colors ${
                         u.isBanned ? "bg-rose-50/40" : ""
                       }`}
                     >
@@ -309,8 +309,8 @@ export default function AdminUsersPage() {
                           <div
                             className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shadow-xs ${
                               u.role === "admin"
-                                ? "bg-[#4A5D4E]"
-                                : "bg-[#C5A059]"
+                                ? "bg-[#1E3A8A]"
+                                : "bg-[#D4AF37]"
                             }`}
                           >
                             {u.full_name?.charAt(0)?.toUpperCase() || "U"}
@@ -549,7 +549,7 @@ export default function AdminUsersPage() {
                 <button
                   type="submit"
                   disabled={isCreating}
-                  className="px-5 py-2 bg-primary hover:bg-[#3d4d40] text-white rounded-lg text-sm font-semibold inline-flex items-center gap-2 shadow-xs"
+                  className="px-5 py-2 bg-primary hover:bg-[#172554] text-white rounded-lg text-sm font-semibold inline-flex items-center gap-2 shadow-xs"
                 >
                   {isCreating ? (
                     <>

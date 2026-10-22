@@ -66,7 +66,7 @@ export default function SettingsPage() {
                     {/* Avatar */}
                     <div className="flex items-center gap-6">
                         <div className="relative">
-                            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
+                            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#1E3A8A] to-[#0B192C] border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] text-2xl font-bold shadow-xs">
                                 {formData.full_name?.charAt(0) || 'U'}
                             </div>
                             <button

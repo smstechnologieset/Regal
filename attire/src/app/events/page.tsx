@@ -44,7 +44,7 @@ export default function EventsPage() {
         : packages.filter(pkg => pkg.type === selectedType);
 
     return (
-        <div className="min-h-screen bg-[#FDFBF7]">
+        <div className="min-h-screen bg-[#F9F8F6]">
             {/* Hero Section */}
             <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
                 <Image
@@ -54,7 +54,7 @@ export default function EventsPage() {
                     unoptimized
                     className="object-cover"
                 />
-                <div className="absolute inset-0 bg-[#2B2D2F]/70" />
+                <div className="absolute inset-0 bg-[#0B192C]/75" />
 
                 <div className="container mx-auto px-4 relative z-10 text-center">
                     <span className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white font-medium text-xs sm:text-sm mb-6 animate-fade-in-up border border-white/30">
@@ -68,7 +68,7 @@ export default function EventsPage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
                         <Link href="#packages">
-                            <Button size="lg" className="bg-[#4A5D4E] hover:bg-[#38463B] text-white" leftIcon={<Search size={18} />}>
+                            <Button size="lg" className="bg-[#1E3A8A] hover:bg-[#172554] text-white" leftIcon={<Search size={18} />}>
                                 {t.eventsPage.browsePackages}
                             </Button>
                         </Link>
@@ -82,14 +82,14 @@ export default function EventsPage() {
             </section>
 
             {/* Filter Section */}
-            <section id="packages" className="py-12 bg-white border-b border-[#E0D6C8]">
+            <section id="packages" className="py-12 bg-white border-b border-[#E5DFD7]">
                 <div className="container mx-auto px-4">
                     <div className="flex flex-wrap items-center justify-center gap-2">
                         <button
                             onClick={() => setSelectedType('all')}
                             className={`px-6 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all ${selectedType === 'all'
-                                ? 'bg-[#4A5D4E] text-[#FDFBF7] shadow-md shadow-[#4A5D4E]/20'
-                                : 'bg-[#F4EFEA] text-[#2B2D2F]/80 hover:bg-[#E0D6C8]'
+                                ? 'bg-[#1E3A8A] text-[#F4F1EA] shadow-md shadow-[#1E3A8A]/20'
+                                : 'bg-[#F4EFEA] text-[#111827]/80 hover:bg-[#E5DFD7]'
                                 }`}
                         >
                             {t.eventsPage.allEvents}
@@ -99,8 +99,8 @@ export default function EventsPage() {
                                 key={type.value}
                                 onClick={() => setSelectedType(type.value)}
                                 className={`px-6 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all ${selectedType === type.value
-                                    ? 'bg-[#4A5D4E] text-[#FDFBF7] shadow-md shadow-[#4A5D4E]/20'
-                                    : 'bg-[#F4EFEA] text-[#2B2D2F]/80 hover:bg-[#E0D6C8]'
+                                    ? 'bg-[#1E3A8A] text-[#F4F1EA] shadow-md shadow-[#1E3A8A]/20'
+                                    : 'bg-[#F4EFEA] text-[#111827]/80 hover:bg-[#E5DFD7]'
                                     }`}
                             >
                                 {type.label}
@@ -111,7 +111,7 @@ export default function EventsPage() {
             </section>
 
             {/* Packages Grid */}
-            <section className="py-16 md:py-24 bg-[#FDFBF7]">
+            <section className="py-16 md:py-24 bg-[#F9F8F6]">
                 <div className="container mx-auto px-4">
                     {loading ? (
                         <div className="py-20">
@@ -126,8 +126,8 @@ export default function EventsPage() {
                             </div>
 
                             {filteredPackages.length === 0 && (
-                                <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-[#E0D6C8]">
-                                    <p className="text-[#2B2D2F]/60 text-lg">
+                                <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-[#E5DFD7]">
+                                    <p className="text-[#111827]/60 text-lg">
                                         {isAmharic ? "ለዚህ ምድብ የተዘጋጀ ጥቅል አልተገኘም።" : "No event packages found for this category."}
                                     </p>
                                 </div>
@@ -138,18 +138,18 @@ export default function EventsPage() {
             </section>
 
             {/* Custom Event CTA */}
-            <section className="py-20 bg-[#2B2D2F] text-white relative overflow-hidden border-t border-[#E0D6C8]">
+            <section className="py-20 bg-[#0B192C] text-white relative overflow-hidden border-t border-[#E5DFD7]">
                 <div className="container mx-auto px-4 relative z-10">
                     <div className="max-w-3xl mx-auto text-center">
-                        <Sparkles size={48} className="text-[#C5A059] mx-auto mb-6" />
-                        <h2 className="text-3xl md:text-5xl font-serif font-bold mb-6 text-[#FDFBF7]">
+                        <Sparkles size={48} className="text-[#D4AF37] mx-auto mb-6" />
+                        <h2 className="text-3xl md:text-5xl font-serif font-bold mb-6 text-[#F4F1EA]">
                             {t.eventsPage.customCtaTitle}
                         </h2>
-                        <p className="text-base sm:text-lg text-[#FDFBF7]/75 mb-8 leading-relaxed font-light">
+                        <p className="text-base sm:text-lg text-[#F4F1EA]/75 mb-8 leading-relaxed font-light">
                             {t.eventsPage.customCtaDesc}
                         </p>
                         <Link href="/events/custom">
-                            <Button size="lg" className="bg-[#4A5D4E] hover:bg-[#38463B] text-white" rightIcon={<ArrowRight size={18} />}>
+                            <Button size="lg" className="bg-[#1E3A8A] hover:bg-[#172554] text-white" rightIcon={<ArrowRight size={18} />}>
                                 {t.eventsPage.startPlanning}
                             </Button>
                         </Link>

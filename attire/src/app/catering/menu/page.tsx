@@ -86,7 +86,7 @@ export default function CateringMenuPage() {
                                                 <ul className="space-y-1 mb-6">
                                                     {pkg.includes.map((item, i) => (
                                                         <li key={i} className="text-sm text-slate-700 flex items-center gap-2">
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
                                                             {item}
                                                         </li>
                                                     ))}
@@ -94,7 +94,7 @@ export default function CateringMenuPage() {
                                             </div>
 
                                             <Link href={`/catering/quote?package=${pkg.id}`}>
-                                                <Button fullWidth className="bg-primary hover:bg-slate-800">
+                                                <Button fullWidth className="bg-[#1E3A8A] hover:bg-[#172554] text-white">
                                                     Select Package
                                                 </Button>
                                             </Link>
@@ -115,8 +115,8 @@ export default function CateringMenuPage() {
                                         key={cat}
                                         onClick={() => setActiveCategory(cat)}
                                         className={`px-6 py-2 rounded-full text-sm font-medium transition-all capitalize ${activeCategory === cat
-                                            ? 'bg-amber-600 text-white shadow-md'
-                                            : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                            ? 'bg-[#1E3A8A] text-white shadow-md'
+                                            : 'bg-white text-slate-600 hover:bg-[#F9F8F6] border border-slate-200'
                                             }`}
                                     >
                                         {cat}

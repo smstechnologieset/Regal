@@ -365,7 +365,7 @@ export default function AttireManager() {
 
           <button
             onClick={() => handleOpenModal()}
-            className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors whitespace-nowrap text-sm"
+            className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-[#1E3A8A] transition-colors whitespace-nowrap text-sm"
           >
             <Plus size={18} />
             Add Product

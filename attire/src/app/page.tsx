@@ -221,34 +221,34 @@ export default function RegalLandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#2B2D2F]">
+    <div className="min-h-screen bg-[#F9F8F6] text-[#111827]">
       {/* Hero Section */}
-      <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#F4EFEA] via-[#FDFBF7] to-[#FDFBF7] pt-28 pb-20">
-        <div className="absolute top-0 inset-x-0 h-96 bg-[radial-gradient(circle_at_top,_rgba(74,93,78,0.08),_transparent_70%)] pointer-events-none" />
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#C5A059]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 -right-24 w-96 h-96 bg-[#4A5D4E]/8 rounded-full blur-3xl pointer-events-none" />
+      <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#F4EFEA] via-[#F9F8F6] to-[#F9F8F6] pt-28 pb-20">
+        <div className="absolute top-0 inset-x-0 h-96 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at top, rgba(30,58,138,0.06), transparent 70%)' }} />
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 -right-24 w-96 h-96 bg-[#1E3A8A]/8 rounded-full blur-3xl pointer-events-none" />
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             {/* Top Badge */}
-            <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-[#4A5D4E]/10 border border-[#4A5D4E]/20 text-[#4A5D4E] text-sm font-medium mb-8 backdrop-blur-sm animate-fade-in shadow-xs">
-              <Leaf size={16} className="text-[#4A5D4E]" />
+            <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-[#1E3A8A]/10 border border-[#1E3A8A]/20 text-[#1E3A8A] text-sm font-medium mb-8 backdrop-blur-sm animate-fade-in shadow-xs">
+              <Leaf size={16} className="text-[#1E3A8A]" />
               <span>{t.hero.topBadge}</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-bold text-[#2B2D2F] tracking-tight leading-[1.12] mb-4 animate-fade-in-up">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-bold text-[#111827] tracking-tight leading-[1.12] mb-4 animate-fade-in-up">
               {t.hero.headline}
             </h1>
 
             {/* Sub-Tagline in Alternate Language */}
-            <p className="text-lg sm:text-2xl font-serif text-[#C5A059] font-medium tracking-wide mb-8 animate-fade-in-up">
+            <p className="text-lg sm:text-2xl font-serif text-[#D4AF37] font-medium tracking-wide mb-8 animate-fade-in-up">
               {t.hero.amharicTagline}
             </p>
 
             {/* Mission Subheadline */}
             <p
-              className="text-base sm:text-xl text-[#4A5D4E]/90 max-w-2xl mx-auto leading-relaxed mb-10 font-sans animate-fade-in-up"
+              className="text-base sm:text-xl text-[#111827]/80 max-w-2xl mx-auto leading-relaxed mb-10 font-sans animate-fade-in-up"
               style={{ animationDelay: "0.1s" }}
             >
               {t.hero.subheadline}
@@ -273,7 +273,7 @@ export default function RegalLandingPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="px-8 py-3.5 border-[#4A5D4E]/30 text-[#4A5D4E] hover:bg-[#4A5D4E] hover:text-[#FDFBF7] transition-all"
+                  className="px-8 py-3.5 border-[#1E3A8A]/30 text-[#1E3A8A] hover:bg-[#1E3A8A] hover:text-[#F4F1EA] transition-all"
                 >
                   {t.hero.secondaryCta}
                 </Button>
@@ -284,24 +284,24 @@ export default function RegalLandingPage() {
 
         {/* Scroll Indicator */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 opacity-60">
-          <div className="w-5 h-9 border-2 border-[#4A5D4E]/40 rounded-full flex items-start justify-center p-1.5">
-            <div className="w-1 h-2 bg-[#4A5D4E] rounded-full animate-bounce" />
+          <div className="w-5 h-9 border-2 border-[#1E3A8A]/40 rounded-full flex items-start justify-center p-1.5">
+            <div className="w-1 h-2 bg-[#1E3A8A] rounded-full animate-bounce" />
           </div>
         </div>
       </section>
 
       {/* SECTION 1: ALL 5 PREMIER SERVICES (Attire, Events, Bridal, Catering, Gifts) */}
-      <section id="services" className="py-24 md:py-32 bg-[#FDFBF7]">
+      <section id="services" className="py-24 md:py-32 bg-[#F9F8F6]">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-[#C5A059] font-semibold text-xs sm:text-sm uppercase tracking-widest block mb-2 font-sans">
+            <span className="text-[#D4AF37] font-semibold text-xs sm:text-sm uppercase tracking-widest block mb-2 font-sans">
               {t.services.tagline}
             </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#2B2D2F] mt-2 mb-5 leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#111827] mt-2 mb-5 leading-tight">
               {t.services.headline}
             </h2>
-            <div className="w-16 h-0.5 bg-[#C5A059] mx-auto mb-6" />
-            <p className="text-base sm:text-lg text-[#2B2D2F]/75 leading-relaxed font-sans">
+            <div className="w-16 h-0.5 bg-[#D4AF37] mx-auto mb-6" />
+            <p className="text-base sm:text-lg text-[#111827]/75 leading-relaxed font-sans">
               {t.services.subheadline}
             </p>
           </div>
@@ -314,7 +314,7 @@ export default function RegalLandingPage() {
                 <Link
                   key={service.id}
                   href={service.href}
-                  className="group relative overflow-hidden rounded-2xl border border-[#E0D6C8] bg-white shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 flex flex-col"
+                  className="group relative overflow-hidden rounded-2xl border border-[#E5DFD7] bg-white shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1 flex flex-col"
                 >
                   <div className="aspect-[16/11] relative overflow-hidden bg-[#F4EFEA]">
                     <Image
@@ -324,33 +324,33 @@ export default function RegalLandingPage() {
                       unoptimized
                       className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#2B2D2F]/80 via-[#2B2D2F]/25 to-transparent opacity-75 group-hover:opacity-85 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B192C]/80 via-[#0B192C]/25 to-transparent opacity-75 group-hover:opacity-85 transition-opacity" />
 
                     <div className="absolute top-4 left-4">
-                      <span className="px-3 py-1 rounded-full bg-[#FDFBF7]/90 text-[#4A5D4E] text-xs font-semibold backdrop-blur-md shadow-xs">
+                      <span className="px-3 py-1 rounded-full bg-[#F9F8F6]/90 text-[#1E3A8A] text-xs font-semibold backdrop-blur-md shadow-xs">
                         {service.badge}
                       </span>
                     </div>
 
-                    <div className="absolute bottom-4 left-4 w-11 h-11 rounded-xl bg-[#FDFBF7]/90 backdrop-blur-md flex items-center justify-center text-[#4A5D4E] shadow-xs group-hover:scale-110 transition-transform">
+                    <div className="absolute bottom-4 left-4 w-11 h-11 rounded-xl bg-[#F9F8F6]/90 backdrop-blur-md flex items-center justify-center text-[#1E3A8A] shadow-xs group-hover:scale-110 transition-transform">
                       <Icon size={20} />
                     </div>
                   </div>
 
                   <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between bg-white">
                     <div>
-                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#2B2D2F] mb-1.5 group-hover:text-[#4A5D4E] transition-colors">
+                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#111827] mb-1.5 group-hover:text-[#1E3A8A] transition-colors">
                         {service.title}
                       </h3>
-                      <p className="text-xs uppercase tracking-wider text-[#C5A059] font-semibold mb-3">
+                      <p className="text-xs uppercase tracking-wider text-[#D4AF37] font-semibold mb-3">
                         {service.tagline}
                       </p>
-                      <p className="text-sm sm:text-base text-[#2B2D2F]/70 leading-relaxed font-sans mb-6">
+                      <p className="text-sm sm:text-base text-[#111827]/70 leading-relaxed font-sans mb-6">
                         {service.description}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm font-semibold text-[#4A5D4E] group-hover:text-[#C5A059] transition-colors pt-2 border-t border-[#F4EFEA]">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-[#1E3A8A] group-hover:text-[#D4AF37] transition-colors pt-2 border-t border-[#F4EFEA]">
                       <span>{t.common.exploreNow}</span>
                       <ArrowRight
                         size={16}
@@ -366,17 +366,17 @@ export default function RegalLandingPage() {
       </section>
 
       {/* SECTION 2: THE FIVE PILLARS OF PURE LIVING */}
-      <section className="py-20 md:py-28 bg-[#F4EFEA] border-y border-[#E0D6C8]">
+      <section className="py-20 md:py-28 bg-[#F4EFEA] border-y border-[#E5DFD7]">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-[#C5A059] font-semibold text-xs sm:text-sm uppercase tracking-widest block mb-2 font-sans">
+            <span className="text-[#D4AF37] font-semibold text-xs sm:text-sm uppercase tracking-widest block mb-2 font-sans">
               {t.pillars.tagline}
             </span>
-            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#2B2D2F] mt-2 mb-4">
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#111827] mt-2 mb-4">
               {t.pillars.headline}
             </h2>
-            <div className="w-16 h-0.5 bg-[#C5A059] mx-auto mb-5" />
-            <p className="text-sm sm:text-base text-[#2B2D2F]/75 leading-relaxed font-sans max-w-2xl mx-auto">
+            <div className="w-16 h-0.5 bg-[#D4AF37] mx-auto mb-5" />
+            <p className="text-sm sm:text-base text-[#111827]/75 leading-relaxed font-sans max-w-2xl mx-auto">
               {t.pillars.subheadline}
             </p>
           </div>
@@ -388,20 +388,20 @@ export default function RegalLandingPage() {
                 <Link
                   key={pillar.id}
                   href={pillar.href}
-                  className="p-6 rounded-2xl bg-white border border-[#E0D6C8] shadow-2xs hover:shadow-lg hover:border-[#4A5D4E]/40 transition-all flex flex-col justify-between group"
+                  className="p-6 rounded-2xl bg-white border border-[#E5DFD7] shadow-2xs hover:shadow-lg hover:border-[#1E3A8A]/40 transition-all flex flex-col justify-between group"
                 >
                   <div>
-                    <div className="w-10 h-10 rounded-xl bg-[#4A5D4E]/10 text-[#4A5D4E] group-hover:bg-[#4A5D4E] group-hover:text-[#FDFBF7] transition-colors flex items-center justify-center mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-[#1E3A8A]/10 text-[#1E3A8A] group-hover:bg-[#1E3A8A] group-hover:text-[#F4F1EA] transition-colors flex items-center justify-center mb-4">
                       <Icon size={18} />
                     </div>
-                    <h4 className="font-serif font-bold text-lg text-[#2B2D2F] mb-2 group-hover:text-[#4A5D4E] transition-colors">
+                    <h4 className="font-serif font-bold text-lg text-[#111827] mb-2 group-hover:text-[#1E3A8A] transition-colors">
                       {pillar.title}
                     </h4>
-                    <p className="text-xs text-[#2B2D2F]/70 leading-relaxed font-sans">
+                    <p className="text-xs text-[#111827]/70 leading-relaxed font-sans">
                       {pillar.description}
                     </p>
                   </div>
-                  <div className="mt-5 pt-3 border-t border-[#F4EFEA] flex items-center gap-1 text-xs font-semibold text-[#4A5D4E] group-hover:text-[#C5A059]">
+                  <div className="mt-5 pt-3 border-t border-[#F4EFEA] flex items-center gap-1 text-xs font-semibold text-[#1E3A8A] group-hover:text-[#D4AF37]">
                     <span>{t.common.exploreNow}</span>
                     <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -413,20 +413,20 @@ export default function RegalLandingPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-[#FDFBF7] border-b border-[#E0D6C8]">
+      <section className="py-16 bg-[#F9F8F6] border-b border-[#E5DFD7]">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
                 <div key={index} className="text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#4A5D4E]/10 text-[#4A5D4E] flex items-center justify-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#1E3A8A]/10 text-[#1E3A8A] flex items-center justify-center">
                     <Icon size={22} />
                   </div>
-                  <div className="text-3xl md:text-4xl font-serif font-bold text-[#2B2D2F] mb-1">
+                  <div className="text-3xl md:text-4xl font-serif font-bold text-[#111827] mb-1">
                     {stat.value}
                   </div>
-                  <div className="text-xs sm:text-sm text-[#4A5D4E] font-medium font-sans">
+                  <div className="text-xs sm:text-sm text-[#1E3A8A] font-medium font-sans">
                     {stat.label}
                   </div>
                 </div>
@@ -437,12 +437,12 @@ export default function RegalLandingPage() {
       </section>
 
       {/* The Regal Difference Section */}
-      <section className="py-24 md:py-32 bg-[#FDFBF7]">
+      <section className="py-24 md:py-32 bg-[#F9F8F6]">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left Column: Regal Logo Emblem with Reviews Card */}
             <div className="relative">
-              <div className="aspect-[4/5] rounded-3xl overflow-hidden relative shadow-xl border border-[#E0D6C8] bg-gradient-to-br from-[#F4EFEA] via-[#FDFBF7] to-[#EAE3D8] flex flex-col items-center justify-center p-8 sm:p-12">
+              <div className="aspect-[4/5] rounded-3xl overflow-hidden relative shadow-xl border border-[#E5DFD7] bg-gradient-to-br from-[#F4EFEA] via-[#F9F8F6] to-[#EAE3D8] flex flex-col items-center justify-center p-8 sm:p-12">
                 <div className="relative w-52 h-52 sm:w-64 sm:h-64 drop-shadow-xl transition-transform duration-700 hover:scale-105 flex items-center justify-center">
                   <Image
                     src="/Logo-bg.png"
@@ -454,24 +454,24 @@ export default function RegalLandingPage() {
                   />
                 </div>
                 <div className="mt-6 text-center">
-                  <span className="text-2xl sm:text-3xl font-serif font-extrabold tracking-widest text-[#2B2D2F] block">
+                  <span className="text-2xl sm:text-3xl font-serif font-extrabold tracking-widest text-[#111827] block">
                     REGAL
                   </span>
-                  <span className="text-xs uppercase tracking-widest text-[#C5A059] font-semibold block mt-1.5 font-sans">
+                  <span className="text-xs uppercase tracking-widest text-[#D4AF37] font-semibold block mt-1.5 font-sans">
                     Curated • Crafted • Crowned
                   </span>
-                  <span className="text-xs sm:text-sm tracking-wider text-[#4A5D4E] font-medium block mt-1 font-serif">
+                  <span className="text-xs sm:text-sm tracking-wider text-[#1E3A8A] font-medium block mt-1 font-serif">
                     የተመረጠ። በጥበብ የተሰራ። የነገሰ።
                   </span>
                 </div>
               </div>
 
               {/* Floating Reviews Card */}
-              <div className="absolute -bottom-6 -right-4 sm:-right-6 bg-[#FDFBF7] rounded-xl shadow-xl p-5 sm:p-6 max-w-xs border border-[#E0D6C8] backdrop-blur-md">
-                <div className="font-serif font-bold text-[#2B2D2F] text-sm sm:text-base leading-snug">
+              <div className="absolute -bottom-6 -right-4 sm:-right-6 bg-[#F9F8F6] rounded-xl shadow-xl p-5 sm:p-6 max-w-xs border border-[#E5DFD7] backdrop-blur-md">
+                <div className="font-serif font-bold text-[#111827] text-sm sm:text-base leading-snug">
                   {t.difference.reviewsTitle}
                 </div>
-                <div className="text-xs text-[#2B2D2F]/70 mt-1 leading-relaxed">
+                <div className="text-xs text-[#111827]/70 mt-1 leading-relaxed">
                   {t.difference.reviewsSub}
                 </div>
               </div>
@@ -479,14 +479,14 @@ export default function RegalLandingPage() {
 
             {/* Right Column: Narrative & 4 Bullets */}
             <div>
-              <span className="text-[#C5A059] font-semibold text-xs sm:text-sm uppercase tracking-widest block mb-2">
+              <span className="text-[#D4AF37] font-semibold text-xs sm:text-sm uppercase tracking-widest block mb-2">
                 {t.difference.tagline}
               </span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#2B2D2F] mt-2 mb-5 leading-tight">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-[#111827] mt-2 mb-5 leading-tight">
                 {t.difference.headline}
               </h2>
-              <div className="w-16 h-0.5 bg-[#C5A059] mb-6" />
-              <p className="text-base sm:text-lg text-[#2B2D2F]/80 mb-8 leading-relaxed font-sans">
+              <div className="w-16 h-0.5 bg-[#D4AF37] mb-6" />
+              <p className="text-base sm:text-lg text-[#111827]/80 mb-8 leading-relaxed font-sans">
                 {t.difference.narrative}
               </p>
 
@@ -495,16 +495,16 @@ export default function RegalLandingPage() {
                 {bullets.map((bullet, index) => (
                   <div
                     key={index}
-                    className="flex items-start gap-3.5 p-3.5 rounded-xl bg-white border border-[#E0D6C8]/60 shadow-2xs hover:border-[#4A5D4E]/40 transition-colors"
+                    className="flex items-start gap-3.5 p-3.5 rounded-xl bg-white border border-[#E5DFD7]/60 shadow-2xs hover:border-[#1E3A8A]/40 transition-colors"
                   >
-                    <div className="w-7 h-7 rounded-full bg-[#4A5D4E]/10 text-[#4A5D4E] flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-7 h-7 rounded-full bg-[#1E3A8A]/10 text-[#1E3A8A] flex items-center justify-center shrink-0 mt-0.5">
                       <CheckCircle2 size={18} />
                     </div>
                     <div>
-                      <h4 className="font-serif font-bold text-base text-[#2B2D2F]">
+                      <h4 className="font-serif font-bold text-base text-[#111827]">
                         {bullet.title}
                       </h4>
-                      <p className="text-xs sm:text-sm text-[#2B2D2F]/70 mt-0.5 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-[#111827]/70 mt-0.5 leading-relaxed">
                         {bullet.description}
                       </p>
                     </div>
@@ -530,16 +530,16 @@ export default function RegalLandingPage() {
       </section>
 
       {/* Pure Living Call to Action Banner */}
-      <section className="py-24 bg-[#4A5D4E] text-[#FDFBF7] relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(197,160,89,0.15),_transparent_70%)] pointer-events-none" />
+      <section className="py-24 bg-[#0B192C] text-[#F4F1EA] relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at bottom right, rgba(212,175,55,0.15), transparent 70%)' }} />
         <div className="container mx-auto px-4 text-center relative z-10 max-w-3xl">
-          <span className="text-[#C5A059] font-medium text-xs sm:text-sm uppercase tracking-widest block mb-3">
+          <span className="text-[#D4AF37] font-medium text-xs sm:text-sm uppercase tracking-widest block mb-3">
             {isAmharic ? "ሬጋል አኗኗር" : "The Regal Standard"}
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold mb-6 tracking-tight leading-tight">
             {t.cta.headline}
           </h2>
-          <p className="text-base sm:text-xl text-[#FDFBF7]/85 mb-10 leading-relaxed font-sans">
+          <p className="text-base sm:text-xl text-[#F4F1EA]/85 mb-10 leading-relaxed font-sans">
             {t.cta.subheadline}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -555,7 +555,7 @@ export default function RegalLandingPage() {
             </Link>
             <Link
               href="/about"
-              className="inline-flex items-center justify-center px-8 py-3.5 rounded-lg border-2 border-[#FDFBF7] text-[#FDFBF7] font-semibold hover:bg-[#FDFBF7] hover:text-[#4A5D4E] transition-all duration-200 text-base shadow-sm"
+              className="inline-flex items-center justify-center px-8 py-3.5 rounded-lg border-2 border-[#D4AF37] text-[#D4AF37] font-semibold hover:bg-[#D4AF37] hover:text-[#111827] transition-all duration-200 text-base shadow-sm"
             >
               {t.nav.about}
             </Link>

@@ -254,7 +254,7 @@ export default function ServiceCatalogManager({
         category: serviceId,
         subcategory: formData.subcategory,
         sizes: parsedSizes,
-        colors: [{ name: 'Standard', hex: '#4A5D4E' }],
+        colors: [{ name: 'Standard', hex: '#1E3A8A' }],
         images: formData.images.length > 0 ? formData.images : ['https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&h=800&fit=crop'],
         badges: formData.badges,
         in_stock: effectiveInStock,
@@ -393,7 +393,7 @@ export default function ServiceCatalogManager({
 
         <button
           onClick={() => handleOpenModal()}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#4A5D4E] hover:bg-[#3d4d40] text-white text-xs sm:text-sm font-semibold transition-all shadow-xs cursor-pointer shrink-0"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1E3A8A] hover:bg-[#172554] text-white text-xs sm:text-sm font-semibold transition-all shadow-xs cursor-pointer shrink-0"
         >
           <Plus size={16} />
           <span>Add {serviceTitle} Item</span>
@@ -409,7 +409,7 @@ export default function ServiceCatalogManager({
             placeholder={`Search ${serviceTitle} products...`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A5D4E]"
+            className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]"
           />
         </div>
 
@@ -441,7 +441,7 @@ export default function ServiceCatalogManager({
       {/* Products Table / Cards */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 size={32} className="animate-spin text-[#4A5D4E]" />
+          <Loader2 size={32} className="animate-spin text-[#1E3A8A]" />
         </div>
       ) : filteredProducts.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
@@ -508,7 +508,7 @@ export default function ServiceCatalogManager({
                       </span>
                     )}
                     {p.allowPreorder && (
-                      <span className="bg-[#C5A059] text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+                      <span className="bg-[#D4AF37] text-[#111827] text-[10px] font-bold px-2 py-0.5 rounded-md shadow-xs">
                         PRE-ORDER
                       </span>
                     )}
@@ -572,7 +572,7 @@ export default function ServiceCatalogManager({
                       className={cn(
                         'text-[10px] font-semibold px-2 py-0.5 rounded-md',
                         p.allowPreorder
-                          ? 'bg-[#C5A059]/15 text-[#8C6D28] border border-[#C5A059]/30'
+                          ? 'bg-[#D4AF37]/15 text-[#8C6D28] border border-[#D4AF37]/30'
                           : 'text-slate-400 bg-slate-100'
                       )}
                     >
@@ -613,7 +613,7 @@ export default function ServiceCatalogManager({
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g. Pure Nilotica Shea Butter"
-                  className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#4A5D4E] outline-none"
+                  className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] outline-none"
                 />
               </div>
 
@@ -626,7 +626,7 @@ export default function ServiceCatalogManager({
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Manifesto, botanical ingredients, craftsmanship..."
-                  className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#4A5D4E] outline-none"
+                  className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] outline-none"
                 />
               </div>
 
@@ -642,7 +642,7 @@ export default function ServiceCatalogManager({
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     placeholder="1200"
-                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#4A5D4E] outline-none"
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] outline-none"
                   />
                 </div>
                 <div>
@@ -655,7 +655,7 @@ export default function ServiceCatalogManager({
                     value={formData.original_price}
                     onChange={(e) => setFormData({ ...formData, original_price: e.target.value })}
                     placeholder="1500"
-                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#4A5D4E] outline-none"
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] outline-none"
                   />
                 </div>
               </div>
@@ -668,7 +668,7 @@ export default function ServiceCatalogManager({
                   <select
                     value={formData.subcategory}
                     onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
-                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#4A5D4E] outline-none"
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] outline-none"
                   >
                     {subcategories.map((sub) => (
                       <option key={sub.id} value={sub.id}>
@@ -687,7 +687,7 @@ export default function ServiceCatalogManager({
                     value={sizeInput}
                     onChange={(e) => setSizeInput(e.target.value)}
                     placeholder="100ml, 250ml or A5, B5"
-                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#4A5D4E] outline-none"
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#1E3A8A] outline-none"
                   />
                 </div>
               </div>
@@ -713,7 +713,7 @@ export default function ServiceCatalogManager({
                       }}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#4A5D4E]" />
+                    <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1E3A8A]" />
                   </label>
                 </div>
 
@@ -740,7 +740,7 @@ export default function ServiceCatalogManager({
               </div>
 
               {/* Pre-Order Settings */}
-              <div className="bg-[#C5A059]/10 p-4 rounded-2xl border border-[#C5A059]/30 space-y-3">
+              <div className="bg-[#D4AF37]/10 p-4 rounded-2xl border border-[#D4AF37]/30 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-bold text-[#8C6D28]">Pre-Order Settings</p>
@@ -757,7 +757,7 @@ export default function ServiceCatalogManager({
                       }
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C5A059]" />
+                    <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D4AF37]" />
                   </label>
                 </div>
 
@@ -836,7 +836,7 @@ export default function ServiceCatalogManager({
                   <input
                     type="url"
                     placeholder="Or paste an image URL (https://...)"
-                    className="flex-1 px-3.5 py-2 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#4A5D4E]/20 focus:border-[#4A5D4E] text-xs sm:text-sm bg-white"
+                    className="flex-1 px-3.5 py-2 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] text-xs sm:text-sm bg-white"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -884,7 +884,7 @@ export default function ServiceCatalogManager({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#4A5D4E] hover:bg-[#3d4d40] text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#1E3A8A] hover:bg-[#172554] text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer disabled:opacity-50"
                 >
                   {submitting && <Loader2 size={16} className="animate-spin" />}
                   <span>{editingProduct ? 'Update Product' : 'Create Product'}</span>

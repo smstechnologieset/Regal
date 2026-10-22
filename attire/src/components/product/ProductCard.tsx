@@ -106,7 +106,7 @@ export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
           {/* Discount badge */}
           {discount > 0 && product.inStock && (
             <div className="absolute top-2 right-2">
-              <span className="bg-secondary text-white text-xs font-bold px-2 py-1 rounded">
+              <span className="bg-[#D4AF37] text-[#111827] text-xs font-bold px-2 py-1 rounded">
                 -{discount}%
               </span>
             </div>
@@ -119,8 +119,8 @@ export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
               "absolute top-2 right-2 p-2 rounded-full transition-all duration-200",
               discount > 0 ? "top-10" : "top-2",
               isWishlisted
-                ? "bg-secondary/10 text-secondary"
-                : "bg-white/80 text-slate-600 hover:bg-white hover:text-secondary",
+                ? "bg-[#D4AF37]/20 text-[#D4AF37]"
+                : "bg-white/80 text-slate-600 hover:bg-white hover:text-[#D4AF37]",
               "opacity-0 group-hover:opacity-100"
             )}
             aria-label={
@@ -136,7 +136,7 @@ export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
               {product.inStock && (product.stockCount ?? 0) > 0 ? (
                 <button
                   onClick={handleQuickAdd}
-                  className="absolute bottom-2 left-2 right-2 py-2.5 bg-primary text-white text-sm font-medium rounded-lg opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2"
+                  className="absolute bottom-2 left-2 right-2 py-2.5 bg-[#1E3A8A] text-white text-sm font-medium rounded-lg opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2"
                 >
                   <ShoppingBag size={16} />
                   Quick Add
@@ -144,7 +144,7 @@ export default function ProductCard({ product, onQuickAdd }: ProductCardProps) {
               ) : product.allowPreorder ? (
                 <button
                   onClick={handleQuickAdd}
-                  className="absolute bottom-2 left-2 right-2 py-2.5 bg-amber-500 text-white text-sm font-medium rounded-lg opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2"
+                  className="absolute bottom-2 left-2 right-2 py-2.5 bg-[#D4AF37] text-[#111827] text-sm font-bold rounded-lg opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2"
                 >
                   <ShoppingBag size={16} />
                   Pre-Order Now

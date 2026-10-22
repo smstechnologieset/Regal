@@ -8,6 +8,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -115,10 +116,9 @@ export default function ForgotPasswordPage() {
             <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <Link href="/" className="inline-block mb-2">
-                        <span className="text-3xl font-bold bg-gradient-to-r from-rose-600 to-purple-600 bg-clip-text text-transparent">
-                            REGAL
-                        </span>
+                    <Link href="/" className="inline-flex items-center gap-2 mb-2 group">
+                        <Image src="/Logo-bg.png" alt="Regal Logo" width={56} height={56} className="h-12 w-auto object-contain transition-transform group-hover:scale-105" />
+                        <span className="text-primary font-extrabold text-3xl tracking-tight">REGAL</span>
                     </Link>
                     <h1 className="text-2xl font-bold text-primary mb-2">Reset Password</h1>
                     <p className="text-slate-600">Enter your email and we&apos;ll send you a reset link</p>

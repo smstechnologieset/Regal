@@ -56,18 +56,18 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-[#2B2D2F] text-[#FDFBF7]">
+    <footer className="bg-[#0B192C] text-[#F4F1EA]">
       {/* Newsletter & Direct Contact Banner */}
-      <div className="bg-[#4A5D4E] border-b border-[#C5A059]/20 text-[#FDFBF7]">
+      <div className="bg-[#1E3A8A] border-b border-[#D4AF37]/25 text-[#F4F1EA]">
         <div className="container mx-auto px-4 py-14">
           <div className="max-w-3xl mx-auto text-center">
-            <span className="text-[#C5A059] text-xs font-semibold uppercase tracking-widest block mb-2 font-sans">
+            <span className="text-[#D4AF37] text-xs font-semibold uppercase tracking-widest block mb-2 font-sans">
               {isAmharic ? "ሬጋል ማህበረሰብ" : "Regal Community"}
             </span>
             <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-3 tracking-tight">
               {t.newsletter.headline}
             </h3>
-            <p className="text-[#FDFBF7]/85 text-sm sm:text-base mb-8 max-w-xl mx-auto leading-relaxed font-sans">
+            <p className="text-[#F4F1EA]/85 text-sm sm:text-base mb-8 max-w-xl mx-auto leading-relaxed font-sans">
               {t.newsletter.subheadline}
             </p>
             <NewsletterForm />
@@ -91,15 +91,15 @@ export default function Footer() {
                 />
               </div>
               <div>
-                <span className="text-2xl font-serif font-extrabold tracking-wider text-[#FDFBF7] block">
+                <span className="text-2xl font-serif font-extrabold tracking-wider text-[#F4F1EA] block">
                   REGAL
                 </span>
-                <span className="text-[11px] tracking-widest text-[#C5A059] font-medium block">
+                <span className="text-[11px] tracking-widest text-[#D4AF37] font-medium block">
                   {t.hero.headline}
                 </span>
               </div>
             </Link>
-            <p className="text-[#FDFBF7]/70 text-sm mb-6 leading-relaxed max-w-md font-sans">
+            <p className="text-[#F4F1EA]/70 text-sm mb-6 leading-relaxed max-w-md font-sans">
               {t.footer.tagline}
             </p>
             {/* Social Links */}
@@ -110,7 +110,7 @@ export default function Footer() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-white/5 border border-white/10 text-[#C5A059] hover:text-[#FDFBF7] hover:bg-[#4A5D4E] hover:border-[#4A5D4E] transition-all flex items-center justify-center"
+                  className="w-9 h-9 rounded-full bg-white/5 border border-white/10 text-[#D4AF37] hover:text-[#F4F1EA] hover:bg-[#1E3A8A] hover:border-[#1E3A8A] transition-all flex items-center justify-center"
                   aria-label={social.label}
                 >
                   <social.icon size={16} />
@@ -121,7 +121,7 @@ export default function Footer() {
 
           {/* Column 1: Our Services */}
           <div>
-            <h4 className="font-serif font-bold text-base sm:text-lg mb-4 text-[#C5A059] tracking-wide">
+            <h4 className="font-serif font-bold text-base sm:text-lg mb-4 text-[#D4AF37] tracking-wide">
               {t.footer.colServices}
             </h4>
             <ul className="space-y-2.5">
@@ -129,7 +129,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-[#FDFBF7]/70 hover:text-[#C5A059] text-sm transition-colors block py-0.5"
+                    className="text-[#F4F1EA]/70 hover:text-[#D4AF37] text-sm transition-colors block py-0.5"
                   >
                     {link.label}
                   </Link>
@@ -140,7 +140,7 @@ export default function Footer() {
 
           {/* Column 2: Philosophy & Quality */}
           <div>
-            <h4 className="font-serif font-bold text-base sm:text-lg mb-4 text-[#C5A059] tracking-wide">
+            <h4 className="font-serif font-bold text-base sm:text-lg mb-4 text-[#D4AF37] tracking-wide">
               {t.footer.colPhilosophy}
             </h4>
             <ul className="space-y-2.5">
@@ -148,7 +148,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-[#FDFBF7]/70 hover:text-[#C5A059] text-sm transition-colors block py-0.5"
+                    className="text-[#F4F1EA]/70 hover:text-[#D4AF37] text-sm transition-colors block py-0.5"
                   >
                     {link.label}
                   </Link>
@@ -159,7 +159,7 @@ export default function Footer() {
 
           {/* Column 3: Support & Care */}
           <div>
-            <h4 className="font-serif font-bold text-base sm:text-lg mb-4 text-[#C5A059] tracking-wide">
+            <h4 className="font-serif font-bold text-base sm:text-lg mb-4 text-[#D4AF37] tracking-wide">
               {t.footer.colSupport}
             </h4>
             <ul className="space-y-2.5">
@@ -167,7 +167,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-[#FDFBF7]/70 hover:text-[#C5A059] text-sm transition-colors block py-0.5"
+                    className="text-[#F4F1EA]/70 hover:text-[#D4AF37] text-sm transition-colors block py-0.5"
                   >
                     {link.label}
                   </Link>
@@ -179,20 +179,20 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-white/10 bg-[#242628]">
+      <div className="border-t border-white/10 bg-[#07111E]">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm text-[#FDFBF7]/60">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs sm:text-sm text-[#F4F1EA]/60">
             <p suppressHydrationWarning>
               © {currentYear} Regal. {t.footer.rightsReserved}
             </p>
             <div className="flex gap-6">
-              <Link href="/terms" className="hover:text-[#C5A059] transition-colors">
+              <Link href="/terms" className="hover:text-[#D4AF37] transition-colors">
                 Terms of Service
               </Link>
-              <Link href="/privacy" className="hover:text-[#C5A059] transition-colors">
+              <Link href="/privacy" className="hover:text-[#D4AF37] transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/about#purity" className="hover:text-[#C5A059] transition-colors">
+              <Link href="/about#purity" className="hover:text-[#D4AF37] transition-colors">
                 Purity Guarantee
               </Link>
             </div>

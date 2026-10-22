@@ -239,19 +239,19 @@ export default function ProductPage({ params }: ProductPageProps) {
     !product.allowPreorder;
 
   return (
-    <div className="min-h-screen bg-white w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-[#F9F8F6] w-full max-w-full overflow-x-hidden">
       {/* Breadcrumb */}
-      <div className="bg-slate-50 border-b border-slate-200 w-full overflow-x-hidden">
+      <div className="bg-[#F4EFEA]/80 border-b border-[#E5DFD7] w-full overflow-x-hidden">
         <div className="container mx-auto px-3 sm:px-4 py-3 max-w-7xl">
           <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm flex-wrap">
             <Link
               href={storeRoute.href}
-              className="text-slate-500 hover:text-slate-900 shrink-0"
+              className="text-slate-500 hover:text-[#1E3A8A] shrink-0"
             >
               {isAmharic ? storeRoute.labelAm : storeRoute.label}
             </Link>
             <ChevronRight size={14} className="text-slate-400 shrink-0" />
-            <span className="text-slate-900 font-medium truncate max-w-[200px] sm:max-w-xs">
+            <span className="text-[#111827] font-medium truncate max-w-[200px] sm:max-w-xs">
               {product.name}
             </span>
           </nav>
@@ -285,7 +285,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             )}
 
             {/* Title & Rating */}
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-2 sm:mb-3 break-words font-serif leading-snug">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#111827] mb-2 sm:mb-3 break-words font-serif leading-snug">
               {product.name}
             </h1>
 
@@ -297,7 +297,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                     size={15}
                     className={cn(
                       i < Math.floor(product.rating)
-                        ? "text-amber-400 fill-amber-400"
+                        ? "text-[#D4AF37] fill-[#D4AF37]"
                         : "text-slate-300"
                     )}
                   />
@@ -314,7 +314,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 
             {/* Price */}
             <div className="flex items-baseline gap-2.5 sm:gap-3 mb-5 flex-wrap">
-              <span className="text-2xl sm:text-3xl font-bold text-slate-900">
+              <span className="text-2xl sm:text-3xl font-bold text-[#1E3A8A]">
                 {formatPrice(product.price)}
               </span>
               {product.originalPrice && (
@@ -358,7 +358,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 
             {/* Quantity */}
             <div className="mb-5">
-              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-xs sm:text-sm font-semibold text-[#111827] mb-2">
                 {isAmharic ? "ብዛት" : "Quantity"}
               </label>
               <div className="flex items-center gap-2.5">
@@ -377,7 +377,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                   onChange={(e) =>
                     setQuantity(Math.max(1, parseInt(e.target.value) || 1))
                   }
-                  className="w-14 sm:w-16 h-9 sm:h-10 text-center border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A5D4E] disabled:bg-slate-100 text-sm font-semibold"
+                  className="w-14 sm:w-16 h-9 sm:h-10 text-center border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1E3A8A] disabled:bg-slate-100 text-sm font-semibold"
                   min="1"
                 />
                 <button
@@ -394,8 +394,8 @@ export default function ProductPage({ params }: ProductPageProps) {
             {/* Stock Status & Urgency */}
             <div className="mb-5">
               {isEligibleForPreOrder(product) ? (
-                <div className="flex items-center gap-2 text-[#C5A059] font-semibold bg-[#C5A059]/10 border border-[#C5A059]/30 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl w-fit text-xs sm:text-sm">
-                  <RefreshCw size={16} className="animate-spin text-[#C5A059]" />
+                <div className="flex items-center gap-2 text-[#8C6D28] font-semibold bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl w-fit text-xs sm:text-sm">
+                  <RefreshCw size={16} className="animate-spin text-[#8C6D28]" />
                   <span>
                     {isAmharic ? "ለቅድመ-ትዕዛዝ ይገኛል" : "Available for Pre-Order"}
                   </span>
@@ -490,7 +490,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                       fullWidth
                       size="md"
                       onClick={handleAddToCart}
-                      className="bg-[#4A5D4E] hover:bg-[#3D4D40] text-white font-medium py-3 px-2 sm:px-4 text-xs sm:text-sm rounded-xl flex items-center justify-center gap-1.5"
+                      className="bg-[#1E3A8A] hover:bg-[#172554] text-white font-medium py-3 px-2 sm:px-4 text-xs sm:text-sm rounded-xl flex items-center justify-center gap-1.5"
                     >
                       <ShoppingBag size={15} className="shrink-0" />
                       <span className="truncate">{isAmharic ? "ወደ ቅርጫት" : "Add to Cart"}</span>
@@ -499,7 +499,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                       fullWidth
                       size="md"
                       onClick={handleBuyNow}
-                      className="bg-[#C5A059] hover:bg-[#B38F4B] text-white font-medium py-3 px-2 sm:px-4 text-xs sm:text-sm rounded-xl flex items-center justify-center"
+                      className="bg-[#D4AF37] hover:bg-[#B4942E] text-[#111827] font-bold py-3 px-2 sm:px-4 text-xs sm:text-sm rounded-xl flex items-center justify-center"
                     >
                       <span className="truncate">{isAmharic ? "አሁን ይግዙ" : "Buy Now"}</span>
                     </Button>
@@ -525,7 +525,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             </div>
 
             {/* Features */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 p-3 sm:p-4 bg-slate-50 rounded-2xl border border-slate-100 w-full min-w-0">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 p-3 sm:p-4 bg-white rounded-2xl border border-[#E5DFD7] w-full min-w-0">
               <div className="text-center min-w-0">
                 <Truck size={18} className="mx-auto mb-1 text-slate-600" />
                 <span className="text-[11px] sm:text-xs text-slate-600 block truncate">
@@ -553,9 +553,9 @@ export default function ProductPage({ params }: ProductPageProps) {
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <section className="mt-16 pt-12 border-t border-slate-200">
-            <h2 className="text-2xl font-bold text-slate-900 mb-8">
-              You May Also Like
+          <section className="mt-16 pt-12 border-t border-[#E5DFD7]">
+            <h2 className="text-2xl font-bold font-serif text-[#111827] mb-8">
+              {isAmharic ? "ተመሳሳይ ምርቶች" : "You May Also Like"}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
               {relatedProducts.map((relatedProduct) => (

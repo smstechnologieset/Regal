@@ -35,7 +35,7 @@ export default function CatalogClient() {
         { id: 'toys', name: ' Toys', icon: Smile, color: 'text-amber-700', bg: 'bg-amber-50' },
         { id: 'journals', name: 'Journals', icon: BookOpen, color: 'text-indigo-700', bg: 'bg-indigo-50' },
         { id: 'catering', name: 'Catering', icon: UtensilsCrossed, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-        { id: 'gifts', name: 'Gift Packages', icon: Gift, color: 'text-purple-600', bg: 'bg-purple-50' },
+        { id: 'gifts', name: 'Gift Packages', icon: Gift, color: 'text-[#1E3A8A]', bg: 'bg-[#1E3A8A]/10' },
         { id: 'bridal', name: 'Bridal', icon: Heart, color: 'text-pink-600', bg: 'bg-pink-50' },
         { id: 'events', name: 'Events', icon: Calendar, color: 'text-amber-600', bg: 'bg-amber-50' },
         { id: 'promocodes', name: 'Promo Codes', icon: Tag, color: 'text-blue-600', bg: 'bg-blue-50' },

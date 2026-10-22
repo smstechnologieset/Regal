@@ -183,7 +183,7 @@ export default function AccountLayout({
               {/* User Info */}
               <div className="p-6 border-b border-slate-100">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#1E3A8A] to-[#0B192C] border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] text-xl font-bold shadow-xs">
                     {profile?.full_name?.charAt(0) || "U"}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -200,7 +200,7 @@ export default function AccountLayout({
                 {isAdmin && (
                   <Link
                     href="/admin"
-                    className="mt-4 flex items-center justify-between p-3 bg-primary text-white rounded-lg hover:bg-slate-800 transition-colors"
+                    className="mt-4 flex items-center justify-between p-3 bg-primary text-white rounded-lg hover:bg-[#1E3A8A] transition-colors"
                   >
                     <span className="flex items-center gap-2">
                       <LayoutDashboard size={18} />
@@ -221,14 +221,14 @@ export default function AccountLayout({
                         <Link
                           href={item.href}
                           className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                            ? "bg-rose-50 text-rose-700 font-medium"
-                            : "text-slate-600 hover:bg-slate-50 hover:text-primary"
+                            ? "bg-[#1E3A8A]/10 text-[#1E3A8A] font-semibold"
+                            : "text-slate-600 hover:bg-[#F9F8F6] hover:text-primary"
                             }`}
                         >
                           <item.icon size={20} />
                           <span className="flex-1">{item.name}</span>
                           {item.name === "Messages" && unreadMessageCount > 0 && (
-                            <span className="bg-secondary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                            <span className="bg-[#D4AF37] text-[#111827] text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
                               {unreadMessageCount}
                             </span>
                           )}

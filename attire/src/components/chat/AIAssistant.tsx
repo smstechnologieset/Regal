@@ -160,10 +160,10 @@ export default function AIAssistant() {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-14 h-14 sm:w-16 sm:h-16 bg-[#4A5D4E] text-[#FDFBF7] rounded-full shadow-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50 group border-2 border-[#C5A059]/40 cursor-pointer"
+                className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-14 h-14 sm:w-16 sm:h-16 bg-[#1E3A8A] text-[#F4F1EA] rounded-full shadow-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50 group border-2 border-[#D4AF37]/50 cursor-pointer"
                 aria-label="Open AI Assistant"
             >
-                <div className="absolute inset-0 rounded-full animate-ping bg-[#4A5D4E]/20 scale-125" />
+                <div className="absolute inset-0 rounded-full animate-ping bg-[#1E3A8A]/20 scale-125" />
                 <MessageCircle size={26} className="group-hover:rotate-12 transition-transform" />
             </button>
         );
@@ -173,34 +173,34 @@ export default function AIAssistant() {
         <>
             {/* Mobile Backdrop */}
             <div
-                className="fixed inset-0 bg-black/50 backdrop-blur-xs z-[998] sm:hidden animate-fade-in"
+                className="fixed inset-0 bg-[#0B192C]/60 backdrop-blur-xs z-[998] sm:hidden animate-fade-in"
                 onClick={() => setIsOpen(false)}
             />
 
             {/* Chat Drawer / Window */}
             <div className="fixed inset-x-0 bottom-0 sm:inset-x-auto sm:bottom-6 sm:right-6 z-[999] flex flex-col transition-all duration-300 w-full sm:w-[420px] h-[90dvh] sm:h-[600px] sm:max-h-[640px] px-0 sm:px-0">
-                <div className="bg-[#FDFBF7] rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#E0D6C8] overflow-hidden flex flex-col h-full animate-slide-up">
+                <div className="bg-[#F9F8F6] rounded-t-3xl sm:rounded-3xl shadow-2xl border border-[#E5DFD7] overflow-hidden flex flex-col h-full animate-slide-up">
                     {/* Header */}
-                    <div className="bg-[#4A5D4E] px-4 py-3 sm:py-3.5 flex flex-col text-[#FDFBF7] shrink-0">
+                    <div className="bg-[#0B192C] px-4 py-3 sm:py-3.5 flex flex-col text-[#F4F1EA] shrink-0 border-b border-[#D4AF37]/20">
                         {/* Mobile Grab Pill */}
                         <div className="w-10 h-1 bg-white/30 rounded-full mx-auto mb-2 sm:hidden" />
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-full bg-white/10 p-1 flex items-center justify-center backdrop-blur-md border border-[#C5A059]/30">
+                                <div className="w-9 h-9 rounded-full bg-white/10 p-1 flex items-center justify-center backdrop-blur-md border border-[#D4AF37]/40">
                                     <Image src="/Logo-bg.png" alt="Regal AI" width={24} height={24} className="object-contain" />
                                 </div>
                                 <div>
                                     <h3 className="font-serif font-bold text-sm tracking-wide">REGAL Assistant</h3>
                                     <div className="flex items-center gap-1.5">
                                         <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                                        <span className="text-[10px] text-[#FDFBF7]/70 uppercase tracking-widest font-semibold">Online</span>
+                                        <span className="text-[10px] text-[#F4F1EA]/70 uppercase tracking-widest font-semibold">Online</span>
                                     </div>
                                 </div>
                             </div>
                             <div className="flex items-center gap-1">
                                 <button
                                     onClick={() => setIsOpen(false)}
-                                    className="p-2 sm:p-1.5 hover:bg-white/10 active:bg-white/20 rounded-full transition-colors text-[#FDFBF7] cursor-pointer"
+                                    className="p-2 sm:p-1.5 hover:bg-white/10 active:bg-white/20 rounded-full transition-colors text-[#F4F1EA] cursor-pointer"
                                     aria-label="Close"
                                 >
                                     <X size={20} />
@@ -210,7 +210,7 @@ export default function AIAssistant() {
                     </div>
 
                     {/* Messages Area */}
-                    <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-4 bg-[#FDFBF7]/60">
+                    <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-4 bg-[#F9F8F6]/60">
                         {messages.map((msg) => (
                             <div
                                 key={msg.id}
@@ -218,28 +218,28 @@ export default function AIAssistant() {
                             >
                                 <div className={`flex gap-2 max-w-[90%] sm:max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                                     <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 border ${
-                                        msg.role === 'user' ? 'bg-[#C5A059] text-[#2B2D2F]' : 'bg-white text-[#4A5D4E] border-[#E0D6C8]'
+                                        msg.role === 'user' ? 'bg-[#D4AF37] text-[#111827]' : 'bg-white text-[#1E3A8A] border-[#E5DFD7]'
                                     } shadow-2xs text-xs font-bold`}>
                                         {msg.role === 'user' ? <User size={13} /> : <Bot size={13} />}
                                     </div>
                                     <div className="space-y-2">
                                         <div className={`rounded-2xl p-3 shadow-2xs ${
                                             msg.role === 'user'
-                                                ? 'bg-[#4A5D4E] text-[#FDFBF7] rounded-tr-none'
-                                                : 'bg-white border border-[#E0D6C8] text-[#2B2D2F] rounded-tl-none'
+                                                ? 'bg-[#1E3A8A] text-[#F4F1EA] rounded-tr-none'
+                                                : 'bg-white border border-[#E5DFD7] text-[#111827] rounded-tl-none'
                                         }`}>
                                             <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-line">{stripMarkdownLinks(msg.content).trim()}</p>
                                         </div>
 
                                         {/* Links/Quick Actions */}
                                         {msg.links && msg.links.length > 0 && (
-                                            <div className="flex flex-wrap gap-1.5 pt-0.5">
+                                             <div className="flex flex-wrap gap-1.5 pt-0.5">
                                                 {msg.links.map((link, idx) => (
                                                     <Link
                                                         key={idx}
                                                         href={link.url}
                                                         onClick={() => setIsOpen(false)}
-                                                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-[#E0D6C8] rounded-full text-[11px] font-semibold text-[#4A5D4E] hover:border-[#C5A059] hover:text-[#C5A059] transition-all shadow-2xs cursor-pointer"
+                                                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-[#E5DFD7] rounded-full text-[11px] font-semibold text-[#1E3A8A] hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all shadow-2xs cursor-pointer"
                                                     >
                                                         {link.label} <ArrowRight size={10} />
                                                     </Link>
@@ -252,9 +252,9 @@ export default function AIAssistant() {
                         ))}
                         {isLoading && (
                             <div className="flex justify-start animate-fade-in">
-                                <div className="flex gap-2 items-center text-[#2B2D2F]/50">
-                                    <div className="w-7 h-7 rounded-full bg-white border border-[#E0D6C8] flex items-center justify-center">
-                                        <Loader2 className="animate-spin text-[#4A5D4E]" size={13} />
+                                <div className="flex gap-2 items-center text-[#111827]/50">
+                                    <div className="w-7 h-7 rounded-full bg-white border border-[#E5DFD7] flex items-center justify-center">
+                                        <Loader2 className="animate-spin text-[#1E3A8A]" size={13} />
                                     </div>
                                     <span className="text-[10px] font-bold uppercase tracking-wider">
                                         {isAmharic ? "እየፈለገ ነው..." : "Thinking..."}
@@ -267,13 +267,13 @@ export default function AIAssistant() {
 
                     {/* Suggestions */}
                     {!isLoading && messages.length <= 3 && quickSuggestions.length > 0 && (
-                        <div className="px-3 py-2 bg-white border-t border-[#E0D6C8] overflow-x-auto whitespace-nowrap scrollbar-hide">
+                        <div className="px-3 py-2 bg-white border-t border-[#E5DFD7] overflow-x-auto whitespace-nowrap scrollbar-hide">
                             <div className="flex gap-1.5">
                                 {quickSuggestions.map((suggestion) => (
                                     <button
                                         key={suggestion}
                                         onClick={() => handleSend(undefined, suggestion)}
-                                        className="px-2.5 py-1 bg-[#FDFBF7] border border-[#E0D6C8] rounded-full text-[11px] font-medium text-[#2B2D2F]/80 hover:border-[#4A5D4E] hover:text-[#4A5D4E] transition-all cursor-pointer"
+                                        className="px-2.5 py-1 bg-[#F9F8F6] border border-[#E5DFD7] rounded-full text-[11px] font-medium text-[#111827]/80 hover:border-[#1E3A8A] hover:text-[#1E3A8A] transition-all cursor-pointer"
                                     >
                                         {suggestion}
                                     </button>
@@ -283,20 +283,20 @@ export default function AIAssistant() {
                     )}
 
                     {/* Input Area */}
-                    <form onSubmit={handleSend} className="p-3 bg-white border-t border-[#E0D6C8] pb-safe sm:pb-3">
-                        <div className="flex gap-2 bg-[#F4EFEA] rounded-2xl p-1.5 items-center focus-within:bg-white focus-within:ring-2 focus-within:ring-[#4A5D4E]/20 transition-all border border-transparent focus-within:border-[#4A5D4E]/30">
+                    <form onSubmit={handleSend} className="p-3 bg-white border-t border-[#E5DFD7] pb-safe sm:pb-3">
+                        <div className="flex gap-2 bg-[#F4EFEA] rounded-2xl p-1.5 items-center focus-within:bg-white focus-within:ring-2 focus-within:ring-[#1E3A8A]/20 transition-all border border-transparent focus-within:border-[#1E3A8A]/30">
                             <input
                                 type="text"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 placeholder={isAmharic ? "ስለ ሬጋል ይጠይቁ..." : "Ask anything about Regal..."}
-                                className="flex-1 bg-transparent border-none focus:ring-0 text-xs sm:text-sm px-2 text-[#2B2D2F] placeholder:text-[#2B2D2F]/40 outline-none"
+                                className="flex-1 bg-transparent border-none focus:ring-0 text-xs sm:text-sm px-2 text-[#111827] placeholder:text-[#111827]/40 outline-none"
                                 disabled={isLoading}
                             />
                             <button
                                 type="submit"
                                 disabled={!input.trim() || isLoading}
-                                className="w-9 h-9 bg-[#4A5D4E] text-[#FDFBF7] rounded-xl flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#38463B] transition-colors shadow-xs shrink-0 cursor-pointer"
+                                className="w-9 h-9 bg-[#1E3A8A] text-[#F4F1EA] rounded-xl flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#172554] transition-colors shadow-xs shrink-0 cursor-pointer"
                                 aria-label="Send message"
                             >
                                 <Send size={15} />

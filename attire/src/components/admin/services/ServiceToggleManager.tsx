@@ -90,7 +90,7 @@ export default function ServiceToggleManager() {
       {/* Top Header Card */}
       <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#4A5D4E]/10 border border-[#4A5D4E]/20 text-[#4A5D4E] text-xs font-semibold uppercase tracking-wider mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1E3A8A]/10 border border-[#1E3A8A]/20 text-[#1E3A8A] text-xs font-semibold uppercase tracking-wider mb-2">
             <Sparkles size={13} />
             <span>Service Visibility Engine</span>
           </div>
@@ -151,7 +151,7 @@ export default function ServiceToggleManager() {
                   <div
                     className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
                       isEnabled
-                        ? 'bg-[#4A5D4E]/10 text-[#4A5D4E]'
+                        ? 'bg-[#1E3A8A]/10 text-[#1E3A8A]'
                         : 'bg-slate-200 text-slate-400'
                     }`}
                   >
@@ -181,8 +181,8 @@ export default function ServiceToggleManager() {
                   aria-checked={isEnabled}
                   disabled={isUpdating}
                   onClick={() => handleToggle(svc)}
-                  className={`relative inline-flex h-7 w-13 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#4A5D4E] focus:ring-offset-2 ${
-                    isEnabled ? 'bg-[#4A5D4E]' : 'bg-slate-300'
+                  className={`relative inline-flex h-7 w-13 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#1E3A8A] focus:ring-offset-2 ${
+                    isEnabled ? 'bg-[#1E3A8A]' : 'bg-slate-300'
                   } ${isUpdating ? 'opacity-60 cursor-wait' : ''}`}
                 >
                   <span
@@ -208,7 +208,7 @@ export default function ServiceToggleManager() {
                   <Link
                     href={svc.href}
                     target="_blank"
-                    className="inline-flex items-center gap-1 text-[#4A5D4E] hover:underline font-medium"
+                    className="inline-flex items-center gap-1 text-[#1E3A8A] hover:underline font-medium"
                   >
                     <span>Preview page</span>
                     <ExternalLink size={12} />

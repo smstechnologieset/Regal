@@ -171,12 +171,12 @@ export default function GiftPackagesManager() {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search gift packages..."
-                        className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                        className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A]"
                     />
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+                    className="flex items-center gap-2 bg-[#1E3A8A] text-white px-4 py-2 rounded-lg hover:bg-[#172554] transition-colors"
                 >
                     <Plus size={18} />
                     Add Gift Package
@@ -197,16 +197,16 @@ export default function GiftPackagesManager() {
                         )
                         .map((pkg) => (
                         <div key={pkg.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all group">
-                            <div className="aspect-video bg-purple-50 relative">
+                            <div className="aspect-video bg-[#1E3A8A]/5 relative">
                                 {pkg.image ? (
                                     <img src={pkg.image} alt={pkg.name} className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-purple-200">
+                                    <div className="w-full h-full flex items-center justify-center text-[#1E3A8A]/30">
                                         <Gift size={40} />
                                     </div>
                                 )}
                                 <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => handleOpenModal(pkg)} className="p-2 bg-white rounded-lg shadow-sm text-slate-600 hover:text-purple-600">
+                                    <button onClick={() => handleOpenModal(pkg)} className="p-2 bg-white rounded-lg shadow-sm text-slate-600 hover:text-[#1E3A8A]">
                                         <Edit2 size={16} />
                                     </button>
                                     <button onClick={() => handleDelete(pkg.id)} className="p-2 bg-white rounded-lg shadow-sm text-slate-600 hover:text-red-600">
@@ -214,13 +214,13 @@ export default function GiftPackagesManager() {
                                     </button>
                                 </div>
                                 <div className="absolute bottom-2 left-2">
-                                    <span className="text-[10px] px-2 py-0.5 bg-white/90 text-purple-700 rounded-full font-bold uppercase tracking-wider backdrop-blur-sm shadow-sm">{pkg.category}</span>
+                                    <span className="text-[10px] px-2 py-0.5 bg-white/90 text-[#1E3A8A] rounded-full font-bold uppercase tracking-wider backdrop-blur-sm shadow-sm">{pkg.category}</span>
                                 </div>
                             </div>
                             <div className="p-5">
                                 <div className="flex justify-between items-start mb-2">
-                                    <h3 className="font-bold text-primary truncate pr-2">{pkg.name}</h3>
-                                    <span className="text-purple-600 font-bold">ETB {pkg.price}</span>
+                                    <h3 className="font-bold text-[#111827] truncate pr-2">{pkg.name}</h3>
+                                    <span className="text-[#1E3A8A] font-bold">ETB {pkg.price}</span>
                                 </div>
                                 <p className="text-xs text-slate-500 mb-4 line-clamp-2">{pkg.description}</p>
                                 <div className="space-y-2">
@@ -261,21 +261,21 @@ export default function GiftPackagesManager() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="col-span-2 space-y-1">
                                     <label className="text-sm font-medium text-slate-700">Package Name</label>
-                                    <input required type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500/20 outline-none" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+                                    <input required type="text" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#1E3A8A]/20 outline-none" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
                                 </div>
                                 <div className="space-y-1">
                                     <label className="text-sm font-medium text-slate-700">Category</label>
-                                    <select required className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500/20 outline-none" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
+                                    <select required className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#1E3A8A]/20 outline-none" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
                                         {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-medium text-slate-700">Price ($)</label>
-                                    <input required type="number" step="0.01" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500/20 outline-none" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
+                                    <label className="text-sm font-medium text-slate-700">Price (ETB)</label>
+                                    <input required type="number" step="0.01" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#1E3A8A]/20 outline-none" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} />
                                 </div>
                                 <div className="col-span-2 space-y-1">
                                     <label className="text-sm font-medium text-slate-700">Description</label>
-                                    <textarea rows={2} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-purple-500/20 outline-none" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+                                    <textarea rows={2} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#1E3A8A]/20 outline-none" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
                                 </div>
                                 <div className="col-span-2 space-y-1">
                                     <label className="text-sm font-medium text-slate-700">What's Inside (Contents)</label>
@@ -284,7 +284,7 @@ export default function GiftPackagesManager() {
                                             <input
                                                 type="text"
                                                 placeholder="Add an item (e.g. Personalized Card)"
-                                                className="flex-1 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                                                className="flex-1 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A]"
                                                 value={contentInput}
                                                 onChange={(e) => setContentInput(e.target.value)}
                                                 onKeyDown={handleContentKeyDown}
@@ -304,13 +304,13 @@ export default function GiftPackagesManager() {
                                                 form.contents.map((item, index) => (
                                                     <div
                                                         key={index}
-                                                        className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-700 border border-purple-100 rounded-full text-sm font-medium animate-in fade-in zoom-in duration-200"
+                                                        className="flex items-center gap-1.5 px-3 py-1 bg-[#1E3A8A]/10 text-[#1E3A8A] border border-[#1E3A8A]/20 rounded-full text-sm font-medium animate-in fade-in zoom-in duration-200"
                                                     >
                                                         {item}
                                                         <button
                                                             type="button"
                                                             onClick={() => removeContentItem(item)}
-                                                            className="hover:text-purple-900 transition-colors"
+                                                            className="hover:text-[#0B192C] transition-colors"
                                                         >
                                                             <X size={14} />
                                                         </button>
@@ -330,7 +330,7 @@ export default function GiftPackagesManager() {
                                     <input
                                         type="text"
                                         placeholder="Or paste an image URL..."
-                                        className="w-full mt-2 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-sm"
+                                        className="w-full mt-2 px-4 py-2 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-[#1E3A8A]/20 focus:border-[#1E3A8A] text-sm"
                                         value={form.image}
                                         onChange={(e) => setForm({ ...form, image: e.target.value })}
                                     />
@@ -339,7 +339,7 @@ export default function GiftPackagesManager() {
 
                             <div className="pt-4 flex gap-3">
                                 <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors font-medium">Cancel</button>
-                                <button disabled={submitting} type="submit" className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 font-medium">
+                                <button disabled={submitting} type="submit" className="flex-1 px-4 py-2 bg-[#1E3A8A] text-white rounded-lg hover:bg-[#172554] transition-colors flex items-center justify-center gap-2 font-medium">
                                     {submitting && <Loader2 size={18} className="animate-spin" />}
                                     {editingItem ? 'Update' : 'Create'}
                                 </button>

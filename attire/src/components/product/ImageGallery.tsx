@@ -52,7 +52,7 @@ export default function ImageGallery({ images, productName }: ImageGalleryProps)
                             className={cn(
                                 'shrink-0 w-14 h-16 sm:w-16 sm:h-20 lg:w-20 lg:h-24 rounded-xl overflow-hidden border-2 transition-all cursor-pointer relative',
                                 selectedIndex === index
-                                    ? 'border-[#4A5D4E] ring-2 ring-[#4A5D4E]/30 scale-102'
+                                    ? 'border-[#1E3A8A] ring-2 ring-[#1E3A8A]/30 scale-102'
                                     : 'border-slate-200 hover:border-slate-400 opacity-60 hover:opacity-100'
                             )}
                         >

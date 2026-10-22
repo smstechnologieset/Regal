@@ -319,8 +319,8 @@ export default function AdminOrdersClient() {
 
             {/* Bulk Actions Floating Row */}
             {selectedOrders.length > 0 && (
-              <div className="flex items-center justify-between bg-[#F4EFEA] border border-[#E0D6C8] px-4 py-2.5 rounded-lg animate-fade-in text-sm">
-                <div className="flex items-center gap-2 text-[#4A5D4E] font-medium">
+              <div className="flex items-center justify-between bg-[#F4EFEA] border border-[#E5DFD7] px-4 py-2.5 rounded-lg animate-fade-in text-sm">
+                <div className="flex items-center gap-2 text-[#1E3A8A] font-medium">
                   <CheckSquare size={16} />
                   <span>
                     <strong>{selectedOrders.length}</strong> order
@@ -388,7 +388,7 @@ export default function AdminOrdersClient() {
                         <tr
                           key={order.id}
                           className={cn(
-                            "hover:bg-[#FDFBF7] transition-colors",
+                            "hover:bg-[#F9F8F6] transition-colors",
                             isSelected && "bg-[#F4EFEA]/60"
                           )}
                         >
